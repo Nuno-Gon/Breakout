@@ -1,9 +1,13 @@
 #include <tchar.h>
 #include <Windows.h>
 #include <io.h>
+#include <iostream>
 #include <stdio.h>
 #include <fcntl.h>
 #include <time.h>
+#include "Jogo.h"
+
+using namespace std;
 
 int _tmain(int argc, LPTSTR argv[]) {
 
@@ -13,7 +17,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif
 
-	_tprintf(TEXT("Olá Mundo!"));
+	JOGO jogo;
 
-	_gettchar(); //pause
+	_tprintf(TEXT("Olá Mundo!"));
+	_gettchar();
 }
