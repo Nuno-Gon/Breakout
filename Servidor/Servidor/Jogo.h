@@ -27,3 +27,5 @@ typedef struct TIJOLO {
 typedef struct BRINDE {
 
 }BRINDE;
+
+//Criar cpp e h para brinde/barreira/tijolo/brinde
