@@ -18,15 +18,9 @@
     <ClCompile Include="Servidor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Jogo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Jogo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Utilizadores.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

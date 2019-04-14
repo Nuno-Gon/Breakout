@@ -5,9 +5,14 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <time.h>
-#include "Jogo.h"
+#include <thread>
+
+#include "..\Dll\dll.h"
 
 using namespace std;
+
+//Listagem de Funções
+
 
 int _tmain(int argc, LPTSTR argv[]) {
 
@@ -17,16 +22,11 @@ int _tmain(int argc, LPTSTR argv[]) {
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif 
 	
-	HMODULE dll = LoadLibrary(L"");
-	if (NULL != dll) {
 
-	}
-	else {
-		cout << "";
+	while (1){
+		
 	}
 
-	JOGO jogo;
-
-	_tprintf(TEXT("Olá Mundo!"));
+	_tprintf(TEXT("\Terminei!\n"));
 	_gettchar();
 }
