@@ -6,3 +6,7 @@
 char ponteiro[40960];
 
 //definição da varíavel global
+int nDLL = 1234;
+
+//Funções (por ordem de declaração)
+

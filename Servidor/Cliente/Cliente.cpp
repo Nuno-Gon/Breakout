@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include "..\Dll\dll.h"
-#define PIPE_NAME TEXT("\\\\.\\pipe\\conect")
+#define PIPE_NAME TEXT("\\\\.\\pipe\\connect")
 
 
 //Prototipos para Cliente
@@ -28,7 +28,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	//Ciclo para começar a lidar com informações, connectar serv, lidar com a informação
 	while (1) {
-
 		
 
 	}

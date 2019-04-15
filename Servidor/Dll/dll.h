@@ -19,6 +19,7 @@ HANDLE podeLer;
 //Estruturas
 
 
+
 #ifdef DLL_EXPORTS
 #define DLL_IMP_API __declspec(dllexport)
 #else
@@ -30,10 +31,7 @@ extern "C"
 	//Váriavel global da DLL
 	extern DLL_IMP_API int nDLL;
 
-	DLL_IMP_API void createSharedMemery(dataCr *d);
-	DLL_IMP_API void openSharedMemery(dataCr *d);
-	DLL_IMP_API void writeMensagem(dataCr* d, COMANDO_SAHRED *comando);
-	DLL_IMP_API void readMensagen(dataCr* d, COMANDO_SAHRED * s);
+	//Protótipos Funções
 
 
 }
