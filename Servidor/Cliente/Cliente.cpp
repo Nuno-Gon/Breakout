@@ -1,51 +1,62 @@
-//Includes
-#include <windows.h>
-#include <stdio.h>
-#include "..\Dll\dll.h"
-#define PIPE_NAME TEXT("\\\\.\\pipe\\connect")
-
+#include "Cliente.h"
 
 //Prototipos para Cliente
+void createPipeCliente();
 
+
+//VARIAVEIS GLOBAIS
 HANDLE hpipe;
-void CreatePipeCliente();
 BOOL login = false;
+scores ranking;
+int pontosPlayer = 0;
 
 
 
 //FUNÇÕES
 //Função Principal!
-/* 
-	docs.microsoft.com/en-us/windows/desktop/learnwin32/winmain--the-application-entry-point
-	Every Windows program includes an entry-point function that is named either WinMain or wWinMain. Here is the signature for wWinMain.
-	int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow);
-*/
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPWSTR    lpCmdLine,
-	_In_ int       nCmdShow) {
+int _tmain(int argc, LPTSTR argv[]) {
 
+	//Project Properties > Character Set > Use Unicode Character Set
+#ifdef UNICODE
+	_setmode(_fileno(stdin), _O_WTEXT);
+	_setmode(_fileno(stdout), _O_WTEXT);
+#endif 
 
-	//Ciclo para começar a lidar com informações, connectar serv, lidar com a informação
-	while (1) {
-		
+	createPipeCliente();
 
-	}
+	
 
-
+	_tprintf(TEXT("\Terminei!\n"));
+	_gettchar();
 }
+
 
 // **** PIPES ****
 //Criar Pipe
-void CreatePipeCliente() {
+void createPipeCliente() {
+	_tprintf(TEXT("[LEITOR] Esperar pelo pipe '%s' (WaitNamedPipe)\n"), PIPE_NAME);
+	/*
+	BOOL WaitNamedPipeA(
+		LPCSTR lpNamedPipeName,
+		DWORD  nTimeOut
+	);
+	*/
+	if (!WaitNamedPipe(PIPE_NAME, NMPWAIT_WAIT_FOREVER)) {
+		_tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (WaitNamedPipe)\n"), PIPE_NAME);
+		exit(-1);
+	}
+
+	_tprintf(TEXT("[LEITOR] Ligação ao pipe do escritor... (CreateFile)\n"));
+
+
 }
 
 //Guardar TOP10 no Registo
-void escreveRegestry() {
+void escreveRegistry() {
 
 }
 
-void leRegestry() {
+void leRegistry() {
 
 }
 

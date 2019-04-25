@@ -42,10 +42,13 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 
 DWORD WINAPI aceita_cliente(LPVOID param) {
 
+
+	return;
 }
 
 BOOL existePlayer() {
 
+	return true;
 }
 
 void inicia_vetor_clientes() {

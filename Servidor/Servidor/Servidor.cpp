@@ -12,7 +12,20 @@
 using namespace std;
 
 //Listagem de Funções
+//Threads
+DWORD WINAPI readMensagemMemory(void);
 
+
+// Outras Funções
+void trataComando(COMANDO_SHARED comando);
+
+
+
+//Variaveis Globais
+INT acabar;
+dataCr memoriaPartilhadaServidor;
+COMANDO_SHARED comandoLido;
+BOOL loginPlayer = FALSE;
 
 int _tmain(int argc, LPTSTR argv[]) {
 
@@ -23,10 +36,42 @@ int _tmain(int argc, LPTSTR argv[]) {
 #endif 
 	
 
+
+	//openSharedMemory(&memoriaPartilhadaServidor);
+
 	while (1){
-		
+		acabar = 0;
 	}
 
 	_tprintf(TEXT("\Terminei!\n"));
 	_gettchar();
+}
+
+//THREADS
+//Lê mensagens da Memória
+DWORD WINAPI readMensagemMemory(void) {
+	while (1) {
+		readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
+		trataComando(comandoLido);
+	}
+	return 0;
+}
+
+
+
+//Outras Funções
+void trataComando(COMANDO_SHARED comando) {
+	int id = 0;
+	Player aux;
+
+	//Outros tipos de comando
+
+	switch (comando.tipo) {
+	case CMD_LOGIN:
+		_tprintf(TEXT("\n New User Login:"));
+		loginPlayer = TRUE;
+		break;
+	}
+
+	return;
 }
