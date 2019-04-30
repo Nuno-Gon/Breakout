@@ -45,7 +45,6 @@ typedef struct {
 	Dados * shared;
 	HANDLE hSemafroPodeEscrever;
 	HANDLE hSemafroPodeLer;
-
 }dataCr;
 
 typedef struct {

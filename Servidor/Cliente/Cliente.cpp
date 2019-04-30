@@ -2,6 +2,7 @@
 
 //Prototipos para Cliente
 void createPipeCliente();
+void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam);
 
 
 //VARIAVEIS GLOBAIS
@@ -9,6 +10,7 @@ HANDLE hpipe;
 BOOL login = false;
 scores ranking;
 int pontosPlayer = 0;
+TCHAR nomePlayer[100] = TEXT(" ");
 
 
 
@@ -22,12 +24,43 @@ int _tmain(int argc, LPTSTR argv[]) {
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif 
 
+	//PIPE
 	createPipeCliente();
+	DWORD mode = PIPE_READMODE_MESSAGE;
+	SetNamedPipeHandleState(hpipe, &mode, NULL, NULL);
 
+	//Login
+	TCHAR buf[256];
+
+	COMANDO_SHARED comando;
+	HANDLE ioReady;
+	OVERLAPPED ov;
+	DWORD tam = 0;
+
+	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	do {
+		_tprintf("Nome utilizador: ");
+		_fgetts(buf, 256, stdin);
+		comando.idUser = 0;
+		comando.tipo = CMD_LOGIN;
+		comando.idHandle = hpipe;
+
+
+		escrevePipe(comando, ioReady, ov, tam);
+		login = true;
+	} while (login == false);
+	
+	_tprintf(TEXT("FIZ LOGIN!\n"));
 	
 
+	
+	while (1) {
+
+	}
+
 	_tprintf(TEXT("\Terminei!\n"));
-	_gettchar();
+	//_gettchar();
 }
 
 
@@ -43,13 +76,53 @@ void createPipeCliente() {
 	*/
 	if (!WaitNamedPipe(PIPE_NAME, NMPWAIT_WAIT_FOREVER)) {
 		_tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (WaitNamedPipe)\n"), PIPE_NAME);
-		exit(-1);
+		//exit(-1);
 	}
 
 	_tprintf(TEXT("[LEITOR] Ligação ao pipe do escritor... (CreateFile)\n"));
+	/*
+	HANDLE CreateFileA(
+		LPCSTR                lpFileName,
+		DWORD                 dwDesiredAccess,
+		DWORD                 dwShareMode,
+		LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+		DWORD                 dwCreationDisposition,
+		DWORD                 dwFlagsAndAttributes,
+		HANDLE                hTemplateFile
+	);
+	*/
+	hpipe = CreateFile(PIPE_NAME, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0 | FILE_FLAG_OVERLAPPED, NULL);
+	if (hpipe == NULL) {
+		_tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (CreateFile)\n"), PIPE_NAME);
+		//exit(-1);
+	}
 
+	_tprintf(TEXT("[LEITOR] Liguei-me...\n"));
 
 }
+
+//Escreve Pipe
+void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam) {
+
+	if (!WriteFile(hpipe, &comando, sizeof(COMANDO_SHARED), &tam, &ov)) {
+		_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+		exit(-1);
+	}
+
+	WaitForSingleObject(ioReady, INFINITE);
+	/*
+	BOOL GetOverlappedResult(
+		HANDLE       hFile,
+		LPOVERLAPPED lpOverlapped,
+		LPDWORD      lpNumberOfBytesTransferred,
+		BOOL         bWait
+	);
+	*/
+	GetOverlappedResult(hpipe, &ov, &tam, FALSE);
+	_tprintf(TEXT("[ESCRITOR] Enviei %d bytes ao pipe ...\n"), tam);
+}
+
+
 
 //Guardar TOP10 no Registo
 void escreveRegistry() {

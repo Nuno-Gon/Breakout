@@ -60,6 +60,6 @@ void writeMensagem(dataCr* d, COMANDO_SHARED * s) {
 	CopyMemory(&d->shared->PtrMemoria[d->posE], s, sizeof(COMANDO_SHARED));
 
 	ReleaseMutex(hMutexEscrever);
-	ReleaseSemaphore(d->hSemafroPodeLer);
+	//ReleaseSemaphore(d->hSemafroPodeLer);
 
 }

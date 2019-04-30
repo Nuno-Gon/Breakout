@@ -15,11 +15,8 @@ using namespace std;
 //Threads
 DWORD WINAPI readMensagemMemory(void);
 
-
 // Outras Funções
 void trataComando(COMANDO_SHARED comando);
-
-
 
 //Variaveis Globais
 INT acabar;
@@ -35,8 +32,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif 
 	
-
-
+	_tprintf(TEXT("\Servidor Ligado!\n"));
 	//openSharedMemory(&memoriaPartilhadaServidor);
 
 	while (1){
@@ -44,10 +40,10 @@ int _tmain(int argc, LPTSTR argv[]) {
 	}
 
 	_tprintf(TEXT("\Terminei!\n"));
-	_gettchar();
 }
 
 //THREADS
+/*
 //Lê mensagens da Memória
 DWORD WINAPI readMensagemMemory(void) {
 	while (1) {
@@ -75,3 +71,4 @@ void trataComando(COMANDO_SHARED comando) {
 
 	return;
 }
+*/
