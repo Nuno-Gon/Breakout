@@ -13,10 +13,10 @@ using namespace std;
 
 //Listagem de Funções
 //Threads
-//DWORD WINAPI readMensagemMemory(void);
+DWORD WINAPI readMensagemMemory(void);
 
 // Outras Funções
-//void trataComando(COMANDO_SHARED comando);
+void trataComando(COMANDO_SHARED comando);
 
 //Variaveis Globais
 INT acabar;
@@ -34,10 +34,10 @@ int _tmain(int argc, LPTSTR argv[]) {
 #endif 
 	
 	_tprintf(TEXT("\Servidor Ligado!\n"));
-	//openSharedMemory(&memoriaPartilhadaServidor);
+	openSharedMemory(&memoriaPartilhadaServidor);
 
 	
-	//thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
+	thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
 	while (1){
 		acabar = 0;
 		
@@ -46,14 +46,15 @@ int _tmain(int argc, LPTSTR argv[]) {
 		
 	}
 	
-	//CloseHandle(thread_read_msg_memory);
+	CloseHandle(thread_read_msg_memory);
 	_tprintf(TEXT("\Terminei!\n"));
 }
 
 //THREADS
-/*
+
 //Lê mensagens da Memória
 DWORD WINAPI readMensagemMemory(void) {
+	_tprintf(TEXT("\Comecei THread ler mensagem!\n"));
 	while (1) {
 		readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
 		trataComando(comandoLido);
@@ -67,7 +68,7 @@ DWORD WINAPI readMensagemMemory(void) {
 void trataComando(COMANDO_SHARED comando) {
 	int id = 0;
 	Player aux;
-
+	_tprintf(TEXT("\n Entrei Tata Comando!\n"));
 
 	if (comando.tipo != CMD_LOGIN) {
 		id = (comando.idUser);
@@ -90,4 +91,3 @@ void trataComando(COMANDO_SHARED comando) {
 	return;
 }
 
-*/

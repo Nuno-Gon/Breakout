@@ -83,7 +83,7 @@ int _tmain(void) {
 	//Processo de Fecho do Gateway
 	_tprintf(TEXT("\nGateway Terminou!\n"));
 	termina = 1;
-	//CloseHandle(thread_cliente);
+	CloseHandle(thread_cliente);
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		DisconnectNamedPipe(cliente[i]);
 		CloseHandle(cliente[i]);
@@ -132,7 +132,7 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 		}
 
 
-	 //writeMensagem(&memoriaPartilhadaGateway, &aux);
+	 writeMensagem(&memoriaPartilhadaGateway, &aux);
 
 	} while (aux.tipo != CMD_LOGOUT);
 
