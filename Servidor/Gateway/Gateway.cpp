@@ -4,7 +4,7 @@
 #include <thread>
 #include <fcntl.h>
 #include <tchar.h>
-
+#include <io.h>
 #include "..\Dll\dll.h"
 
 //Constantes

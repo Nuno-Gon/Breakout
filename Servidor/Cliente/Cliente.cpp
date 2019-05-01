@@ -22,7 +22,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 #ifdef UNICODE
 	_setmode(_fileno(stdin), _O_WTEXT);
 	_setmode(_fileno(stdout), _O_WTEXT);
-#endif 
+#endif
 
 	//PIPE
 	createPipeCliente();
@@ -40,7 +40,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	do {
-		_tprintf("Nome utilizador: ");
+		_tprintf(TEXT("Nome utilizador: "));
 		_fgetts(buf, 256, stdin);
 		comando.idUser = 0;
 		comando.tipo = CMD_LOGIN;

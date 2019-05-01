@@ -4,6 +4,9 @@
 #include <windowsx.h>
 #include <windows.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <io.h>
+#include <tchar.h>
 #include "..\Dll\dll.h"
 
 #define MAX_REGISTO 10
