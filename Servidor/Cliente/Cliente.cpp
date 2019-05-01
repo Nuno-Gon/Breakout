@@ -45,6 +45,9 @@ int _tmain(int argc, LPTSTR argv[]) {
 		comando.idUser = 0;
 		comando.tipo = CMD_LOGIN;
 		comando.idHandle = hpipe;
+		ZeroMemory(&ov, sizeof(ov));
+		ResetEvent(ioReady);
+		ov.hEvent = ioReady;
 
 
 		escrevePipe(comando, ioReady, ov, tam);
@@ -106,7 +109,7 @@ void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD ta
 
 	if (!WriteFile(hpipe, &comando, sizeof(COMANDO_SHARED), &tam, &ov)) {
 		_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
-		exit(-1);
+		//exit(-1);
 	}
 
 	WaitForSingleObject(ioReady, INFINITE);

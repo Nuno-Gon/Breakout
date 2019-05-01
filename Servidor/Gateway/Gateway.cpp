@@ -45,8 +45,35 @@ int _tmain(void) {
 	//Inicializar clientes
 	inicializaVectorClientes();
 	thread_cliente = CreateThread(NULL, 0, aceita_cliente, NULL, 0, NULL);
+	
+	HANDLE ioReady;
+	OVERLAPPED ov;
+	DWORD n;
+	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
+	
 	do {
-		_tprintf(TEXT("."));
+		
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		
+			if (cliente[i] != INVALID_HANDLE_VALUE) {
+				ZeroMemory(&ov, sizeof(ov));
+				ResetEvent(ioReady);
+				ov.hEvent = ioReady;
+
+
+				WaitForSingleObject(ioReady, INFINITE);
+				GetOverlappedResult(cliente[i], &ov, &n, FALSE);
+			}
+		
+
+
+		}
+		
+
+	
+
+
+		//_tprintf(TEXT("."));
 	} while (existePlayer() || login == FALSE);
 
 	//Processo de Fecho do Gateway
@@ -94,7 +121,7 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 		}
 
 
-		writeMensagem(&memoriaPartilhadaGateway, &aux);
+	//	writeMensagem(&memoriaPartilhadaGateway, &aux);
 
 	} while (aux.tipo != CMD_LOGOUT);
 

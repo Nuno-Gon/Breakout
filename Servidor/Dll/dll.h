@@ -60,12 +60,15 @@ typedef struct {
 #define DLL_IMP_API __declspec(dllimport)
 #endif
 
+
 extern "C"
 {
 	//Váriavel global da DLL
 	extern DLL_IMP_API int nDLL;
 
 	//Protótipos Funções
+	DLL_IMP_API void createSharedMemory(dataCr* d);
+	DLL_IMP_API void openSharedMemory(dataCr* d);
 	DLL_IMP_API void readMensagem(dataCr* d, COMANDO_SHARED * s);
 	DLL_IMP_API void writeMensagem(dataCr* d, COMANDO_SHARED * s);
 

@@ -11,7 +11,15 @@ int nDLL = 1234;
 //Funções (por ordem de declaração)
 
 
+void createSharedMemory(dataCr* d) {
+	//Criar memoria partilhada
 
+}
+
+void openSharedMemory(dataCr* d) {
+	//abrir memoria partilhada
+
+}
 
 void readMensagem(dataCr* d, COMANDO_SHARED * s) {
 	
@@ -60,6 +68,6 @@ void writeMensagem(dataCr* d, COMANDO_SHARED * s) {
 	CopyMemory(&d->shared->PtrMemoria[d->posE], s, sizeof(COMANDO_SHARED));
 
 	ReleaseMutex(hMutexEscrever);
-	//ReleaseSemaphore(d->hSemafroPodeLer);
+	ReleaseSemaphore(d->hSemafroPodeLer, 1, NULL);
 
 }
