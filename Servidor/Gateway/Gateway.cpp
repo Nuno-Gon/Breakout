@@ -42,6 +42,10 @@ int _tmain(void) {
 #endif
 	_tprintf(TEXT("Gateway Começou!\n"));
 
+	//Criar Memoria Partilhada
+	createSharedMemory(&memoriaPartilhadaGateway);
+
+
 	//Inicializar clientes
 	inicializaVectorClientes();
 	thread_cliente = CreateThread(NULL, 0, aceita_cliente, NULL, 0, NULL);
@@ -88,6 +92,8 @@ int _tmain(void) {
 	hPipe = CreateFile(PIPE_NAME, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	DisconnectNamedPipe(hPipe);
 	CloseHandle(hPipe);
+	UnmapViewOfFile(memoriaPartilhadaGateway.shared);
+	exit(0);
 }
 
 DWORD WINAPI recebe_comando_cliente(LPVOID param) {
@@ -115,13 +121,18 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 
 		_tprintf(TEXT("[ESCRITOR leu] Recebi %d bytes tipo %d: (ReadFile)\n"), n, aux.tipo);
 
+
+		if (aux.tipo == CMD_LOGIN) {
+			_tprintf(TEXT("[ESCRITOR leu]TETE!\n"));
+		}
+
 		if (aux.tipo == CMD_LOGOUT) {
 			_tprintf(TEXT("[ESCRITOR leu] Vou eliminar um jogador!\n"));
 			eliminaHandlePlayer(x);
 		}
 
 
-	//	writeMensagem(&memoriaPartilhadaGateway, &aux);
+	 //writeMensagem(&memoriaPartilhadaGateway, &aux);
 
 	} while (aux.tipo != CMD_LOGOUT);
 

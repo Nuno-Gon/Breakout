@@ -48,22 +48,26 @@ int _tmain(int argc, LPTSTR argv[]) {
 		ZeroMemory(&ov, sizeof(ov));
 		ResetEvent(ioReady);
 		ov.hEvent = ioReady;
-
-
 		escrevePipe(comando, ioReady, ov, tam);
 		login = true;
 	} while (login == false);
-	
-	_tprintf(TEXT("FIZ LOGIN!\n"));
-	
 
-	
+	_tprintf(TEXT("FIZ LOGIN!\n"));
+
+
+
 	while (1) {
+
+
+
+
+
 
 	}
 
 	_tprintf(TEXT("\Terminei!\n"));
 	//_gettchar();
+
 }
 
 
@@ -79,7 +83,7 @@ void createPipeCliente() {
 	*/
 	if (!WaitNamedPipe(PIPE_NAME, NMPWAIT_WAIT_FOREVER)) {
 		_tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (WaitNamedPipe)\n"), PIPE_NAME);
-		//exit(-1);
+		exit(-1);
 	}
 
 	_tprintf(TEXT("[LEITOR] Ligação ao pipe do escritor... (CreateFile)\n"));
@@ -97,7 +101,7 @@ void createPipeCliente() {
 	hpipe = CreateFile(PIPE_NAME, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0 | FILE_FLAG_OVERLAPPED, NULL);
 	if (hpipe == NULL) {
 		_tprintf(TEXT("[ERRO] Ligar ao pipe '%s'! (CreateFile)\n"), PIPE_NAME);
-		//exit(-1);
+		exit(-1);
 	}
 
 	_tprintf(TEXT("[LEITOR] Liguei-me...\n"));
@@ -124,7 +128,6 @@ void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD ta
 	GetOverlappedResult(hpipe, &ov, &tam, FALSE);
 	_tprintf(TEXT("[ESCRITOR] Enviei %d bytes ao pipe ...\n"), tam);
 }
-
 
 
 //Guardar TOP10 no Registo
