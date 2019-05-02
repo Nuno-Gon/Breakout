@@ -55,32 +55,33 @@ void createSharedMemory(dataCr* d) {
 }
 
 
-void openSharedMemory(dataCr* d) {
+bool openSharedMemory(dataCr* d) {
 	d->hMapFileMSG = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, nomeMemoriaComandos);
 	if (d->hMapFileMSG == NULL) {
 		_tprintf(TEXT("Could not open file mapping object (%d).\n"), GetLastError());
-		return;
+		return false;
 	}
 
 	d->shared = (Dados*)MapViewOfFile(d->hMapFileMSG, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(Dados));
 	if (d->shared == NULL) {
 		_tprintf(TEXT("[Erro]Mapeamento da mem�ria partilhada(%d)\n"), GetLastError());
 		CloseHandle(d->hMapFileMSG);
-		return;
+		return false;
 	}
 
 
 	d->hSemafroPodeEscrever = OpenSemaphore(SYNCHRONIZE, TRUE, nomeSemaforoPodeEscrever);
 	if (d->hSemafroPodeEscrever == NULL) {
 		_tprintf(TEXT("Erro Semaphoro!\n"));
-		return;
+		return false;
 	}
 
 	d->hSemafroPodeLer = OpenSemaphore(SYNCHRONIZE, TRUE, nomeSemaforoPodeLer);
 	if (d->hSemafroPodeLer == NULL) {
 		_tprintf(TEXT("O Semaforo da erro!\n"));
-		return;
+		return false;
 	}
+	return true;
 }
 
 void readMensagem(dataCr* d, COMANDO_SHARED* s) {

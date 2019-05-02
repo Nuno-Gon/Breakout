@@ -34,7 +34,12 @@ int _tmain(int argc, LPTSTR argv[]) {
 #endif 
 	
 	_tprintf(TEXT("\Servidor Ligado!\n"));
-	openSharedMemory(&memoriaPartilhadaServidor);
+	
+	if (!openSharedMemory(&memoriaPartilhadaServidor)) {
+		_tprintf(TEXT("\Erro a abrir memoria Partilhada!\n"));
+		Sleep(4000);
+		exit(0);
+	}
 
 	
 	thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
