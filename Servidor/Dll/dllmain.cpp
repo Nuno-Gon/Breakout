@@ -37,11 +37,12 @@ void createSharedMemory(dataCr* d) {
 	}
 
 
-	d->hSemafroPodeEscrever = CreateSemaphore(NULL, 1000, 1000, nomeSemaforoPodeEscrever);
+	d->hSemafroPodeEscrever = CreateSemaphore(NULL, 500, 1000, nomeSemaforoPodeEscrever);
 	if (d->hSemafroPodeEscrever == NULL) {
 		_tprintf(TEXT("O semafro correu mal\n"));
 		return;
 	}
+	
 
 	d->hSemafroPodeLer = CreateSemaphore(NULL, 0, BUFFER, nomeSemaforoPodeLer);
 	if (d->hSemafroPodeLer == NULL) {
@@ -53,7 +54,6 @@ void createSharedMemory(dataCr* d) {
 	d->shared->posWrite = 0;
 	d->shared->posRead = 0;
 }
-
 
 bool openSharedMemory(dataCr* d) {
 	d->hMapFileMSG = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, nomeMemoriaComandos);
@@ -85,30 +85,41 @@ bool openSharedMemory(dataCr* d) {
 }
 
 void readMensagem(dataCr* d, COMANDO_SHARED* s) {
-	WaitForSingleObject(d->hSemafroPodeLer, INFINITE);
+	 WaitForSingleObject(d->hSemafroPodeLer, INFINITE);
+
 	d->posL = d->shared->posRead;
 	d->shared->posRead = (d->shared->posRead + 1) % BUFFER;
-	WaitForSingleObject(hMutexler, INFINITE);
+	WaitForSingleObject(hMutexLer, INFINITE);
 
-	//_tprintf(TEXT("Li do buffer %d: '%s'\n"), d->posL, d->shared->PtrMemoria[d->posL]);  // Reader reads data
 
 	CopyMemory(s, &d->shared->PtrMemoria[d->posL], sizeof(COMANDO_SHARED));
 
-	ReleaseMutex(hMutexler);
+	ReleaseMutex(hMutexLer);
+
 	ReleaseSemaphore(d->hSemafroPodeEscrever, 1, NULL);
+
+
+
 }
 
 void writeMensagem(dataCr* d, COMANDO_SHARED* s) {
-	WaitForSingleObject(d->hSemafroPodeEscrever, INFINITE);
+	DWORD teste = WaitForSingleObject(d->hSemafroPodeEscrever, INFINITE);
+	if (teste == WAIT_OBJECT_0) {
+		_tprintf(TEXT("AGUA!\n"));
+	}
+	else {
+		_tprintf(TEXT("AGUIA MIDANADA!\n"));
+	}
 	WaitForSingleObject(hMutexEscrever, INFINITE);
 
 	d->posE = d->shared->posWrite;
 	d->shared->posWrite = (d->shared->posWrite + 1) % BUFFER;
-
+	
 	CopyMemory(&d->shared->PtrMemoria[d->posE], s, sizeof(COMANDO_SHARED));
 
-
 	ReleaseMutex(hMutexEscrever);
+
 	ReleaseSemaphore(d->hSemafroPodeLer, 1, NULL);
+	
 }
 

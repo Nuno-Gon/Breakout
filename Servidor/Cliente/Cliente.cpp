@@ -3,6 +3,7 @@
 //Prototipos para Cliente
 void createPipeCliente();
 void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam);
+void lePipe();
 
 
 //VARIAVEIS GLOBAIS
@@ -11,6 +12,10 @@ BOOL login = false;
 scores ranking;
 int pontosPlayer = 0;
 TCHAR nomePlayer[100] = TEXT(" ");
+HANDLE thread_mensagem;
+
+
+//thread
 
 
 
@@ -51,19 +56,18 @@ int _tmain(int argc, LPTSTR argv[]) {
 		escrevePipe(comando, ioReady, ov, tam);
 		login = true;
 	} while (login == false);
-
-	_tprintf(TEXT("FIZ LOGIN!\n"));
-
-
+	
+	Sleep(2000);
+	//lePipe();
+	
+	
+	
 
 	while (1) {
 
-
-
-
-
-
 	}
+
+
 
 	_tprintf(TEXT("\Terminei!\n"));
 	//_gettchar();
@@ -113,7 +117,7 @@ void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD ta
 
 	if (!WriteFile(hpipe, &comando, sizeof(COMANDO_SHARED), &tam, &ov)) {
 		_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
-		//exit(-1);
+		exit(-1);
 	}
 
 	WaitForSingleObject(ioReady, INFINITE);
@@ -128,6 +132,44 @@ void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD ta
 	GetOverlappedResult(hpipe, &ov, &tam, FALSE);
 	_tprintf(TEXT("[ESCRITOR] Enviei %d bytes ao pipe ...\n"), tam);
 }
+
+//Lê do Pipe
+void lePipe() {
+	COMANDO_SHARED comando;
+	HANDLE ioReady;
+	OVERLAPPED ov;
+	DWORD tam;
+	
+	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	//Inicializacao da estrurua overlapped
+	ZeroMemory(&ov, sizeof(ov));
+	ResetEvent(ioReady);
+	ov.hEvent = ioReady;
+
+
+	if (!ReadFile(hpipe, &comando, sizeof(COMANDO_SHARED), &tam, &ov)) {
+		_tprintf(TEXT("[ERRO] Erro a ler do pipe! (ReadFile)\n"));
+		Sleep(4000);
+		exit(-1);
+	}
+
+	//aguarda pela conclusão da operacao
+	WaitForSingleObject(ioReady, INFINITE);
+	/*
+	BOOL GetOverlappedResult(
+		HANDLE       hFile,
+		LPOVERLAPPED lpOverlapped,
+		LPDWORD      lpNumberOfBytesTransferred,
+		BOOL         bWait
+	);
+	*/
+
+	//Obtem informação de sucesso/insucesso da operacao
+	GetOverlappedResult(hpipe, &ov, &tam, FALSE);
+	_tprintf(TEXT("[LEITOR] Recebi %d bytes ao pipe ...\n"), tam);
+}
+
 
 
 //Guardar TOP10 no Registo

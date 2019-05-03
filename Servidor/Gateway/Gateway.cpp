@@ -18,7 +18,10 @@ BOOL login = FALSE;
 int termina = 0;
 dataCr memoriaPartilhadaGateway; //Semaphoros
 
+
 static int id_user = 1;
+
+
 
 /*Eventos*/
 HANDLE id_evento_comeco;
@@ -31,6 +34,7 @@ BOOL existePlayer();
 void inicializaVectorClientes();
 BOOL verifica_e_coloca_handle_pipe(HANDLE pipe);
 void eliminaHandlePlayer(HANDLE aux);
+void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam);
 
 
 //Funções
@@ -74,6 +78,7 @@ int _tmain(void) {
 		}
 		
 
+		while (1);
 	
 
 
@@ -103,6 +108,7 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 	HANDLE ioReady;
 	OVERLAPPED ov;
 	COMANDO_SHARED aux;
+	DWORD tam = 0;
 	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	do {
@@ -122,9 +128,7 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 		_tprintf(TEXT("[ESCRITOR leu] Recebi %d bytes tipo %d: (ReadFile)\n"), n, aux.tipo);
 
 
-		if (aux.tipo == CMD_LOGIN) {
-			_tprintf(TEXT("[ESCRITOR leu]TETE!\n"));
-		}
+		
 
 		if (aux.tipo == CMD_LOGOUT) {
 			_tprintf(TEXT("[ESCRITOR leu] Vou eliminar um jogador!\n"));
@@ -133,7 +137,25 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 
 
 	 writeMensagem(&memoriaPartilhadaGateway, &aux);
+	 
+	 if (aux.tipo == CMD_LOGIN) {
+		 _tprintf(TEXT("A Processar Login!\n"));
+		COMANDO_SHARED comandolido;
 
+
+		readMensagem(&memoriaPartilhadaGateway, &comandolido); // Não está a funcionar
+		 
+		 //Escrever para o pipe
+		 _tprintf(TEXT("AQUI!!\n"));
+		 ZeroMemory(&ov, sizeof(ov));
+		 ResetEvent(ioReady);
+		 ov.hEvent = ioReady;
+		
+		// _tprintf(TEXT("Comando Lido %d !!\n"), comandolido.login);
+		
+		// escrevePipe(comandolido, ioReady, ov, tam);
+	 }
+	
 	} while (aux.tipo != CMD_LOGOUT);
 
 	return 0;
@@ -178,7 +200,6 @@ DWORD WINAPI aceita_cliente(LPVOID param) {
 	
 }
 
-
 BOOL existePlayer() {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (cliente[i] != INVALID_HANDLE_VALUE) {
@@ -214,4 +235,26 @@ void eliminaHandlePlayer(HANDLE aux) {
 			cliente[i] = INVALID_HANDLE_VALUE;
 		}
 	}
+}
+
+//Escreve Pipe , secalhar posso meter esta função no DLL perguntar ao PROF (está no gateway e está no Cliente)
+void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam) {
+
+	if (!WriteFile(hPipe, &comando, sizeof(COMANDO_SHARED), &tam, &ov)) {
+		_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+		Sleep(4000);
+		exit(-1);
+	}
+
+	WaitForSingleObject(ioReady, INFINITE);
+	/*
+	BOOL GetOverlappedResult(
+		HANDLE       hFile,
+		LPOVERLAPPED lpOverlapped,
+		LPDWORD      lpNumberOfBytesTransferred,
+		BOOL         bWait
+	);
+	*/
+	GetOverlappedResult(hPipe, &ov, &tam, FALSE);
+	_tprintf(TEXT("[ESCRITOR] Enviei %d bytes ao pipe ...\n"), tam);
 }

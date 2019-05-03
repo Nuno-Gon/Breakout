@@ -19,7 +19,7 @@
 //Mensagens
 HANDLE podeEscrever;
 HANDLE podeLer;
-HANDLE hMutexler;
+HANDLE hMutexLer;
 HANDLE hMutexEscrever;
 
 
@@ -36,6 +36,7 @@ TCHAR nomeSemaforoPodeLer[] = TEXT("Semaforo Pode Ler");
 typedef struct {
 	int idUser;
 	int tipo;
+	bool login;
 	HANDLE idHandle;
 } COMANDO_SHARED;
 
@@ -57,9 +58,14 @@ typedef struct {
 
 typedef struct {
 	int id;
-
 	INT pontos;
+	bool login; //Verificar se foi login
 }Player;
+
+typedef struct {
+	Player players[MAX_NUM_PLAYERS];
+
+}MensagemJogo;
 
 
 #ifdef DLL_EXPORTS
