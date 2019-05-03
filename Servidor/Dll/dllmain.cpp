@@ -43,13 +43,11 @@ void createSharedMemory(dataCr* d) {
 		return;
 	}
 	
-
 	d->hSemafroPodeLer = CreateSemaphore(NULL, 0, BUFFER, nomeSemaforoPodeLer);
 	if (d->hSemafroPodeLer == NULL) {
 		_tprintf(TEXT("O semafro deu problemas\n"));
 		return;
 	}
-
 
 	d->shared->posWrite = 0;
 	d->shared->posRead = 0;
@@ -91,25 +89,22 @@ void readMensagem(dataCr* d, COMANDO_SHARED* s) {
 	d->shared->posRead = (d->shared->posRead + 1) % BUFFER;
 	WaitForSingleObject(hMutexLer, INFINITE);
 
-
 	CopyMemory(s, &d->shared->PtrMemoria[d->posL], sizeof(COMANDO_SHARED));
 
 	ReleaseMutex(hMutexLer);
-
 	ReleaseSemaphore(d->hSemafroPodeEscrever, 1, NULL);
-
-
-
 }
 
 void writeMensagem(dataCr* d, COMANDO_SHARED* s) {
-	DWORD teste = WaitForSingleObject(d->hSemafroPodeEscrever, INFINITE);
-	if (teste == WAIT_OBJECT_0) {
-		_tprintf(TEXT("AGUA!\n"));
-	}
-	else {
-		_tprintf(TEXT("AGUIA MIDANADA!\n"));
-	}
+	 WaitForSingleObject(d->hSemafroPodeEscrever, INFINITE);
+	// DWORD teste =
+	 //if (teste == WAIT_OBJECT_0) {
+		//_tprintf(TEXT("AGUA!\n"));
+	//}
+	//else {
+		//_tprintf(TEXT("AGUIA MIDANADA!\n"));
+	//}
+
 	WaitForSingleObject(hMutexEscrever, INFINITE);
 
 	d->posE = d->shared->posWrite;
@@ -123,3 +118,30 @@ void writeMensagem(dataCr* d, COMANDO_SHARED* s) {
 	
 }
 
+void createSharedMemoryJogo(dataCr* d) {
+	/*	d->hMapFileJogo = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(DadosJogo), nomeMemoriaJogo);
+
+	if (d->hMapFileJogo == NULL) {
+		_tprintf(TEXT("[Erro]Cria��o de objectos do Windows(%d)\n"), GetLastError());
+		return;
+	}
+	d->sharedJogo = (DadosJogo*)MapViewOfFile(d->hMapFileJogo, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(DadosJogo));
+	if (d->sharedJogo == NULL) {
+		_tprintf(TEXT("[Erro]Mapeamento da mem�ria partilhada(%d)\n"), GetLastError());
+		return;
+	}
+
+*/
+	}
+
+bool openSharedMemoryJogo(dataCr* d) {
+	return true;
+}
+
+void readMensagemJogo(dataCr* d, MensagemJogo* s) {
+
+}
+
+void writeMensagemJogo(dataCr* d, MensagemJogo* s) {
+
+}

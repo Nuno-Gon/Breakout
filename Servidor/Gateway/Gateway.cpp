@@ -16,12 +16,10 @@ HANDLE hPipe;
 HANDLE thread_cliente;
 BOOL login = FALSE;
 int termina = 0;
-dataCr memoriaPartilhadaGateway; //Semaphoros
-
+dataCr memoriaPartilhadaGateway; 
+MensagemJogo msgJogo;
 
 static int id_user = 1;
-
-
 
 /*Eventos*/
 HANDLE id_evento_comeco;
@@ -34,8 +32,6 @@ BOOL existePlayer();
 void inicializaVectorClientes();
 BOOL verifica_e_coloca_handle_pipe(HANDLE pipe);
 void eliminaHandlePlayer(HANDLE aux);
-void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam);
-
 
 //Funções
 int _tmain(void) {
@@ -44,7 +40,7 @@ int _tmain(void) {
 	_setmode(_fileno(stdin), _O_WTEXT);
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif
-	_tprintf(TEXT("Gateway Começou!\n"));
+	_tprintf(TEXT("Gateway Começou!"));
 
 	//Criar Memoria Partilhada
 	createSharedMemory(&memoriaPartilhadaGateway);
@@ -68,19 +64,14 @@ int _tmain(void) {
 				ResetEvent(ioReady);
 				ov.hEvent = ioReady;
 
+				WriteFile(cliente[i], &msgJogo, sizeof(MensagemJogo), &n, &ov);
+
 
 				WaitForSingleObject(ioReady, INFINITE);
 				GetOverlappedResult(cliente[i], &ov, &n, FALSE);
 			}
 		
-
-
 		}
-		
-
-		while (1);
-	
-
 
 		//_tprintf(TEXT("."));
 	} while (existePlayer() || login == FALSE);
@@ -96,6 +87,7 @@ int _tmain(void) {
 
 	hPipe = CreateFile(PIPE_NAME, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	DisconnectNamedPipe(hPipe);
+
 	CloseHandle(hPipe);
 	UnmapViewOfFile(memoriaPartilhadaGateway.shared);
 	exit(0);
@@ -127,35 +119,13 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 
 		_tprintf(TEXT("[ESCRITOR leu] Recebi %d bytes tipo %d: (ReadFile)\n"), n, aux.tipo);
 
-
-		
-
 		if (aux.tipo == CMD_LOGOUT) {
 			_tprintf(TEXT("[ESCRITOR leu] Vou eliminar um jogador!\n"));
 			eliminaHandlePlayer(x);
 		}
 
-
 	 writeMensagem(&memoriaPartilhadaGateway, &aux);
-	 
-	 if (aux.tipo == CMD_LOGIN) {
-		 _tprintf(TEXT("A Processar Login!\n"));
-		COMANDO_SHARED comandolido;
-
-
-		readMensagem(&memoriaPartilhadaGateway, &comandolido); // Não está a funcionar
-		 
-		 //Escrever para o pipe
-		 _tprintf(TEXT("AQUI!!\n"));
-		 ZeroMemory(&ov, sizeof(ov));
-		 ResetEvent(ioReady);
-		 ov.hEvent = ioReady;
 		
-		// _tprintf(TEXT("Comando Lido %d !!\n"), comandolido.login);
-		
-		// escrevePipe(comandolido, ioReady, ov, tam);
-	 }
-	
 	} while (aux.tipo != CMD_LOGOUT);
 
 	return 0;
@@ -164,7 +134,6 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 DWORD WINAPI aceita_cliente(LPVOID param) {
 
 	while (termina == 0) {
-		Sleep(1);
 		_tprintf(TEXT("[ESCRITOR] Criar uma copia do pipe '%s' ... (CreateNamedPipe)\n"), PIPE_NAME);
 		hPipe = CreateNamedPipe(PIPE_NAME, PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, 5, sizeof(COMANDO_SHARED) , sizeof(COMANDO_SHARED), 1000, NULL);
 
@@ -191,7 +160,7 @@ DWORD WINAPI aceita_cliente(LPVOID param) {
 		_tprintf(TEXT("[ESCRITOR]  liga��o a um leitor com sucesso... (ConnectNamedPipe)\n"));
 		//criar uma thread para cada cliente para ler msg vindas deles.
 		if ((CreateThread(NULL, 0, recebe_comando_cliente, (LPVOID)hPipe, 0, NULL)) == 0) {
-			_tprintf(TEXT("erro ao criar thread"));
+			_tprintf(TEXT("Erro ao criar Thread!"));
 			exit(-1);
 		}
 	
@@ -210,13 +179,11 @@ BOOL existePlayer() {
 	return false;
 }
 
-
 void inicializaVectorClientes() {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		cliente[i] = INVALID_HANDLE_VALUE;
 	}
 }
-
 
 BOOL verifica_e_coloca_handle_pipe(HANDLE pipe) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
@@ -231,30 +198,8 @@ BOOL verifica_e_coloca_handle_pipe(HANDLE pipe) {
 void eliminaHandlePlayer(HANDLE aux) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (cliente[i] == aux) {
-			_tprintf(TEXT("[Escritor leu] ELeminado\n"));
+			_tprintf(TEXT("[Escritor leu] Eliminado!"));
 			cliente[i] = INVALID_HANDLE_VALUE;
 		}
 	}
-}
-
-//Escreve Pipe , secalhar posso meter esta função no DLL perguntar ao PROF (está no gateway e está no Cliente)
-void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam) {
-
-	if (!WriteFile(hPipe, &comando, sizeof(COMANDO_SHARED), &tam, &ov)) {
-		_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
-		Sleep(4000);
-		exit(-1);
-	}
-
-	WaitForSingleObject(ioReady, INFINITE);
-	/*
-	BOOL GetOverlappedResult(
-		HANDLE       hFile,
-		LPOVERLAPPED lpOverlapped,
-		LPDWORD      lpNumberOfBytesTransferred,
-		BOOL         bWait
-	);
-	*/
-	GetOverlappedResult(hPipe, &ov, &tam, FALSE);
-	_tprintf(TEXT("[ESCRITOR] Enviei %d bytes ao pipe ...\n"), tam);
 }

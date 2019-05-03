@@ -15,7 +15,6 @@ using namespace std;
 //Threads
 DWORD WINAPI readMensagemMemory(void);
 
-
 // Outras Funções
 void trataComando(COMANDO_SHARED comando);
 
@@ -45,12 +44,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 	
 	thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
 	
-	
 	while (1){
 		acabar = 0;
-		
-
-		
 		
 	}
 	
@@ -59,7 +54,6 @@ int _tmain(int argc, LPTSTR argv[]) {
 }
 
 //THREADS
-
 //Lê mensagens da Memória
 DWORD WINAPI readMensagemMemory(void) {
 	_tprintf(TEXT("\Comecei Thread ler mensagem!\n"));
@@ -69,8 +63,6 @@ DWORD WINAPI readMensagemMemory(void) {
 	}
 	return 0;
 }
-
-
 
 //Outras Funções
 void trataComando(COMANDO_SHARED comando) {
@@ -86,16 +78,12 @@ void trataComando(COMANDO_SHARED comando) {
 	//Outros tipos de comando
 
 	switch (comando.tipo) {
-	case CMD_LOGIN: 
-		_tprintf(TEXT("\n Cliente Conectado!\n"));
-	 //teste
+	case CMD_LOGIN:
 		COMANDO_SHARED aux_shared;
 		aux_shared = comando;
 		aux_shared.login = true;
-		writeMensagem(&memoriaPartilhadaServidor, &aux_shared);
 		_tprintf(TEXT("\n Login Feito com Sucesso!\n"));
 		loginPlayer = TRUE;
-
 		break;
 	case CMD_LOGOUT:
 		_tprintf(TEXT("\n Cliente desconectado!\n"));

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <windows.h>
 #include <tchar.h>
 #include <stdio.h>
@@ -12,26 +12,32 @@
 
 #define MAX_NUM_PLAYERS 20
 
+#define CMD_MOVE_CIMA 1
+#define CMD_MOVE_BAIXO 2
+#define CMD_MOVE_ESQ 3 
+#define CMD_MOVE_DIR 4
 #define CMD_LOGIN 5
 #define CMD_LOGOUT 6
 
 
-//Mensagens
+//Mensagens (SINCRONIZAÇÃO)
 HANDLE podeEscrever;
 HANDLE podeLer;
 HANDLE hMutexLer;
 HANDLE hMutexEscrever;
 
+//Objetos JOGO (SINCRONIZAÇÃO)
+HANDLE mutex_bola;
 
 //Memoria Partilhada 
 TCHAR nomeMemoriaComandos[] = TEXT("Nome da Memoria Partilhada Comandos");
+TCHAR nomeMemoriaJogo[] = TEXT("Nome da Mem�ria Partilhada Jogo");
+
 TCHAR nomeSemaforoPodeEscrever[] = TEXT("Semaforo Pode Escrever");
 TCHAR nomeSemaforoPodeLer[] = TEXT("Semaforo Pode Ler");
 
 
-
 //Estruturas
-
 //COMANDO PARTILHADO (COMANDO_SHARED)
 typedef struct {
 	int idUser;
@@ -54,6 +60,9 @@ typedef struct {
 	HANDLE hMapFileMSG;
 	HANDLE hSemafroPodeEscrever;
 	HANDLE hSemafroPodeLer;
+
+	HANDLE hMapFileJogo;
+	//DadosJogo *sharedJogo;
 }dataCr;
 
 typedef struct {
@@ -64,8 +73,17 @@ typedef struct {
 
 typedef struct {
 	Player players[MAX_NUM_PLAYERS];
+	//Bola bola; // Ver se só existe uma bola
+}MensagemJogo; //Jogo
 
-}MensagemJogo;
+typedef struct {
+	MensagemJogo jogo;
+}DadosJogo;
+
+typedef struct {
+	COORD coord;
+}Bola;
+
 
 
 #ifdef DLL_EXPORTS
@@ -77,14 +95,18 @@ typedef struct {
 
 extern "C"
 {
-	//V�riavel global da DLL
+	//Váriavel global da DLL
 	extern DLL_IMP_API int nDLL;
 
-	//Prot�tipos Fun��es
+	//Protótipos Funções
 	DLL_IMP_API void createSharedMemory(dataCr* d);
 	DLL_IMP_API bool openSharedMemory(dataCr* d);
 	DLL_IMP_API void readMensagem(dataCr* d, COMANDO_SHARED* s);
 	DLL_IMP_API void writeMensagem(dataCr* d, COMANDO_SHARED* s);
 
+	DLL_IMP_API void createSharedMemoryJogo(dataCr* d);
+	DLL_IMP_API bool openSharedMemoryJogo(dataCr* d);
+	DLL_IMP_API void readMensagemJogo(dataCr* d, MensagemJogo* s);
+	DLL_IMP_API void writeMensagemJogo(dataCr* d, MensagemJogo* s);
 
 }

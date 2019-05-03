@@ -5,6 +5,9 @@ void createPipeCliente();
 void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam);
 void lePipe();
 
+//THREADS
+DWORD WINAPI leMensagemJogo(void);
+
 
 //VARIAVEIS GLOBAIS
 HANDLE hpipe;
@@ -12,10 +15,11 @@ BOOL login = false;
 scores ranking;
 int pontosPlayer = 0;
 TCHAR nomePlayer[100] = TEXT(" ");
-HANDLE thread_mensagem;
-
+MensagemJogo msgJogo;
 
 //thread
+HANDLE thread_mensagem_jogo;
+HANDLE thread_mensagem;
 
 
 
@@ -56,12 +60,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 		escrevePipe(comando, ioReady, ov, tam);
 		login = true;
 	} while (login == false);
-	
-	Sleep(2000);
-	//lePipe();
-	
-	
-	
+
+	thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
 
 	while (1) {
 
@@ -133,44 +133,6 @@ void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD ta
 	_tprintf(TEXT("[ESCRITOR] Enviei %d bytes ao pipe ...\n"), tam);
 }
 
-//Lê do Pipe
-void lePipe() {
-	COMANDO_SHARED comando;
-	HANDLE ioReady;
-	OVERLAPPED ov;
-	DWORD tam;
-	
-	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
-
-	//Inicializacao da estrurua overlapped
-	ZeroMemory(&ov, sizeof(ov));
-	ResetEvent(ioReady);
-	ov.hEvent = ioReady;
-
-
-	if (!ReadFile(hpipe, &comando, sizeof(COMANDO_SHARED), &tam, &ov)) {
-		_tprintf(TEXT("[ERRO] Erro a ler do pipe! (ReadFile)\n"));
-		Sleep(4000);
-		exit(-1);
-	}
-
-	//aguarda pela conclusão da operacao
-	WaitForSingleObject(ioReady, INFINITE);
-	/*
-	BOOL GetOverlappedResult(
-		HANDLE       hFile,
-		LPOVERLAPPED lpOverlapped,
-		LPDWORD      lpNumberOfBytesTransferred,
-		BOOL         bWait
-	);
-	*/
-
-	//Obtem informação de sucesso/insucesso da operacao
-	GetOverlappedResult(hpipe, &ov, &tam, FALSE);
-	_tprintf(TEXT("[LEITOR] Recebi %d bytes ao pipe ...\n"), tam);
-}
-
-
 
 //Guardar TOP10 no Registo
 void escreveRegistry() {
@@ -187,5 +149,25 @@ void inserirRanking() {
 
 void inicia() {
 
+}
+
+
+DWORD WINAPI leMensagemJogo(void) {
+	HANDLE IoReady;
+	OVERLAPPED ov;
+	DWORD tam;
+	IoReady = CreateEvent(NULL, TRUE, FALSE, NULL);
+	int aux = 0;
+	while (1) {
+		if (login == TRUE) {
+			ZeroMemory(&ov, sizeof(ov));
+			ResetEvent(IoReady);
+			ov.hEvent = IoReady;
+			ReadFile(hpipe, &msgJogo, sizeof(MensagemJogo), &tam, &ov);
+			WaitForSingleObject(IoReady, INFINITE);
+			GetOverlappedResult(hpipe, &ov, &tam, FALSE);
+		}
+	}
+	return 0;
 }
 
