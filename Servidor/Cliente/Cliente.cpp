@@ -166,6 +166,8 @@ DWORD WINAPI leMensagemJogo(void) {
 
 			ReadFile(hpipe, &msgJogo, sizeof(MensagemJogo), &tam, &ov);
 
+			_tprintf(TEXT("Posicao da Bola: (%d , %d)\n"), msgJogo.bola.coord.X, msgJogo.bola.coord.Y);
+
 			WaitForSingleObject(IoReady, INFINITE);
 			GetOverlappedResult(hpipe, &ov, &tam, FALSE);
 		}

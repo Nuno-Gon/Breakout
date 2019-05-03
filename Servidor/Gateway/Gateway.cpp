@@ -88,7 +88,6 @@ int _tmain(void) {
 
 				WriteFile(cliente[i], &msgJogo, sizeof(MensagemJogo), &n, &ov);
 
-
 				WaitForSingleObject(ioReady, INFINITE);
 				GetOverlappedResult(cliente[i], &ov, &n, FALSE);
 			}
