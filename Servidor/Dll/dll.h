@@ -40,11 +40,31 @@ TCHAR nomeSemaforoPodeLer[] = TEXT("Semaforo Pode Ler");
 //Estruturas
 //COMANDO PARTILHADO (COMANDO_SHARED)
 typedef struct {
+	int id;
+	INT pontos;
+	bool login; //Verificar se foi login
+}Player;
+
+typedef struct {
 	int idUser;
 	int tipo;
 	bool login;
 	HANDLE idHandle;
 } COMANDO_SHARED;
+
+typedef struct {
+	COORD coord;
+}Bola;
+
+
+typedef struct {
+	Player players[MAX_NUM_PLAYERS];
+	Bola bola; // Ver se só existe uma bola
+}MensagemJogo; //Jogo
+
+typedef struct {
+	MensagemJogo jogo;
+}DadosJogo;
 
 
 //DADOS
@@ -60,29 +80,14 @@ typedef struct {
 	HANDLE hMapFileMSG;
 	HANDLE hSemafroPodeEscrever;
 	HANDLE hSemafroPodeLer;
-
+	
+	DadosJogo *sharedJogo;
 	HANDLE hMapFileJogo;
-	//DadosJogo *sharedJogo;
+
 }dataCr;
 
-typedef struct {
-	int id;
-	INT pontos;
-	bool login; //Verificar se foi login
-}Player;
 
-typedef struct {
-	Player players[MAX_NUM_PLAYERS];
-	//Bola bola; // Ver se só existe uma bola
-}MensagemJogo; //Jogo
 
-typedef struct {
-	MensagemJogo jogo;
-}DadosJogo;
-
-typedef struct {
-	COORD coord;
-}Bola;
 
 
 

@@ -46,7 +46,6 @@ int _tmain(int argc, LPTSTR argv[]) {
 	
 	while (1){
 		acabar = 0;
-		
 	}
 	
 	CloseHandle(thread_read_msg_memory);

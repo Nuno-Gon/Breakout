@@ -119,22 +119,33 @@ void writeMensagem(dataCr* d, COMANDO_SHARED* s) {
 }
 
 void createSharedMemoryJogo(dataCr* d) {
-	/*	d->hMapFileJogo = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(DadosJogo), nomeMemoriaJogo);
+	d->hMapFileJogo = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(DadosJogo), nomeMemoriaJogo);
 
 	if (d->hMapFileJogo == NULL) {
 		_tprintf(TEXT("[Erro]Cria��o de objectos do Windows(%d)\n"), GetLastError());
 		return;
-	}
+	}
+
 	d->sharedJogo = (DadosJogo*)MapViewOfFile(d->hMapFileJogo, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(DadosJogo));
 	if (d->sharedJogo == NULL) {
 		_tprintf(TEXT("[Erro]Mapeamento da mem�ria partilhada(%d)\n"), GetLastError());
 		return;
 	}
 
-*/
 	}
 
 bool openSharedMemoryJogo(dataCr* d) {
+	d->hMapFileJogo = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, nomeMemoriaJogo);
+	if (d->hMapFileJogo == NULL) {
+		_tprintf(TEXT("Could not open file mapping object (%d).\n"), GetLastError());
+		return false;
+	}
+	d->sharedJogo = (DadosJogo*)MapViewOfFile(d->hMapFileJogo, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(DadosJogo));
+	if (d->sharedJogo == NULL) {
+		_tprintf(TEXT("[Erro]Mapeamento da mem�ria partilhada(%d)\n"), GetLastError());
+		CloseHandle(d->hMapFileJogo);
+		return false;
+	}
 	return true;
 }
 
@@ -143,5 +154,5 @@ void readMensagemJogo(dataCr* d, MensagemJogo* s) {
 }
 
 void writeMensagemJogo(dataCr* d, MensagemJogo* s) {
-
+	CopyMemory(&d->sharedJogo->jogo, s , sizeof(MensagemJogo));
 }
