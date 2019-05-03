@@ -20,10 +20,12 @@ void trataComando(COMANDO_SHARED comando);
 
 //Variaveis Globais
 INT acabar;
+MensagemJogo msgJogo;
 dataCr memoriaPartilhadaServidor;
 COMANDO_SHARED comandoLido;
 BOOL loginPlayer = FALSE;
 HANDLE thread_read_msg_memory;
+HANDLE eventoMemoria, eventoComeco;
 
 int _tmain(int argc, LPTSTR argv[]) {
 
@@ -35,21 +37,44 @@ int _tmain(int argc, LPTSTR argv[]) {
 	
 	_tprintf(TEXT("\Servidor Ligado!\n"));
 	
+	//por verificacoes se correu mal ou não
+	eventoComeco = CreateEvent(NULL, FALSE, FALSE, nomeEventoComecoJogo);
+	eventoMemoria = CreateEvent(NULL, FALSE, FALSE, nomeEventoArrancaMemoria);
+
+	//fazer Protecao
+	createSharedMemoryJogo(&memoriaPartilhadaServidor);
+
+	WaitForSingleObject(eventoMemoria, INFINITE);
+
+	//Abrir memoria partilhada
 	if (!openSharedMemory(&memoriaPartilhadaServidor)) {
 		_tprintf(TEXT("\Erro a abrir memoria Partilhada!\n"));
-		Sleep(4000);
+		system("pause");
 		exit(0);
 	}
 
+	WaitForSingleObject(eventoComeco, INFINITE);
 	
-	thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
-	
+
 	while (1){
 		acabar = 0;
-	}
+
+		thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
 	
-	CloseHandle(thread_read_msg_memory);
-	_tprintf(TEXT("\Terminei!\n"));
+		do {
+			CopyMemory(&memoriaPartilhadaServidor.sharedJogo->jogo, &msgJogo, sizeof(MensagemJogo)); //por no dll
+		} while (1);
+
+		acabar = 1;
+		CloseHandle(thread_read_msg_memory);
+		CloseHandle(eventoComeco);
+		CloseHandle(eventoMemoria);
+	}
+
+	_tprintf(TEXT("\Servidor Desligado!\n"));
+	UnmapViewOfFile(memoriaPartilhadaServidor.sharedJogo);
+	system("pause");
+	return 0;
 }
 
 //THREADS

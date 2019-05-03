@@ -23,34 +23,35 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
-void createSharedMemory(dataCr* d) {
+bool createSharedMemory(dataCr* d) {
 	d->hMapFileMSG = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(Dados), nomeMemoriaComandos);
 	if (d->hMapFileMSG == NULL) {
 		_tprintf(TEXT("[Erro]Cria��o de objectos do Windows(%d)\n"), GetLastError());
-		return;
+		return false;
 	}
 
 	d->shared = (Dados*)MapViewOfFile(d->hMapFileMSG, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(Dados));
 	if (d->shared == NULL) {
 		_tprintf(TEXT("[Erro]Mapeamento da mem�ria partilhada(%d)\n"), GetLastError());
-		return;
+		return false;
 	}
 
 
 	d->hSemafroPodeEscrever = CreateSemaphore(NULL, 500, 1000, nomeSemaforoPodeEscrever);
 	if (d->hSemafroPodeEscrever == NULL) {
 		_tprintf(TEXT("O semafro correu mal\n"));
-		return;
+		return false;
 	}
 	
 	d->hSemafroPodeLer = CreateSemaphore(NULL, 0, BUFFER, nomeSemaforoPodeLer);
 	if (d->hSemafroPodeLer == NULL) {
 		_tprintf(TEXT("O semafro deu problemas\n"));
-		return;
+		return false;
 	}
 
 	d->shared->posWrite = 0;
 	d->shared->posRead = 0;
+	return true;
 }
 
 bool openSharedMemory(dataCr* d) {

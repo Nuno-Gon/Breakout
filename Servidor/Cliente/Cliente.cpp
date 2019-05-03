@@ -162,8 +162,10 @@ DWORD WINAPI leMensagemJogo(void) {
 		if (login == TRUE) {
 			ZeroMemory(&ov, sizeof(ov));
 			ResetEvent(IoReady);
-			ov.hEvent = IoReady;
-			ReadFile(hpipe, &msgJogo, sizeof(MensagemJogo), &tam, &ov);
+			ov.hEvent = IoReady;
+
+			ReadFile(hpipe, &msgJogo, sizeof(MensagemJogo), &tam, &ov);
+
 			WaitForSingleObject(IoReady, INFINITE);
 			GetOverlappedResult(hpipe, &ov, &tam, FALSE);
 		}

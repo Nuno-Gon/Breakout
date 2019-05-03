@@ -14,6 +14,7 @@
 HANDLE cliente[MAX_NUM_PLAYERS];
 HANDLE hPipe;
 HANDLE thread_cliente;
+HANDLE thread_read_msg_jogo;
 BOOL login = FALSE;
 int termina = 0;
 dataCr memoriaPartilhadaGateway; 
@@ -23,11 +24,12 @@ static int id_user = 1;
 
 /*Eventos*/
 HANDLE id_evento_comeco;
-
+HANDLE id_evento_memoria;
 
 //Protótipos funções
 DWORD WINAPI recebe_comando_cliente(LPVOID param);
 DWORD WINAPI aceita_cliente(LPVOID param);
+DWORD WINAPI leMsgJogo(void);
 BOOL existePlayer();
 void inicializaVectorClientes();
 BOOL verifica_e_coloca_handle_pipe(HANDLE pipe);
@@ -40,16 +42,36 @@ int _tmain(void) {
 	_setmode(_fileno(stdin), _O_WTEXT);
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif
-	_tprintf(TEXT("Gateway Começou!"));
+	_tprintf(TEXT("Gateway Começou!\n"));
 
-	//Criar Memoria Partilhada
-	createSharedMemory(&memoriaPartilhadaGateway);
+	//Abrir memoria para interpretrar comandos cliente
+	if (!createSharedMemory(&memoriaPartilhadaGateway)) {
+		_tprintf(TEXT("\Erro a criar memoria Partilhada!\n"));
+		system("pause");
+		exit(0);
+	}
 
 
 	//Inicializar clientes
 	inicializaVectorClientes();
 	thread_cliente = CreateThread(NULL, 0, aceita_cliente, NULL, 0, NULL);
+
+	id_evento_memoria = OpenEvent(EVENT_ALL_ACCESS, TRUE, nomeEventoArrancaMemoria);
+	id_evento_comeco = OpenEvent(EVENT_ALL_ACCESS, TRUE, nomeEventoComecoJogo);
+
+	if (id_evento_memoria == NULL || id_evento_comeco == NULL) {
+		_tprintf(TEXT("[ERRO] Eventos!\n"));
+		system("pause");
+		exit(-1);
+	}
 	
+	SetEvent(id_evento_memoria);
+
+	//Abrir memoria da parte do servidor
+	openSharedMemoryJogo(&memoriaPartilhadaGateway);
+	thread_read_msg_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMsgJogo, NULL, 0, NULL);
+
+
 	HANDLE ioReady;
 	OVERLAPPED ov;
 	DWORD n;
@@ -79,6 +101,10 @@ int _tmain(void) {
 	//Processo de Fecho do Gateway
 	_tprintf(TEXT("\nGateway Terminou!\n"));
 	termina = 1;
+
+	WaitForSingleObject(thread_read_msg_jogo, INFINITE);
+	WaitForSingleObject(thread_cliente, INFINITE);
+	
 	CloseHandle(thread_cliente);
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		DisconnectNamedPipe(cliente[i]);
@@ -202,4 +228,11 @@ void eliminaHandlePlayer(HANDLE aux) {
 			cliente[i] = INVALID_HANDLE_VALUE;
 		}
 	}
+}
+
+DWORD WINAPI leMsgJogo(void) {
+	while (termina == 0) {
+		CopyMemory(&msgJogo, &memoriaPartilhadaGateway.sharedJogo->jogo, sizeof(MensagemJogo)); //meter funcao no dll
+	}
+	return 0;
 }

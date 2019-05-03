@@ -36,6 +36,10 @@ TCHAR nomeMemoriaJogo[] = TEXT("Nome da Mem�ria Partilhada Jogo");
 TCHAR nomeSemaforoPodeEscrever[] = TEXT("Semaforo Pode Escrever");
 TCHAR nomeSemaforoPodeLer[] = TEXT("Semaforo Pode Ler");
 
+//EVENTOS
+TCHAR nomeEventoComecoJogo[] = TEXT("EventoComeco");
+TCHAR nomeEventoArrancaMemoria[] = TEXT("EventoMemoria");
+TCHAR nomeEventoTerminaJogo[] = TEXT("EventoTermina");
 
 //Estruturas
 //COMANDO PARTILHADO (COMANDO_SHARED)
@@ -104,7 +108,7 @@ extern "C"
 	extern DLL_IMP_API int nDLL;
 
 	//Protótipos Funções
-	DLL_IMP_API void createSharedMemory(dataCr* d);
+	DLL_IMP_API bool createSharedMemory(dataCr* d);
 	DLL_IMP_API bool openSharedMemory(dataCr* d);
 	DLL_IMP_API void readMensagem(dataCr* d, COMANDO_SHARED* s);
 	DLL_IMP_API void writeMensagem(dataCr* d, COMANDO_SHARED* s);
