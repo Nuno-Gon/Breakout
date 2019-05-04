@@ -55,16 +55,16 @@ int _tmain(int argc, LPTSTR argv[]) {
 		exit(0);
 	}
 
-	WaitForSingleObject(eventoComeco, INFINITE);
+		WaitForSingleObject(eventoComeco, INFINITE);
 	
 
-	while (1){
-		acabar = 0;
+		while (1){
+			acabar = 0;
 
-		thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
-		thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, NULL, 0, NULL);
+			thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
+			thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, NULL, 0, NULL);
 
-		do {
+			do {
 			CopyMemory(&memoriaPartilhadaServidor.sharedJogo->jogo, &msgJogo, sizeof(MensagemJogo)); //por no dll
 		} while (1);
 
@@ -124,8 +124,7 @@ void trataComando(COMANDO_SHARED comando) {
 
 DWORD WINAPI controlaBola(void) {
 	//termina quando o cliente insere uma tecla
-	SHORT i = 0;
-	SHORT x = 5;
+
 	while (1) {
 		msgJogo.bola.coord.X = rand() % 10;
 		msgJogo.bola.coord.Y = rand() % 10;
