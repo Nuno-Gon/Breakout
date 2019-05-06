@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <thread>
 
-
 #define TAM 256
 #define BUFFER_SIZE 100
 #define BUFFER 10
@@ -24,6 +23,8 @@
 
 #define REGKEY TEXT("SOFTWARE\\Arkanoid")
 LPCTSTR value = TEXT("Scores");
+
+HKEY hKey;
 
 //Mensagens (SINCRONIZAÇÃO)
 HANDLE podeEscrever;
@@ -66,10 +67,13 @@ typedef struct {
 	COORD coord;
 }Bola;
 
+typedef struct {
+	Player jogadores[MAX_REGISTO];
+}Scores;
 
 typedef struct {
 	Player players[MAX_NUM_PLAYERS];
-	Player scores[MAX_REGISTO];
+	Scores ranking;
 	Bola bola; // Ver se só existe uma bola
 }MensagemJogo; //Jogo
 
@@ -96,10 +100,6 @@ typedef struct {
 	HANDLE hMapFileJogo;
 
 }dataCr;
-
-
-
-
 
 
 #ifdef DLL_EXPORTS

@@ -16,6 +16,12 @@ using namespace std;
 DWORD WINAPI readMensagemMemory(void);
 DWORD WINAPI controlaBola(void);
 
+//Registo
+void createRegistry();
+void writeRegistry();
+void readRegistry();
+void inicia();
+
 // Outras Funções
 void trataComando(COMANDO_SHARED comando);
 
@@ -28,6 +34,7 @@ BOOL loginPlayer = FALSE;
 HANDLE thread_read_msg_memory;
 HANDLE thread_bola;
 HANDLE eventoMemoria, eventoComeco;
+Scores score;
 
 int _tmain(int argc, LPTSTR argv[]) {
 
@@ -57,6 +64,10 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 		WaitForSingleObject(eventoComeco, INFINITE);
 	
+	//Abrir Registro
+		createRegistry();
+		inicia();
+
 
 		while (1){
 			acabar = 0;
@@ -130,4 +141,90 @@ DWORD WINAPI controlaBola(void) {
 		msgJogo.bola.coord.Y = rand() % 10;
 	}
 
+}
+
+//Criar Registo
+void createRegistry() {
+	DWORD dwDisposition;
+	RegCreateKeyEx(HKEY_CURRENT_USER, REGKEY, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &dwDisposition); //Key set to NULL but dwDisposition == REG_OPENED_EXISTING_KEY
+
+	if (dwDisposition != REG_CREATED_NEW_KEY && dwDisposition != REG_OPENED_EXISTING_KEY)
+		_tprintf(TEXT("Erro creating new key!\n"));
+	
+	LONG closeOut = RegCloseKey(hKey);
+	if (closeOut == ERROR_SUCCESS) {
+		_tprintf(TEXT("Success closing key."));
+	}
+	else {
+		_tprintf(TEXT("Error closing key."));
+	}
+}
+
+//Guardar TOP10 no Registo
+void writeRegistry() {
+	LONG openRes = RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY, 0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
+	if (openRes == ERROR_SUCCESS) {
+		_tprintf(TEXT("Success opening key."));
+	}
+	else {
+		_tprintf(TEXT("Error opening key."));	}
+	LONG setRes = RegSetValueEx(hKey, value, 0, REG_SZ, (LPBYTE)& score, sizeof(Scores));
+	if (setRes == ERROR_SUCCESS) {		_tprintf(TEXT("Success writing to Registry."));
+	}
+	else {
+		_tprintf(TEXT("Error writing to Registry."));
+	}
+	LONG closeOut = RegCloseKey(hKey);
+	if (closeOut == ERROR_SUCCESS) {
+		_tprintf(TEXT("Success closing key."));
+	}
+	else {
+		_tprintf(TEXT("Error closing key."));
+	}
+}
+
+//LE registo
+void readRegistry() {
+	LONG openRes = RegOpenKeyEx(HKEY_CURRENT_USER, (LPWSTR)REGKEY, 0, KEY_ALL_ACCESS, &hKey);
+	if (openRes == ERROR_SUCCESS) {
+		_tprintf(TEXT("Success opening key."));
+	}
+	else {
+		_tprintf(TEXT("Error opening key."));
+	}
+
+
+	DWORD tam = sizeof(Scores);
+	RegGetValue(HKEY_CURRENT_USER, REGKEY, value, RRF_RT_ANY, NULL, (PVOID)& score, &tam);
+	LONG closeOut = RegCloseKey(hKey);
+	if (closeOut == ERROR_SUCCESS) {
+		_tprintf(TEXT("Success closing key."));
+	}
+	else {
+		_tprintf(TEXT("Error closing key."));
+	}
+}
+
+//Inicia para teste
+void inicia() {
+	//Inicializar para mostrar
+	swprintf_s(score.jogadores[0].nome, TEXT("Hugo"));
+	score.jogadores[0].pontos = 10;
+
+	for (int i = 1; i < 10; i++) {
+		//_tcscpy_s(ranking.jogadores[i].nome, sizeof(100), "Nuno e  HUGO");
+		swprintf_s(score.jogadores[i].nome, TEXT("Nuno"));
+		score.jogadores[i].pontos = 5;
+	}
+	writeRegistry();
+
+	swprintf_s(score.jogadores[1].nome, TEXT("MANUEL"));
+	score.jogadores[1].pontos = 6;
+
+	readRegistry();
+	_tprintf(TEXT("\nREGISTRY!\n TOP SCORE\n"));
+	for (int i = 0; i < 10; i++) {
+		_tprintf(TEXT("NOME: %s \t SCORE: %d\n"), score.jogadores[i].nome, score.jogadores[i].pontos);
+	}
+	_tprintf(TEXT("\n"));
 }

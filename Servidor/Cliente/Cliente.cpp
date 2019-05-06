@@ -1,4 +1,11 @@
-#include "Cliente.h"
+//Includes
+#include <windowsx.h>
+#include <windows.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <io.h>
+#include <tchar.h>
+#include "..\Dll\dll.h"
 
 //Prototipos para Cliente
 void createPipeCliente();
@@ -7,12 +14,9 @@ void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD ta
 //THREADS
 DWORD WINAPI leMensagemJogo(void);
 
-
-
 //VARIAVEIS GLOBAIS
 HANDLE hpipe;
 BOOL login = false;
-scores ranking;
 int pontosPlayer = 0;
 TCHAR nomePlayer[100] = TEXT(" ");
 MensagemJogo msgJogo;
@@ -20,12 +24,6 @@ MensagemJogo msgJogo;
 //thread
 HANDLE thread_mensagem_jogo;
 HANDLE thread_mensagem;
-
-//Regestry
-HKEY hKey;
-void inicia();
-void leRegistry();
-void escreveRegistry();
 
 //FUNÇÕES
 //Função Principal!
@@ -67,19 +65,17 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 	thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
 
-	//TESTE REGISTRY
-	inicia();
 
-	while (1) {
-
-	}
+	//while (1) {
+		
+	//}
 
 
-
+	_gettchar();
 	_tprintf(TEXT("\Terminei!\n"));
-	//_gettchar();
+	//Mandar mensagem ao gateway e servidor a dizer que o cliente foi desconnectado
+	system("pause");
 }
-
 
 // **** PIPES ****
 //Criar Pipe
@@ -139,79 +135,6 @@ void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD ta
 	_tprintf(TEXT("[ESCRITOR] Enviei %d bytes ao pipe ...\n"), tam);
 }
 
-//Cria Registo
-//Criar Registo
-void criarRegistry() {
-		DWORD dwDisposition;
-		RegCreateKeyEx(HKEY_CURRENT_USER, REGKEY, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &dwDisposition); //Key set to NULL but dwDisposition == REG_OPENED_EXISTING_KEY
-
-		if (dwDisposition != REG_CREATED_NEW_KEY && dwDisposition != REG_OPENED_EXISTING_KEY)
-			_tprintf(TEXT("Erro creating new key!\n"));
-}
-
-//Guardar TOP10 no Registo
-void escreveRegistry() {
-	LONG openRes = RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY, 0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
-	if (openRes == ERROR_SUCCESS) {
-		_tprintf(TEXT("Success opening key."));
-	}
-	else {
-		_tprintf(TEXT("Error opening key."));	}
-	LONG setRes = RegSetValueEx(hKey, value, 0, REG_SZ, (LPBYTE)& ranking, sizeof(scores));
-	if (setRes == ERROR_SUCCESS) {		_tprintf(TEXT("Success writing to Registry."));
-	}
-	else {
-		_tprintf(TEXT("Error writing to Registry."));
-	}
-	LONG closeOut = RegCloseKey(hKey);
-	if (closeOut == ERROR_SUCCESS) {
-		_tprintf(TEXT("Success closing key."));
-	}
-	else {
-		_tprintf(TEXT("Error closing key."));
-	}
-}
-
-void leRegistry() {
-	LONG openRes = RegOpenKeyEx(HKEY_CURRENT_USER, (LPWSTR) REGKEY, 0, KEY_ALL_ACCESS, &hKey);
-	if (openRes == ERROR_SUCCESS) {
-		_tprintf(TEXT("Success opening key."));
-	}
-	else {
-		_tprintf(TEXT("Error opening key."));
-	}
-	DWORD tam = sizeof(scores);
-	RegGetValue(HKEY_CURRENT_USER, REGKEY, value, RRF_RT_ANY, NULL, (PVOID)& ranking, &tam);
-}
-
-void inserirRanking() {
-	//Inserir valor no rank
-}
-
-void inicia() {
-	//Inicializar para mostrar
-	swprintf_s(ranking.jogadores[0].nome, TEXT("Hugo"));
-	ranking.jogadores[0].score = 10;
-
-	for (int i = 1; i < 10; i++) {
-		//_tcscpy_s(ranking.jogadores[i].nome, sizeof(100), "Nuno e  HUGO");
-		swprintf_s(ranking.jogadores[i].nome, TEXT("Nuno"));
-		ranking.jogadores[i].score = 5;
-	}
-	escreveRegistry();
-
-	swprintf_s(ranking.jogadores[1].nome, TEXT("MANUEL"));
-	ranking.jogadores[1].score = 6;
-	
-	criarRegistry();
-	leRegistry();
-	_tprintf(TEXT("\nREGISTRY!\n TOP SCORE\n"));
-	for (int i = 0; i < 10; i++) {
-		_tprintf(TEXT("NOME: %s \t SCORE: %d\n"), ranking.jogadores[i].nome ,ranking.jogadores[i].score);
-	}
-	_tprintf(TEXT("\n"));
-}
-
 
 DWORD WINAPI leMensagemJogo(void) {
 	HANDLE IoReady;
@@ -235,4 +158,3 @@ DWORD WINAPI leMensagemJogo(void) {
 	}
 	return 0;
 }
-
