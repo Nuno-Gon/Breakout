@@ -11,6 +11,7 @@
 #define BUFFER 10
 
 #define MAX_NUM_PLAYERS 20
+#define MAX_REGISTO 10
 
 #define CMD_MOVE_CIMA 1
 #define CMD_MOVE_BAIXO 2
@@ -19,6 +20,10 @@
 #define CMD_LOGIN 5
 #define CMD_LOGOUT 6
 
+#define PIPE_NAME TEXT("\\\\.\\pipe\\connect")
+
+#define REGKEY TEXT("SOFTWARE\\Arkanoid")
+LPCTSTR value = TEXT("Scores");
 
 //Mensagens (SINCRONIZAÇÃO)
 HANDLE podeEscrever;
@@ -45,6 +50,7 @@ TCHAR nomeEventoTerminaJogo[] = TEXT("EventoTermina");
 //COMANDO PARTILHADO (COMANDO_SHARED)
 typedef struct {
 	int id;
+	TCHAR nome[BUFFER_SIZE];
 	INT pontos;
 	bool login; //Verificar se foi login
 }Player;
@@ -63,6 +69,7 @@ typedef struct {
 
 typedef struct {
 	Player players[MAX_NUM_PLAYERS];
+	Player scores[MAX_REGISTO];
 	Bola bola; // Ver se só existe uma bola
 }MensagemJogo; //Jogo
 

@@ -9,7 +9,7 @@
 #include <tchar.h>
 #include "..\Dll\dll.h"
 
-#define MAX_REGISTO 10
+
 #define MAX_LOADSTRING 100
 
 #define PIPE_NAME TEXT("\\\\.\\pipe\\connect")
