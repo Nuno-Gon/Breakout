@@ -167,13 +167,17 @@ void writeRegistry() {
 		_tprintf(TEXT("Success opening key."));
 	}
 	else {
-		_tprintf(TEXT("Error opening key."));	}
+		_tprintf(TEXT("Error opening key."));
+	}
+
 	LONG setRes = RegSetValueEx(hKey, value, 0, REG_SZ, (LPBYTE)& score, sizeof(Scores));
-	if (setRes == ERROR_SUCCESS) {		_tprintf(TEXT("Success writing to Registry."));
+	if (setRes == ERROR_SUCCESS) {
+		_tprintf(TEXT("Success writing to Registry."));
 	}
 	else {
 		_tprintf(TEXT("Error writing to Registry."));
-	}
+	}
+
 	LONG closeOut = RegCloseKey(hKey);
 	if (closeOut == ERROR_SUCCESS) {
 		_tprintf(TEXT("Success closing key."));
