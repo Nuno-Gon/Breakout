@@ -47,6 +47,10 @@ TCHAR nomeEventoComecoJogo[] = TEXT("EventoComeco");
 TCHAR nomeEventoArrancaMemoria[] = TEXT("EventoMemoria");
 TCHAR nomeEventoTerminaJogo[] = TEXT("EventoTermina");
 
+//Tipo de cenas
+enum Tipo_Tijolo{normal, resistente, magico};
+enum Tipo_Brinde{speed_up, slow_down, vida_extra, triple, barreira}; //Adicionar outros brindes consoante a originalidade
+
 //Estruturas
 //COMANDO PARTILHADO (COMANDO_SHARED)
 typedef struct {
@@ -66,6 +70,26 @@ typedef struct {
 typedef struct {
 	COORD coord;
 }Bola;
+
+typedef struct {
+	COORD coord;
+	int dimensao;
+}Barreira;
+
+typedef struct {
+	COORD coord;
+	int dimensao;
+	Tipo_Tijolo tipo;
+	int vida;
+}Tijolo;
+
+typedef struct {
+	COORD coord;
+	int dimensao;
+	Tipo_Brinde tipo;
+	int velocidade;
+	int duracao;
+}Brinde;
 
 typedef struct {
 	Player jogadores[MAX_REGISTO];

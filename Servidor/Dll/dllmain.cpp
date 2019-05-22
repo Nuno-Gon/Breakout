@@ -136,12 +136,15 @@ void createSharedMemoryJogo(dataCr* d) {
 	}
 
 bool openSharedMemoryJogo(dataCr* d) {
-	d->hMapFileJogo = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, nomeMemoriaJogo);
+	d->hMapFileJogo = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, nomeMemoriaJogo);
+
 	if (d->hMapFileJogo == NULL) {
 		_tprintf(TEXT("Could not open file mapping object (%d).\n"), GetLastError());
 		return false;
-	}
-	d->sharedJogo = (DadosJogo*)MapViewOfFile(d->hMapFileJogo, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(DadosJogo));
+	}
+
+	d->sharedJogo = (DadosJogo*)MapViewOfFile(d->hMapFileJogo, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(DadosJogo));
+
 	if (d->sharedJogo == NULL) {
 		_tprintf(TEXT("[Erro]Mapeamento da mem�ria partilhada(%d)\n"), GetLastError());
 		CloseHandle(d->hMapFileJogo);
