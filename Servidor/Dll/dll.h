@@ -11,6 +11,9 @@
 
 #define MAX_NUM_PLAYERS 20
 #define MAX_REGISTO 10
+//Variaveis configuraveis para o jogo
+#define MAX_NUM_TIJOLOS 30
+#define MAX_NUM_BRINDES 30
 
 #define CMD_MOVE_CIMA 1
 #define CMD_MOVE_BAIXO 2
@@ -35,6 +38,8 @@ HANDLE hMutexEscrever;
 //Objetos JOGO (SINCRONIZAÇÃO)
 HANDLE mutex_bola;
 
+//Arrays para controlar brindes e secalhar tijolos
+
 //Memoria Partilhada 
 TCHAR nomeMemoriaComandos[] = TEXT("Nome da Memoria Partilhada Comandos");
 TCHAR nomeMemoriaJogo[] = TEXT("Nome da Mem�ria Partilhada Jogo");
@@ -52,10 +57,18 @@ enum Tipo_Tijolo{normal, resistente, magico};
 enum Tipo_Brinde{speed_up, slow_down, vida_extra, triple, barreira}; //Adicionar outros brindes consoante a originalidade
 
 //Estruturas
+typedef struct {
+	int id;
+	COORD coord;
+	int dimensao;
+}Barreira;
+
 //COMANDO PARTILHADO (COMANDO_SHARED)
 typedef struct {
 	int id;
 	TCHAR nome[BUFFER_SIZE];
+	Barreira barreira;
+	int vidas;
 	INT pontos;
 	bool login; //Verificar se foi login
 }Player;
@@ -71,12 +84,9 @@ typedef struct {
 	COORD coord;
 }Bola;
 
-typedef struct {
-	COORD coord;
-	int dimensao;
-}Barreira;
 
 typedef struct {
+	int id;
 	COORD coord;
 	int dimensao;
 	Tipo_Tijolo tipo;
@@ -84,7 +94,9 @@ typedef struct {
 }Tijolo;
 
 typedef struct {
+	int id;
 	COORD coord;
+	DWORD threadId;
 	int dimensao;
 	Tipo_Brinde tipo;
 	int velocidade;
@@ -98,7 +110,10 @@ typedef struct {
 typedef struct {
 	Player players[MAX_NUM_PLAYERS];
 	Scores ranking;
-	Bola bola; // Ver se só existe uma bola
+	Bola bola;  // Ver se só existe uma bola
+	Tijolo tijolos[MAX_NUM_TIJOLOS];
+	Brinde brindes[MAX_NUM_BRINDES];
+
 }MensagemJogo; //Jogo
 
 typedef struct {

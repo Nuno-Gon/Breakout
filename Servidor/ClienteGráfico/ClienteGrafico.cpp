@@ -89,7 +89,8 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK ListBoxExampleProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK ListBoxExampleProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -115,7 +116,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 }
 
 
-//
+//
+
 //  FUNCTION: MyRegisterClass()
 //
 //  PURPOSE: Registers the window class.
@@ -124,11 +126,14 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEXW wcex;
 
-	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW;	wcex.lpfnWndProc = WndProc;
+	wcex.cbSize = sizeof(WNDCLASSEX);
+
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProc;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
-	wcex.hInstance = hInstance;
+	wcex.hInstance = hInstance;
+
 	//Criar cor
    //wcex.hIcon = LoadIcon(NULL, IDI_ERROR);  // icone na barra de tarefas
 	//wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICONGAME));
@@ -137,14 +142,18 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	// wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
 	//wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_CLIENTEGRAFICO);
 	wcex.lpszClassName = szWindowClass;
-	//wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICONGAME));
+	//wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICONGAME));
+
 	return RegisterClassExW(&wcex);
 }
 
 
-//   FUNCTION: InitInstance(HINSTANCE, int)
-//
-//   PURPOSE: Saves instance handle and creates main window
+//   FUNCTION: InitInstance(HINSTANCE, int)
+
+//
+
+//   PURPOSE: Saves instance handle and creates main window
+
 //
 //   COMMENTS:
 //
@@ -155,13 +164,17 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // Store instance handle in our global variable
 	hWnd = CreateWindowW(szWindowClass, TEXT("Trabalho SO2"), WS_OVERLAPPEDWINDOW,
-		0, 0, 530, 600, nullptr, nullptr, hInstance, nullptr);
+		0, 0, 530, 600, nullptr, nullptr, hInstance, nullptr);
+
 	if (!hWnd){
 		return FALSE;
 	}
 
 	ShowWindow(hWnd, nCmdShow);
-	UpdateWindow(hWnd);	return TRUE;
+	UpdateWindow(hWnd);
+
+	return TRUE;
+
 }
 
 //
@@ -174,7 +187,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - post a quit message and return
 //
 //
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {	return 0;}
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+
+	return 0;
+}
+
+
 INT_PTR CALLBACK ListBoxExampleProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
 	return false;
 }
