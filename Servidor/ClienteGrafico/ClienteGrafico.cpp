@@ -38,6 +38,9 @@ HINSTANCE hInst;                                // instância atual
 WCHAR szTitle[MAX_LOADSTRING];                  // O texto da barra de título
 WCHAR szWindowClass[MAX_LOADSTRING];            // o nome da classe da janela principal
 
+HINSTANCE instance;
+
+
 // Declarações de encaminhamento de funções incluídas nesse módulo de código:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -51,33 +54,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-
+	/*
     // TODO: Coloque o código aqui.
 	//PIPE
 	createPipeCliente();
 	DWORD mode = PIPE_READMODE_MESSAGE;
 	SetNamedPipeHandleState(hpipe, &mode, NULL, NULL);
+	*/
 
 
-	//Login
-	TCHAR buf[256];
-
-	COMANDO_SHARED comando;
-	HANDLE ioReady;
-	OVERLAPPED ov;
-	DWORD tam = 0;
-
-	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
-	comando.idUser = 0;
-	comando.tipo = CMD_LOGIN;
-	comando.idHandle = hpipe;
-	ZeroMemory(&ov, sizeof(ov));
-	ResetEvent(ioReady);
-	ov.hEvent = ioReady;
-	escrevePipe(comando, ioReady, ov, tam);
-
+	/*
 	thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
-
+	*/
     // Inicializar cadeias de caracteres globais
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_CLIENTEGRAFICO, szWindowClass, MAX_LOADSTRING);
@@ -106,8 +94,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return (int) msg.wParam;
 }
 
-
-
 //
 //  FUNÇÃO: MyRegisterClass()
 //
@@ -126,7 +112,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hInstance      = hInstance;
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CLIENTEGRAFICO));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
+	wcex.hbrBackground = (HBRUSH)(CreateSolidBrush(RGB(0, 0, 255)));
+	// wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
     wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_CLIENTEGRAFICO);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -148,8 +135,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Armazenar o identificador de instância em nossa variável global
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+  /* HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+*/
+   HWND hWnd = CreateWindowW(szWindowClass, TEXT("Arkanoid"), WS_OVERLAPPEDWINDOW, // segundo parametro szTitle
+	   CW_USEDEFAULT, 0,1000, 900, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -229,7 +219,6 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return (INT_PTR)FALSE;
 }
-
 
 // **** PIPES ****
 //Criar Pipe
