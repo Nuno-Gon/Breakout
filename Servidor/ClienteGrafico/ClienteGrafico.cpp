@@ -17,6 +17,7 @@
 //Prototipos para Cliente
 void createPipeCliente();
 void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam);
+BOOL verifica_ON();
 
 //THREADS
 DWORD WINAPI leMensagemJogo(void);
@@ -37,8 +38,6 @@ HANDLE thread_mensagem;
 HINSTANCE hInst;                                // instância atual
 WCHAR szTitle[MAX_LOADSTRING];                  // O texto da barra de título
 WCHAR szWindowClass[MAX_LOADSTRING];            // o nome da classe da janela principal
-
-HINSTANCE instance;
 
 
 // Declarações de encaminhamento de funções incluídas nesse módulo de código:
@@ -135,12 +134,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Armazenar o identificador de instância em nossa variável global
 
-  /* HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-*/
+
+
+   /*
    HWND hWnd = CreateWindowW(szWindowClass, TEXT("Arkanoid"), WS_OVERLAPPEDWINDOW, // segundo parametro szTitle
 	   CW_USEDEFAULT, 0,1000, 900, nullptr, nullptr, hInstance, nullptr);
-
+	   */
    if (!hWnd)
    {
       return FALSE;
@@ -164,24 +165,69 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	//Variaveis
+	COMANDO_SHARED comando;
+	HANDLE ioReady;
+	OVERLAPPED ov;
+	DWORD tam = 0;
+
+	PAINTSTRUCT ps;
+	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
     switch (message)
     {
+	case WM_CREATE: //Quando é chamado o createWindow
+
+
+		break;
     case WM_COMMAND:
         {
+			
+		if (!verifica_ON())
+			login = false;
+
+		ZeroMemory(&ov, sizeof(ov));
+		ResetEvent(ioReady);
+		ov.hEvent = ioReady;
+
             int wmId = LOWORD(wParam);
             // Analise as seleções do menu:
             switch (wmId)
             {
+			case IDM_LOGIN:
+				if (login == false) {
+					DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+					comando.idUser = 0;
+					comando.tipo = CMD_LOGIN;
+					comando.idHandle = hpipe;
+					escrevePipe(comando, ioReady, ov, tam);
+					login = true;
+				}
+				else {
+					DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGINFAIL), hWnd, About);
+				}
+
+				break;
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
+
             case IDM_EXIT:
+				//mandar mensagem ao servidor para inserir no ranking e dizer que desconectou !
+				comando.idUser = 0;
+				comando.tipo = CMD_LOGOUT;
+				comando.idHandle = hpipe;
+				login = false;
+
+
                 DestroyWindow(hWnd);
                 break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
         }
+
+
+
         break;
     case WM_PAINT:
         {
@@ -300,4 +346,13 @@ DWORD WINAPI leMensagemJogo(void) {
 		}
 	}
 	return 0;
+}
+
+
+BOOL verifica_ON() { //Meter no lado do servidor a funcionar
+	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		if (msgJogo.players[i].idHandle == hpipe)
+			return true;
+	}
+	return false;
 }

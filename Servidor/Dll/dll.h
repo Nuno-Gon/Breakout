@@ -71,6 +71,7 @@ typedef struct {
 	int vidas;
 	INT pontos;
 	bool login; //Verificar se foi login
+	HANDLE idHandle;
 }Player;
 
 typedef struct {
