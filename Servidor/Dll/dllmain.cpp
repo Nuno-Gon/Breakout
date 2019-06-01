@@ -160,3 +160,22 @@ void readMensagemJogo(dataCr* d, MensagemJogo* s) {
 void writeMensagemJogo(dataCr* d, MensagemJogo* s) {
 	CopyMemory(&d->sharedJogo->jogo, s , sizeof(MensagemJogo));
 }
+
+void assertHandleIsNot(HANDLE qual, HANDLE valor, TCHAR* msg) {
+	if (qual == valor) {
+		_tprintf(TEXT("\nAssert: %s\n"), msg);
+		exit(1);
+	}
+}
+
+void gotoxy(int x, int y) {
+	static HANDLE hStdout = NULL;
+	COORD coord;
+	coord.X = x;
+	coord.Y = y;
+	if (hStdout == NULL) {
+		hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+		assertHandleIsNot(hStdout, NULL, (TCHAR*)TEXT("GetStdHandle falhou"));
+	}
+	SetConsoleCursorPosition(hStdout, coord);
+}

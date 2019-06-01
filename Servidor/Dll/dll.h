@@ -165,4 +165,8 @@ extern "C"
 	DLL_IMP_API void readMensagemJogo(dataCr* d, MensagemJogo* s);
 	DLL_IMP_API void writeMensagemJogo(dataCr* d, MensagemJogo* s);
 
+
+	//Obter posição jogadores
+	DLL_IMP_API void gotoxy(int x, int y);
+
 }

@@ -195,7 +195,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
 			case IDM_LOGIN:
 				if (login == false) {
-					DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+					DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGIN), hWnd, About);
 					comando.idUser = 0;
 					comando.tipo = CMD_LOGIN;
 					comando.idHandle = hpipe;
@@ -230,16 +230,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         break;
     case WM_PAINT:
-        {
+        { //pintar
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Adicione qualquer código de desenho que use hdc aqui...
             EndPaint(hWnd, &ps);
         }
         break;
+
+	case WM_KEYDOWN:
+		//Lidar com as teclas primidas
+		break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+	case WM_CLOSE:
+
+		break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }

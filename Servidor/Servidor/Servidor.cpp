@@ -24,6 +24,8 @@ void inicia();
 
 // Outras Funções
 void trataComando(COMANDO_SHARED comando);
+void inicia_mapa();
+int getIdPlayer(HANDLE aux);
 
 //Variaveis Globais
 INT acabar;
@@ -43,12 +45,20 @@ int _tmain(int argc, LPTSTR argv[]) {
 	_setmode(_fileno(stdin), _O_WTEXT);
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif 
-	srand(time_t(NULL));
 	_tprintf(TEXT("\Servidor Ligado!\n"));
 	
+	//Mutex
+
+
+
 	//por verificacoes se correu mal ou não
 	eventoComeco = CreateEvent(NULL, FALSE, FALSE, nomeEventoComecoJogo);
 	eventoMemoria = CreateEvent(NULL, FALSE, FALSE, nomeEventoArrancaMemoria);
+
+	if (eventoComeco == NULL || eventoMemoria == NULL) {
+		_tprintf(TEXT("ERRO!"));
+		return 0;
+	}
 
 	//fazer Protecao
 	createSharedMemoryJogo(&memoriaPartilhadaServidor);
@@ -66,7 +76,10 @@ int _tmain(int argc, LPTSTR argv[]) {
 	
 	//Abrir Registro
 		createRegistry();
-		inicia();
+		inicia(); //Inicia o Registry
+
+
+		inicia_mapa();
 
 
 		while (1){
@@ -110,7 +123,7 @@ void trataComando(COMANDO_SHARED comando) {
 	_tprintf(TEXT("\n Entrei Trata Comando!\n"));
 
 	if (comando.tipo != CMD_LOGIN) {
-		id = (comando.idUser);
+		id = getIdPlayer(comando.idHandle);
 
 	}
 
@@ -231,4 +244,35 @@ void inicia() {
 		_tprintf(TEXT("NOME: %s \t SCORE: %d\n"), score.jogadores[i].nome, score.jogadores[i].pontos);
 	}
 	_tprintf(TEXT("\n"));
+}
+
+int getIdPlayer(HANDLE aux) {
+	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		if (aux == msgJogo.players[i].idHandle) {
+			_tprintf(TEXT("\nRetornado id = %d"), msgJogo.players[i].id);
+			return msgJogo.players[i].id;
+		}
+	}
+	return -1;
+}
+
+
+void inicia_mapa() {
+	//Configuração inicial do MAPA
+	//Barreira
+	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		msgJogo.players[i].barreira.id = -1;
+		msgJogo.players[i].barreira.dimensao = 4; //ainda  verificar
+		msgJogo.players[i].barreira.coord.X = -1;
+		msgJogo.players[i].barreira.coord.Y = -1;
+
+
+		msgJogo.players[i].id = -1;
+		msgJogo.players[i].pontos = 0;
+		msgJogo.players[i].idHandle = INVALID_HANDLE_VALUE;
+		msgJogo.players[i].vidas = 3;
+	}
+
+
+
 }
