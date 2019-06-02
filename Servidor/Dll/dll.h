@@ -12,7 +12,9 @@
 #define MAX_NUM_PLAYERS 20
 #define MAX_REGISTO 10
 //Variaveis configuraveis para o jogo
+#define MAX_NUM_VIDAS 3
 #define MAX_NUM_TIJOLOS 30
+#define MAX_NUM_TIJOLOS_LINHA 6
 #define MAX_NUM_BRINDES 30
 
 #define CMD_MOVE_CIMA 1
