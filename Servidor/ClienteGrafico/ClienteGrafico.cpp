@@ -28,6 +28,12 @@ BOOL login = false;
 int pontosPlayer = 0;
 TCHAR nomePlayer[100] = TEXT(" ");
 MensagemJogo msgJogo;
+HWND hWnd;
+
+
+//PROVISORIO
+int x = 10;
+int y = 10;
 
 //thread
 HANDLE thread_mensagem_jogo;
@@ -131,7 +137,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Armazenar o identificador de instância em nossa variável global
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+   //HWND 
+		hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
 
@@ -286,14 +293,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//Imprimir tijolos
 			//for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
 			//	StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
-				StretchBlt(auxDC, 30, 30, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
+	
+			StretchBlt(auxDC, x += 1, y=+ 1, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
 			//}
 
+				//BOLA
+				if (Ellipse(auxDC, msgJogo.bola.coord.X, msgJogo.bola.coord.Y, msgJogo.bola.coord.X + 3, msgJogo.bola.coord.Y + 3) == 0) {
+					exit(0);
+				}
 
 			
 		
-
-			swprintf_s(informacoes, TEXT("Nenhum ativo"));
 
 			swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bola.coord.X, msgJogo.bola.coord.Y);
 			TextOut(auxDC, 10, 505, informacoes, _tcslen(informacoes));
@@ -414,6 +424,11 @@ DWORD WINAPI leMensagemJogo(void) {
 			ReadFile(hpipe, &msgJogo, sizeof(MensagemJogo), &tam, &ov);
 			WaitForSingleObject(IoReady, INFINITE);
 			GetOverlappedResult(hpipe, &ov, &tam, FALSE);
+			
+			
+			//fazer um refresh
+			Sleep(0.016666667); // 1 / 60 para meter 60hz
+			InvalidateRect(hWnd, NULL, FALSE);
 		}
 	}
 	return 0;
