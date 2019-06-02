@@ -206,6 +206,9 @@ BOOL checkEsquerda(int idUser) {
 
 
 /**************************************************************************************************************************************/
+
+/*********************************************************************** THREADS *******************************************************/
+
 DWORD WINAPI controlaBola(void) {
 	//termina quando o cliente insere uma tecla
 
@@ -215,6 +218,11 @@ DWORD WINAPI controlaBola(void) {
 	}
 
 }
+
+/**************************************************************************************************************************************/
+
+
+/********************************************************************* CONFIGURAÇÃO DO JOGO ********************************************/
 
 //Configuração inicial do MAPA
 void inicia_mapa() {
@@ -267,6 +275,10 @@ void insereBarreiraJogo(int id) {
 	}
 }
 
+/**************************************************************************************************************************************/
+
+
+/***************************************************************** FUNÇÔES SOBRE UTILIZADOR ***********************************************/
 
 int getIdPlayer(HANDLE aux) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
@@ -292,6 +304,18 @@ Player getPlayer(int idUser) {
 	}
 }
 
+
+//Desligar um Jogador
+void desconectaPlayer(int id) {
+	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		msgJogo.players[i].id = -1;
+		msgJogo.players[i].idHandle = INVALID_HANDLE_VALUE;
+	}
+}
+
+/*************************************************************************************************************************************/
+
+/*********************************************************************** REGISTERY *****************************************************/
 //Criar Registo
 void createRegistry() {
 	DWORD dwDisposition;
@@ -382,12 +406,4 @@ void inicia() {
 	_tprintf(TEXT("\n"));
 }
 
-
-//Desligar um Jogador
-void desconectaPlayer(int id) {
-	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
-		msgJogo.players[i].id = -1;
-		msgJogo.players[i].idHandle = INVALID_HANDLE_VALUE;
-	}
-}
-
+/***************************************************************************************************************************************/
