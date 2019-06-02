@@ -12,10 +12,11 @@
 #define IDI_CLIENTEGRAFICO              107
 #define IDI_SMALL                       108
 #define IDC_CLIENTEGRAFICO              109
+#define IDB_TIJOLO                      110
 #define IDR_MAINFRAME                   128
 #define IDD_LOGINFAIL                   132
+#define IDB_BITMAP1                     134
 #define IDC_USER                        1000
-#define IDC_EDIT1                       1001
 #define ID_AJUDA_TOP10                  32772
 #define ID_ARQUIVO_LOGIN                32774
 #define IDM_LOGIN                       32775
@@ -26,9 +27,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        133
+#define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32776
 #define _APS_NEXT_CONTROL_VALUE         1002
-#define _APS_NEXT_SYMED_VALUE           110
+#define _APS_NEXT_SYMED_VALUE           111
 #endif
 #endif

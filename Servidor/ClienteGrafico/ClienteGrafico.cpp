@@ -34,6 +34,8 @@ HANDLE thread_mensagem_jogo;
 HANDLE thread_mensagem;
 
 
+TCHAR informacoes[100] = TEXT("");
+
 // Variáveis Globais:
 HINSTANCE hInst;                                // instância atual
 WCHAR szTitle[MAX_LOADSTRING];                  // O texto da barra de título
@@ -53,18 +55,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-	/*
+	
     // TODO: Coloque o código aqui.
 	//PIPE
 	createPipeCliente();
 	DWORD mode = PIPE_READMODE_MESSAGE;
 	SetNamedPipeHandleState(hpipe, &mode, NULL, NULL);
-	*/
-
-
-	/*
-	thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
-	*/
+	
     // Inicializar cadeias de caracteres globais
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_CLIENTEGRAFICO, szWindowClass, MAX_LOADSTRING);
@@ -111,8 +108,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hInstance      = hInstance;
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CLIENTEGRAFICO));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(CreateSolidBrush(RGB(0, 0, 255)));
-	// wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
+	//wcex.hbrBackground = (HBRUSH)(CreateSolidBrush(RGB(0, 0, 255)));
+	 wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
     wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_CLIENTEGRAFICO);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -169,14 +166,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	COMANDO_SHARED comando;
 	HANDLE ioReady;
 	OVERLAPPED ov;
-	DWORD tam = 0;
+	DWORD tam = 0;	
 
-	PAINTSTRUCT ps;
+	static HBRUSH bg = NULL;
+	static int nx = 0, ny = 0;
+
+	static HDC hdc = NULL;
+	static HDC auxDC = NULL;
+	static HBITMAP auxBM = NULL;
+
+	static HBITMAP hTijolo = NULL;
+	static BITMAP bmTijolo;
+	static HDC hdcTijolo;
+
+
 	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
     switch (message)
     {
 	case WM_CREATE: //Quando é chamado o createWindow
+		//Obter as dimensões do Ecra
+		bg = CreateSolidBrush(RGB(255, 0, 0));
+		nx = GetSystemMetrics(SM_CYSCREEN);
+		ny = GetSystemMetrics(SM_CYSCREEN);
 
+
+		// Preparação de 'BITMAP'
+		hdc = GetDC(hWnd);
+		auxDC = CreateCompatibleDC(hdc);
+		auxBM = CreateCompatibleBitmap(hdc, nx, ny);
+		SelectObject(auxDC, auxBM);
+		SelectObject(auxDC, bg);
+		PatBlt(auxDC, 0, 0, nx, ny, PATCOPY);
+		ReleaseDC(hWnd, hdc);
+
+		// Carregar "BITMAP's"
+		hTijolo = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLO), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+
+		hdc = GetDC(hWnd);
+
+		// GETOBJECT ** Returns a reference to an object provided by an ActiveX component.
+		GetObject(hTijolo, sizeof(bmTijolo), &bmTijolo);
+
+		// The CreateCompatibleDC function creates a memory device context (DC) compatible with the specified device.
+		hdcTijolo = CreateCompatibleDC(hdc);
+
+		// The SelectObject function selects an object into the specified device context (DC). The new object replaces the previous object of the same type.
+		SelectObject(hdcTijolo, hTijolo);
+
+		ReleaseDC(hWnd, hdc);
 
 		break;
     case WM_COMMAND:
@@ -199,8 +236,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					comando.idUser = 0;
 					comando.tipo = CMD_LOGIN;
 					comando.idHandle = hpipe;
+					ZeroMemory(&ov, sizeof(ov));
+					ResetEvent(ioReady);
+					ov.hEvent = ioReady;
 					escrevePipe(comando, ioReady, ov, tam);
 					login = true;
+					thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
 				}
 				else {
 					DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGINFAIL), hWnd, About);
@@ -225,15 +266,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
         }
-
-
-
         break;
     case WM_PAINT:
         { //pintar
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
+			PAINTSTRUCT ps;
+           // HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Adicione qualquer código de desenho que use hdc aqui...
+			
+			// **The PatBlt function** paints the specified rectangle using the brush that is currently 
+			//selected into the specified device context. The brush color and the surface color 
+			//or colors are combined by using the specified raster operation.
+			PatBlt(auxDC, 0, 0, nx, ny, PATCOPY);
+
+
+			//The SetStretchBltMode function sets the bitmap stretching mode in the specified device context.
+			//BLACKONWHITE Perserva os valores pretos acima dos brancos (Pixeis)
+			SetStretchBltMode(auxDC, BLACKONWHITE);
+
+			//Imprimir tijolos
+			//for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
+			//	StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
+				StretchBlt(auxDC, 30, 30, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
+			//}
+
+
+			
+		
+
+			swprintf_s(informacoes, TEXT("Nenhum ativo"));
+
+			swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bola.coord.X, msgJogo.bola.coord.Y);
+			TextOut(auxDC, 10, 505, informacoes, _tcslen(informacoes));
+			//Copia a informação que está no 'DC' para a memória do Display ;)
+			hdc = BeginPaint(hWnd, &ps);
+			BitBlt(hdc, 0, 0, nx, ny, auxDC, 0, 0, SRCCOPY);
             EndPaint(hWnd, &ps);
         }
         break;
@@ -245,7 +311,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         break;
 	case WM_CLOSE:
-
+		exit(0);
 		break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -338,16 +404,14 @@ DWORD WINAPI leMensagemJogo(void) {
 	DWORD tam;
 	IoReady = CreateEvent(NULL, TRUE, FALSE, NULL);
 	int aux = 0;
+
+	
 	while (1) {
 		if (login == TRUE) {
 			ZeroMemory(&ov, sizeof(ov));
 			ResetEvent(IoReady);
 			ov.hEvent = IoReady;
-
 			ReadFile(hpipe, &msgJogo, sizeof(MensagemJogo), &tam, &ov);
-
-			_tprintf(TEXT("Posicao da Bola: (%d , %d)\n"), msgJogo.bola.coord.X, msgJogo.bola.coord.Y);
-			Sleep(500);
 			WaitForSingleObject(IoReady, INFINITE);
 			GetOverlappedResult(hpipe, &ov, &tam, FALSE);
 		}

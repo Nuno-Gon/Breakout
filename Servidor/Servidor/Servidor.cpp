@@ -32,6 +32,7 @@ void desconectaPlayer(int id);
 void inserePlayerJogo(HANDLE novo);
 BOOL checkDireita(int idUser);
 BOOL checkEsquerda(int idUser);
+void insereBarreiraJogo(int id);
 
 
 //Variaveis Globais

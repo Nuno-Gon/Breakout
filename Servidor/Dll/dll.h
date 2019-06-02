@@ -17,6 +17,10 @@
 #define MAX_NUM_TIJOLOS_LINHA 6
 #define MAX_NUM_BRINDES 30
 
+//LARGURA
+#define ALT_TIJOLO 50
+
+
 #define CMD_MOVE_CIMA 1
 #define CMD_MOVE_BAIXO 2
 #define CMD_MOVE_ESQ 3 
