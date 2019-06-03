@@ -220,58 +220,59 @@ DWORD WINAPI controlaBola(void) {
 		//NAO ESQUECER DE VERIFICAR QUANDO bate na barreira para ir para cima
 
 		//Verificações para a bola deve mexer agora
-		if (msgJogo.bola.direita) { // Se estiver a mover para a direita
-
-			if (msgJogo.bola.cima) { // Se mover para a direita e tiver a ir para cima
-				msgJogo.bola.coord.X += msgJogo.bola.velocidade;
-				msgJogo.bola.coord.Y -= msgJogo.bola.velocidade;
-			}
-			else { // Se mover para a direita e para baixo
-				msgJogo.bola.coord.X += msgJogo.bola.velocidade;
-				msgJogo.bola.coord.Y += msgJogo.bola.velocidade;
-			}
-		}
-		else { // SE MOVER PARA A ESQUERDA
-
-			if (msgJogo.bola.cima) { // Se mover para a esquerda e tiver a ir para cima
-				msgJogo.bola.coord.X -= msgJogo.bola.velocidade;
-				msgJogo.bola.coord.Y -= msgJogo.bola.velocidade;
-			}
-			else { // Se mover para a esquerda e para baixo
-				msgJogo.bola.coord.X -= msgJogo.bola.velocidade;
-				msgJogo.bola.coord.Y += msgJogo.bola.velocidade;
-			}
-
-		}
 
 
-		/*if (msgJogo.bola.coord.Y > LIMITE_INFERIOR) { // SE A BOLA PASSAR O LIMITE INFERIOR
+		if (msgJogo.bola.coord.Y > LIMITE_INFERIOR + 1) { // SE A BOLA PASSAR O LIMITE INFERIOR
 	//Acabar esta bola
 			msgJogo.bola.ativa = 0;
 			msgJogo.bola.coord.Y = -30;
 			msgJogo.bola.coord.X = -30;
 			break;
 		}
-		*/
 
-		if (msgJogo.bola.coord.X <= LIMITE_ESQUERDO || msgJogo.bola.coord.X >= LIMITE_DIREITO) { // Se bater dos lados, invertir posições laterais
 
-			if (msgJogo.bola.direita) {
-				msgJogo.bola.direita = false;
+		if (msgJogo.bola.cima) { //se mover para cima
+
+			if (msgJogo.bola.direita) { //Se mover para a direita
+				msgJogo.bola.coord.X += msgJogo.bola.velocidade;
+				msgJogo.bola.coord.Y -= msgJogo.bola.velocidade;
 			}
 			else {
-				msgJogo.bola.direita = true;
+				msgJogo.bola.coord.X -= msgJogo.bola.velocidade;
+				msgJogo.bola.coord.Y -= msgJogo.bola.velocidade;
+			}
+
+
+		}
+		else { // Se mover para baixo
+			if (msgJogo.bola.direita) { //Se mover para a direita
+				msgJogo.bola.coord.X += msgJogo.bola.velocidade;
+				msgJogo.bola.coord.Y += msgJogo.bola.velocidade;
+			}
+			else {
+				msgJogo.bola.coord.X -= msgJogo.bola.velocidade;
+				msgJogo.bola.coord.Y += msgJogo.bola.velocidade;
 			}
 
 		}
-		else if (msgJogo.bola.coord.Y <= LIMITE_SUPERIOR) { // se bater no LIMITE SUPERIOR INVERTER A DIREÇÃO DA BOLA
+
+
+
+
+		if (msgJogo.bola.coord.Y <= LIMITE_SUPERIOR) { // se bater no LIMITE SUPERIOR INVERTER A DIREÇÃO DA BOLA
 			msgJogo.bola.cima = false;
 		}
 		else if (msgJogo.bola.coord.Y >= LIMITE_INFERIOR) {//Meter um else onde verifica se imbate numa barreira, é se a possição dos x quando, está no limit é igual a da barreira!
 			msgJogo.bola.cima = true;
 		}
+		else if (msgJogo.bola.coord.X >= LIMITE_DIREITO){
+			msgJogo.bola.direita = false;
+		}
+		else if (msgJogo.bola.coord.X <= LIMITE_ESQUERDO) {
+			msgJogo.bola.direita = true;
+		}
 
-		Sleep(5);
+		Sleep(10);
 	}
 	return 0;
 }
@@ -309,7 +310,7 @@ void inicia_mapa() {
 
 	//BOLA
 	msgJogo.bola.ativa = 1;
-	msgJogo.bola.coord.X = LIMITE_ESQUERDO + 20;
+	msgJogo.bola.coord.X = LIMITE_ESQUERDO + 250;
 	msgJogo.bola.coord.Y = LIMITE_INFERIOR - 20;
 	msgJogo.bola.cima = true;
 	msgJogo.bola.direita = true;
