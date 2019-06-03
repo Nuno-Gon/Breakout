@@ -172,10 +172,12 @@ void gotoxy(int x, int y) {
 	static HANDLE hStdout = NULL;
 	COORD coord;
 	coord.X = x;
-	coord.Y = y;
+	coord.Y = y;
+
 	if (hStdout == NULL) {
 		hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 		assertHandleIsNot(hStdout, NULL, (TCHAR*)TEXT("GetStdHandle falhou"));
 	}
-	SetConsoleCursorPosition(hStdout, coord);
+	SetConsoleCursorPosition(hStdout, coord);
+
 }

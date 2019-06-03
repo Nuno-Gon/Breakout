@@ -138,14 +138,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	hInst = hInstance; // Armazenar o identificador de instância em nossa variável global
 
 	//HWND 
-	hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+//	hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+	//	CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
 
-	/*
-	HWND hWnd = CreateWindowW(szWindowClass, TEXT("Arkanoid"), WS_OVERLAPPEDWINDOW, // segundo parametro szTitle
-		CW_USEDEFAULT, 0,1000, 900, nullptr, nullptr, hInstance, nullptr);
-		*/
+	
+	hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, // segundo parametro szTitle
+		CW_USEDEFAULT, 0, LIMITE_DIREITO + 50, LIMITE_INFERIOR + 110, nullptr, nullptr, hInstance, nullptr);
+		
 	if (!hWnd)
 	{
 		return FALSE;
@@ -199,7 +199,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE: //Quando é chamado o createWindow
 		//Obter as dimensões do Ecra
-		bg = CreateSolidBrush(RGB(255, 0, 0));
+		bg = CreateSolidBrush(RGB(153, 153, 0));
 		nx = GetSystemMetrics(SM_CYSCREEN);
 		ny = GetSystemMetrics(SM_CYSCREEN);
 
@@ -215,7 +215,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		// Carregar "BITMAP's"
 		hTijolo = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLO), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
-		hBarreira = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLO), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hBarreira = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BARREIRA), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 
 		hdc = GetDC(hWnd);
 
@@ -305,7 +305,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//Imprimir tijolos
 		for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
 			if (msgJogo.tijolos[i].vida != 0) {
-				StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
+				StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
 			}
 			//StretchBlt(auxDC, msgJogo.bola.coord.X + 10 , msgJogo.bola.coord.Y + 10, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
 		}
@@ -313,17 +313,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//Barreira
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
-				StretchBlt(auxDC, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y, msgJogo.players[i].barreira.dimensao, ALT_BARREIRA, hdcBarreira, 0, 0, bmBarreira.bmWidth, bmBarreira.bmHeight, SRCCOPY);
+				StretchBlt(auxDC, msgJogo.players[i].barreira.coord.X , msgJogo.players[i].barreira.coord.Y, msgJogo.players[i].barreira.dimensao, ALT_BARREIRA, hdcBarreira, 0, 0, bmBarreira.bmWidth, bmBarreira.bmHeight, SRCCOPY);
 			}
 		}
-
+	
 		//BOLA
 		if(msgJogo.bola.ativa == 1)
 			Ellipse(auxDC, msgJogo.bola.coord.X, msgJogo.bola.coord.Y, msgJogo.bola.coord.X + 20, msgJogo.bola.coord.Y + 20);
 
 
 		swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bola.coord.X, msgJogo.bola.coord.Y);
-		TextOut(auxDC, 10, 505, informacoes, _tcslen(informacoes));
+		TextOut(auxDC, LIMITE_ESQUERDO + 10, LIMITE_INFERIOR + 20, informacoes, _tcslen(informacoes));
 		//Copia a informação que está no 'DC' para a memória do Display ;)
 		hdc = BeginPaint(hWnd, &ps);
 		BitBlt(hdc, 0, 0, nx, ny, auxDC, 0, 0, SRCCOPY);

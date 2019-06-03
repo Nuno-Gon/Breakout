@@ -13,22 +13,23 @@
 #define MAX_REGISTO 10
 //Variaveis configuraveis para o jogo
 #define MAX_NUM_VIDAS 3
-#define MAX_NUM_TIJOLOS 30
-#define MAX_NUM_TIJOLOS_LINHA 6
+#define MAX_NUM_TIJOLOS 66
+#define MAX_NUM_TIJOLOS_LINHA 11
 #define MAX_NUM_BRINDES 30
 
 //LARGURA
-#define ALT_TIJOLO 50
+#define LARG_TIJOLO 50
 
 //Altura Barreira
-#define ALT_BARREIRA 5
+#define ALT_BARREIRA 10
+#define ALT_TIJOLO 20
 
 
 //DIMENSÔES MAPA
 #define LIMITE_SUPERIOR 0
-#define LIMITE_INFERIOR 500
+#define LIMITE_INFERIOR 600
 #define LIMITE_ESQUERDO 0
-#define LIMITE_DIREITO 500
+#define LIMITE_DIREITO 700
 
 #define CMD_MOVE_CIMA 1
 #define CMD_MOVE_BAIXO 2

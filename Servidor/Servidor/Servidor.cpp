@@ -59,7 +59,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 	_setmode(_fileno(stdin), _O_WTEXT);
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif 
-	_tprintf(TEXT("\Servidor Ligado!\n"));
+	_tprintf(TEXT("Servidor Ligado!\n"));
 
 	//Mutex
 
@@ -81,7 +81,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 	//Abrir memoria partilhada
 	if (!openSharedMemory(&memoriaPartilhadaServidor)) {
-		_tprintf(TEXT("\Erro a abrir memoria Partilhada!\n"));
+		_tprintf(TEXT("Erro a abrir memoria Partilhada!\n"));
 		system("pause");
 		exit(0);
 	}
@@ -115,7 +115,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 		CloseHandle(eventoMemoria);
 	}
 
-	_tprintf(TEXT("\Servidor Desligado!\n"));
+	_tprintf(TEXT("Servidor Desligado!\n"));
 	UnmapViewOfFile(memoriaPartilhadaServidor.sharedJogo);
 	system("pause");
 	return 0;
@@ -124,7 +124,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 //THREADS
 //Lê mensagens da Memória
 DWORD WINAPI readMensagemMemory(void) {
-	_tprintf(TEXT("\Comecei Thread ler mensagem!\n"));
+	_tprintf(TEXT("Comecei Thread ler mensagem!\n"));
 	while (1) {
 		readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
 		trataComando(comandoLido);
@@ -136,7 +136,6 @@ DWORD WINAPI readMensagemMemory(void) {
 void trataComando(COMANDO_SHARED comando) {
 	int id = 0;
 	Player aux;
-	_tprintf(TEXT("\n Entrei Trata Comando!\n"));
 
 	if (comando.tipo != CMD_LOGIN) {
 		id = getIdPlayer(comando.idHandle);
@@ -151,7 +150,7 @@ void trataComando(COMANDO_SHARED comando) {
 		COMANDO_SHARED aux_shared;
 		aux_shared = comando;
 		aux_shared.login = true;
-		_tprintf(TEXT("\n Login Feito com Sucesso!\n"));
+		_tprintf(TEXT("Novo Utilizador Logado!\n"));
 		//Insere no JOGO
 		inserePlayerJogo(comando.idHandle);
 		loginPlayer = TRUE;
@@ -163,7 +162,7 @@ void trataComando(COMANDO_SHARED comando) {
 		break;
 	case CMD_LOGOUT:
 		desconectaPlayer(id);
-		_tprintf(TEXT("\n Cliente [%d] desconectado!\n"), id);
+		_tprintf(TEXT("Cliente [%d] desconectado!\n"), id);
 		break;
 	}
 
@@ -271,9 +270,9 @@ DWORD WINAPI controlaBola(void) {
 		else if (msgJogo.bola.coord.X <= LIMITE_ESQUERDO) {
 			msgJogo.bola.direita = true;
 		}
-
-		Sleep(10);
+		Sleep(5);
 	}
+
 	return 0;
 }
 
@@ -288,7 +287,7 @@ void inicia_mapa() {
 	//Barreira
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		msgJogo.players[i].barreira.id = -1;
-		msgJogo.players[i].barreira.dimensao = 4; //ainda  verificar
+		msgJogo.players[i].barreira.dimensao = 40; //ainda  verificar
 		msgJogo.players[i].barreira.coord.X = -1;
 		msgJogo.players[i].barreira.coord.Y = -1;
 
@@ -300,17 +299,17 @@ void inicia_mapa() {
 	}
 
 	//Tijolos
-	for (int i = 0; i < MAX_NUM_TIJOLOS / MAX_NUM_TIJOLOS_LINHA; i++) {
-		for (int x = 0; x < MAX_NUM_TIJOLOS_LINHA; x++) {
+	for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
 			msgJogo.tijolos[i].id = idTijolo++;
-			msgJogo.tijolos[i].coord.X = 10 + (x * ALT_TIJOLO); //Secalhar mudar porque o tijolo não é um quadrado, mas para começar ;)
-			msgJogo.tijolos[i].coord.Y = 20 + (x * ALT_TIJOLO);
-		}
+			msgJogo.tijolos[i].vida = 1;
+			msgJogo.tijolos[i].coord.X = LIMITE_SUPERIOR + 35 + ((i % MAX_NUM_TIJOLOS_LINHA) * (LARG_TIJOLO + 10)); //Secalhar mudar porque o tijolo não é um quadrado, mas para começar ;)
+			msgJogo.tijolos[i].coord.Y = LIMITE_ESQUERDO + 20 + ((i / MAX_NUM_TIJOLOS_LINHA) * (ALT_TIJOLO + 20));
+			//_tprintf(TEXT("Tijolo Colocado %d na posicao: x = %d, y = %d\n"), msgJogo.tijolos[i].id, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y);
 	}
 
 	//BOLA
 	msgJogo.bola.ativa = 1;
-	msgJogo.bola.coord.X = LIMITE_ESQUERDO + 250;
+	msgJogo.bola.coord.X = LIMITE_DIREITO / 2;
 	msgJogo.bola.coord.Y = LIMITE_INFERIOR - 20;
 	msgJogo.bola.cima = true;
 	msgJogo.bola.direita = true;
@@ -345,9 +344,9 @@ void insereBarreiraJogo(int id) {
 
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == id) {
-			_tprintf(TEXT("\n Colocado %d na posicao: x = , y = "), id);
-			msgJogo.players[i].barreira.coord.X = 20;
-			msgJogo.players[i].barreira.coord.Y = 500;
+			msgJogo.players[i].barreira.coord.X = LIMITE_ESQUERDO + 10;
+			msgJogo.players[i].barreira.coord.Y = LIMITE_INFERIOR;
+			_tprintf(TEXT("Colocado %d na posicao: x = %d, y = %d\n"), id, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y);
 
 			//Fazer função para verificar se ficou na posição certa
 		}
@@ -362,7 +361,7 @@ void insereBarreiraJogo(int id) {
 int getIdPlayer(HANDLE aux) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (aux == msgJogo.players[i].idHandle) {
-			_tprintf(TEXT("\nRetornado id = %d"), msgJogo.players[i].id);
+			_tprintf(TEXT("Retornado id = %d\n"), msgJogo.players[i].id);
 			return msgJogo.players[i].id;
 		}
 	}
@@ -374,11 +373,11 @@ Player getPlayer(int idUser) {
 	aux.id = -1;
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == idUser) {
-			_tprintf(TEXT("\n Player com %d [Retorno]"), msgJogo.players[i].id);
+			_tprintf(TEXT("Player com %d [Retorno]\n"), msgJogo.players[i].id);
 			return msgJogo.players[i];
 		}
 	}
-	_tprintf(TEXT("\n Player com %d [Retorno]"), aux.id);
+	_tprintf(TEXT("Player com %d [Retorno]\n"), aux.id);
 	return aux;
 }
 
@@ -477,7 +476,7 @@ void inicia() {
 	score.jogadores[1].pontos = 6;
 
 	readRegistry();
-	_tprintf(TEXT("\nREGISTRY!\n TOP SCORE\n"));
+	_tprintf(TEXT("REGISTRY!\n TOP SCORE\n"));
 	for (int i = 0; i < 10; i++) {
 		_tprintf(TEXT("NOME: %s \t SCORE: %d\n"), score.jogadores[i].nome, score.jogadores[i].pontos);
 	}
