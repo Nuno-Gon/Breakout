@@ -46,6 +46,7 @@ HANDLE thread_bola;
 HANDLE eventoMemoria, eventoComeco;
 Scores score;
 INT idUserPlayer = 1;
+INT idTijolo = 1;
 
 
 //VARIAVEIS CONFIGURAVEIS JOGO
@@ -53,13 +54,13 @@ INT movimentoBarreira = 3;
 
 int _tmain(int argc, LPTSTR argv[]) {
 
-//Project Properties > Character Set > Use Unicode Character Set
+	//Project Properties > Character Set > Use Unicode Character Set
 #ifdef UNICODE
 	_setmode(_fileno(stdin), _O_WTEXT);
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif 
 	_tprintf(TEXT("\Servidor Ligado!\n"));
-	
+
 	//Mutex
 
 
@@ -85,25 +86,25 @@ int _tmain(int argc, LPTSTR argv[]) {
 		exit(0);
 	}
 
-		WaitForSingleObject(eventoComeco, INFINITE);
-	
+	WaitForSingleObject(eventoComeco, INFINITE);
+
 	//Abrir Registro
-		createRegistry();
-		inicia(); //Inicia o Registry
+	createRegistry();
+	inicia(); //Inicia o Registry
 
 
-		//inicia_mapa();
+	inicia_mapa();
 
 
-		while (1){
-			acabar = 0;
+	while (1) {
+		acabar = 0;
 
-		//	iniciar_tijolos();
+		iniciar_tijolos();
 
-			thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
-			thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, NULL, 0, NULL);
+		thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
+		thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, NULL, 0, NULL);
 
-			do {
+		do {
 			CopyMemory(&memoriaPartilhadaServidor.sharedJogo->jogo, &msgJogo, sizeof(MensagemJogo)); //por no dll
 		} while (1);
 
@@ -125,8 +126,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 DWORD WINAPI readMensagemMemory(void) {
 	_tprintf(TEXT("\Comecei Thread ler mensagem!\n"));
 	while (1) {
-	readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
-	trataComando(comandoLido);
+		readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
+		trataComando(comandoLido);
 	}
 	return 0;
 }
@@ -146,12 +147,13 @@ void trataComando(COMANDO_SHARED comando) {
 
 	switch (comando.tipo) {
 	case CMD_LOGIN:
-		//Insere no JOGO
-		inserePlayerJogo(comando.idHandle);
+
 		COMANDO_SHARED aux_shared;
 		aux_shared = comando;
 		aux_shared.login = true;
 		_tprintf(TEXT("\n Login Feito com Sucesso!\n"));
+		//Insere no JOGO
+		inserePlayerJogo(comando.idHandle);
 		loginPlayer = TRUE;
 		break;
 	case CMD_MOVE_DIR:
@@ -214,11 +216,66 @@ DWORD WINAPI controlaBola(void) {
 	//termina quando o cliente insere uma tecla
 
 	while (1) {
-		msgJogo.bola.coord.X = rand() % 10;
-		msgJogo.bola.coord.Y = rand() % 10;
-	}
 
+		//NAO ESQUECER DE VERIFICAR QUANDO bate na barreira para ir para cima
+
+		//Verificações para a bola deve mexer agora
+		if (msgJogo.bola.direita) { // Se estiver a mover para a direita
+
+			if (msgJogo.bola.cima) { // Se mover para a direita e tiver a ir para cima
+				msgJogo.bola.coord.X += msgJogo.bola.velocidade;
+				msgJogo.bola.coord.Y -= msgJogo.bola.velocidade;
+			}
+			else { // Se mover para a direita e para baixo
+				msgJogo.bola.coord.X += msgJogo.bola.velocidade;
+				msgJogo.bola.coord.Y += msgJogo.bola.velocidade;
+			}
+		}
+		else { // SE MOVER PARA A ESQUERDA
+
+			if (msgJogo.bola.cima) { // Se mover para a esquerda e tiver a ir para cima
+				msgJogo.bola.coord.X -= msgJogo.bola.velocidade;
+				msgJogo.bola.coord.Y -= msgJogo.bola.velocidade;
+			}
+			else { // Se mover para a esquerda e para baixo
+				msgJogo.bola.coord.X -= msgJogo.bola.velocidade;
+				msgJogo.bola.coord.Y += msgJogo.bola.velocidade;
+			}
+
+		}
+
+
+		/*if (msgJogo.bola.coord.Y > LIMITE_INFERIOR) { // SE A BOLA PASSAR O LIMITE INFERIOR
+	//Acabar esta bola
+			msgJogo.bola.ativa = 0;
+			msgJogo.bola.coord.Y = -30;
+			msgJogo.bola.coord.X = -30;
+			break;
+		}
+		*/
+
+		if (msgJogo.bola.coord.X <= LIMITE_ESQUERDO || msgJogo.bola.coord.X >= LIMITE_DIREITO) { // Se bater dos lados, invertir posições laterais
+
+			if (msgJogo.bola.direita) {
+				msgJogo.bola.direita = false;
+			}
+			else {
+				msgJogo.bola.direita = true;
+			}
+
+		}
+		else if (msgJogo.bola.coord.Y <= LIMITE_SUPERIOR) { // se bater no LIMITE SUPERIOR INVERTER A DIREÇÃO DA BOLA
+			msgJogo.bola.cima = false;
+		}
+		else if (msgJogo.bola.coord.Y >= LIMITE_INFERIOR) {//Meter um else onde verifica se imbate numa barreira, é se a possição dos x quando, está no limit é igual a da barreira!
+			msgJogo.bola.cima = true;
+		}
+
+		Sleep(5);
+	}
+	return 0;
 }
+
 
 /**************************************************************************************************************************************/
 
@@ -240,7 +297,25 @@ void inicia_mapa() {
 		msgJogo.players[i].idHandle = INVALID_HANDLE_VALUE;
 		msgJogo.players[i].vidas = 3;
 	}
+
+	//Tijolos
+	for (int i = 0; i < MAX_NUM_TIJOLOS / MAX_NUM_TIJOLOS_LINHA; i++) {
+		for (int x = 0; x < MAX_NUM_TIJOLOS_LINHA; x++) {
+			msgJogo.tijolos[i].id = idTijolo++;
+			msgJogo.tijolos[i].coord.X = 10 + (x * ALT_TIJOLO); //Secalhar mudar porque o tijolo não é um quadrado, mas para começar ;)
+			msgJogo.tijolos[i].coord.Y = 20 + (x * ALT_TIJOLO);
+		}
+	}
+
+	//BOLA
+	msgJogo.bola.ativa = 1;
+	msgJogo.bola.coord.X = LIMITE_ESQUERDO + 20;
+	msgJogo.bola.coord.Y = LIMITE_INFERIOR - 20;
+	msgJogo.bola.cima = true;
+	msgJogo.bola.direita = true;
+	msgJogo.bola.velocidade = 1;
 }
+
 
 //Iniciar tijolos
 void iniciar_tijolos() {
@@ -270,6 +345,8 @@ void insereBarreiraJogo(int id) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == id) {
 			_tprintf(TEXT("\n Colocado %d na posicao: x = , y = "), id);
+			msgJogo.players[i].barreira.coord.X = 20;
+			msgJogo.players[i].barreira.coord.Y = 500;
 
 			//Fazer função para verificar se ficou na posição certa
 		}
@@ -299,10 +376,9 @@ Player getPlayer(int idUser) {
 			_tprintf(TEXT("\n Player com %d [Retorno]"), msgJogo.players[i].id);
 			return msgJogo.players[i];
 		}
-
-		_tprintf(TEXT("\n Player com %d [Retorno]"), aux.id);
-		return aux;
 	}
+	_tprintf(TEXT("\n Player com %d [Retorno]"), aux.id);
+	return aux;
 }
 
 

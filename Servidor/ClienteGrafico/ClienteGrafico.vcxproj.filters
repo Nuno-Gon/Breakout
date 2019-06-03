@@ -48,6 +48,12 @@
     <Image Include="tijolo.bmp">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
+    <Image Include="bitmap1.bmp">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="barreira.bmp">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="PropertySheet.props" />

@@ -20,6 +20,15 @@
 //LARGURA
 #define ALT_TIJOLO 50
 
+//Altura Barreira
+#define ALT_BARREIRA 5
+
+
+//DIMENSÔES MAPA
+#define LIMITE_SUPERIOR 0
+#define LIMITE_INFERIOR 500
+#define LIMITE_ESQUERDO 0
+#define LIMITE_DIREITO 500
 
 #define CMD_MOVE_CIMA 1
 #define CMD_MOVE_BAIXO 2
@@ -88,6 +97,10 @@ typedef struct {
 } COMANDO_SHARED;
 
 typedef struct {
+	int ativa;
+	bool cima;
+	bool direita;
+	int velocidade;
 	COORD coord;
 }Bola;
 

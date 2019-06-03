@@ -55,45 +55,45 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPWSTR    lpCmdLine,
+	_In_ int       nCmdShow)
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
-	
-    // TODO: Coloque o código aqui.
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	// TODO: Coloque o código aqui.
 	//PIPE
 	createPipeCliente();
 	DWORD mode = PIPE_READMODE_MESSAGE;
 	SetNamedPipeHandleState(hpipe, &mode, NULL, NULL);
-	
-    // Inicializar cadeias de caracteres globais
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_CLIENTEGRAFICO, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
 
-    // Realize a inicialização do aplicativo:
-    if (!InitInstance (hInstance, nCmdShow))
-    {
-        return FALSE;
-    }
+	// Inicializar cadeias de caracteres globais
+	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+	LoadStringW(hInstance, IDC_CLIENTEGRAFICO, szWindowClass, MAX_LOADSTRING);
+	MyRegisterClass(hInstance);
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CLIENTEGRAFICO));
+	// Realize a inicialização do aplicativo:
+	if (!InitInstance(hInstance, nCmdShow))
+	{
+		return FALSE;
+	}
 
-    MSG msg;
+	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CLIENTEGRAFICO));
 
-    // Loop de mensagem principal:
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
+	MSG msg;
 
-    return (int) msg.wParam;
+	// Loop de mensagem principal:
+	while (GetMessage(&msg, nullptr, 0, 0))
+	{
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+
+	return (int)msg.wParam;
 }
 
 //
@@ -103,24 +103,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-    WNDCLASSEXW wcex;
+	WNDCLASSEXW wcex;
 
-    wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CLIENTEGRAFICO));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_CLIENTEGRAFICO));
+	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	//wcex.hbrBackground = (HBRUSH)(CreateSolidBrush(RGB(0, 0, 255)));
-	 wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_CLIENTEGRAFICO);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_CLIENTEGRAFICO);
+	wcex.lpszClassName = szWindowClass;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-    return RegisterClassExW(&wcex);
+	return RegisterClassExW(&wcex);
 }
 
 //
@@ -135,26 +135,26 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Armazenar o identificador de instância em nossa variável global
+	hInst = hInstance; // Armazenar o identificador de instância em nossa variável global
 
-   //HWND 
-		hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+	//HWND 
+	hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
 
-   /*
-   HWND hWnd = CreateWindowW(szWindowClass, TEXT("Arkanoid"), WS_OVERLAPPEDWINDOW, // segundo parametro szTitle
-	   CW_USEDEFAULT, 0,1000, 900, nullptr, nullptr, hInstance, nullptr);
-	   */
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+	/*
+	HWND hWnd = CreateWindowW(szWindowClass, TEXT("Arkanoid"), WS_OVERLAPPEDWINDOW, // segundo parametro szTitle
+		CW_USEDEFAULT, 0,1000, 900, nullptr, nullptr, hInstance, nullptr);
+		*/
+	if (!hWnd)
+	{
+		return FALSE;
+	}
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
 
-   return TRUE;
+	return TRUE;
 }
 
 //
@@ -173,7 +173,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	COMANDO_SHARED comando;
 	HANDLE ioReady;
 	OVERLAPPED ov;
-	DWORD tam = 0;	
+	DWORD tam = 0;
 
 	static HBRUSH bg = NULL;
 	static int nx = 0, ny = 0;
@@ -182,14 +182,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static HDC auxDC = NULL;
 	static HBITMAP auxBM = NULL;
 
+	//Tijolo
 	static HBITMAP hTijolo = NULL;
 	static BITMAP bmTijolo;
 	static HDC hdcTijolo;
 
+	//Barreira
+	static HBITMAP hBarreira = NULL;
+	static BITMAP bmBarreira;
+	static HDC hdcBarreira;
+
+
 
 	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
-    switch (message)
-    {
+	switch (message)
+	{
 	case WM_CREATE: //Quando é chamado o createWindow
 		//Obter as dimensões do Ecra
 		bg = CreateSolidBrush(RGB(255, 0, 0));
@@ -208,24 +215,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		// Carregar "BITMAP's"
 		hTijolo = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLO), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hBarreira = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLO), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 
 		hdc = GetDC(hWnd);
 
 		// GETOBJECT ** Returns a reference to an object provided by an ActiveX component.
 		GetObject(hTijolo, sizeof(bmTijolo), &bmTijolo);
+		GetObject(hBarreira, sizeof(bmBarreira), &bmBarreira);
+
 
 		// The CreateCompatibleDC function creates a memory device context (DC) compatible with the specified device.
 		hdcTijolo = CreateCompatibleDC(hdc);
+		hdcBarreira = CreateCompatibleDC(hdc);
 
 		// The SelectObject function selects an object into the specified device context (DC). The new object replaces the previous object of the same type.
 		SelectObject(hdcTijolo, hTijolo);
+		SelectObject(hdcBarreira, hBarreira);
 
 		ReleaseDC(hWnd, hdc);
 
 		break;
-    case WM_COMMAND:
-        {
-			
+	case WM_COMMAND:
+	{
+
 		if (!verifica_ON())
 			login = false;
 
@@ -233,120 +245,125 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		ResetEvent(ioReady);
 		ov.hEvent = ioReady;
 
-            int wmId = LOWORD(wParam);
-            // Analise as seleções do menu:
-            switch (wmId)
-            {
-			case IDM_LOGIN:
-				if (login == false) {
-					DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGIN), hWnd, About);
-					comando.idUser = 0;
-					comando.tipo = CMD_LOGIN;
-					comando.idHandle = hpipe;
-					ZeroMemory(&ov, sizeof(ov));
-					ResetEvent(ioReady);
-					ov.hEvent = ioReady;
-					escrevePipe(comando, ioReady, ov, tam);
-					login = true;
-					thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
-				}
-				else {
-					DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGINFAIL), hWnd, About);
-				}
-
-				break;
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-
-            case IDM_EXIT:
-				//mandar mensagem ao servidor para inserir no ranking e dizer que desconectou !
+		int wmId = LOWORD(wParam);
+		// Analise as seleções do menu:
+		switch (wmId)
+		{
+		case IDM_LOGIN:
+			if (login == false) {
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGIN), hWnd, About);
 				comando.idUser = 0;
-				comando.tipo = CMD_LOGOUT;
+				comando.tipo = CMD_LOGIN;
 				comando.idHandle = hpipe;
-				login = false;
+				ZeroMemory(&ov, sizeof(ov));
+				ResetEvent(ioReady);
+				ov.hEvent = ioReady;
+				escrevePipe(comando, ioReady, ov, tam);
+				login = true;
+				thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
+			}
+			else {
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGINFAIL), hWnd, About);
+			}
+
+			break;
+		case IDM_ABOUT:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+			break;
+
+		case IDM_EXIT:
+			//mandar mensagem ao servidor para inserir no ranking e dizer que desconectou !
+			comando.idUser = 0;
+			comando.tipo = CMD_LOGOUT;
+			comando.idHandle = hpipe;
+			login = false;
 
 
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
-        }
-        break;
-    case WM_PAINT:
-        { //pintar
-			PAINTSTRUCT ps;
-           // HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Adicione qualquer código de desenho que use hdc aqui...
-			
-			// **The PatBlt function** paints the specified rectangle using the brush that is currently 
-			//selected into the specified device context. The brush color and the surface color 
-			//or colors are combined by using the specified raster operation.
-			PatBlt(auxDC, 0, 0, nx, ny, PATCOPY);
+			DestroyWindow(hWnd);
+			break;
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
+	}
+	break;
+	case WM_PAINT:
+	{ //pintar
+		PAINTSTRUCT ps;
+		// HDC hdc = BeginPaint(hWnd, &ps);
+		 // TODO: Adicione qualquer código de desenho que use hdc aqui...
+
+		 // **The PatBlt function** paints the specified rectangle using the brush that is currently 
+		 //selected into the specified device context. The brush color and the surface color 
+		 //or colors are combined by using the specified raster operation.
+		PatBlt(auxDC, 0, 0, nx, ny, PATCOPY);
 
 
-			//The SetStretchBltMode function sets the bitmap stretching mode in the specified device context.
-			//BLACKONWHITE Perserva os valores pretos acima dos brancos (Pixeis)
-			SetStretchBltMode(auxDC, BLACKONWHITE);
+		//The SetStretchBltMode function sets the bitmap stretching mode in the specified device context.
+		//BLACKONWHITE Perserva os valores pretos acima dos brancos (Pixeis)
+		SetStretchBltMode(auxDC, BLACKONWHITE);
 
-			//Imprimir tijolos
-			//for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
-			//	StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
-	
-			StretchBlt(auxDC, x += 1, y=+ 1, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
-			//}
+		//Imprimir tijolos
+		for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
+			if (msgJogo.tijolos[i].vida != 0) {
+				StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
+			}
+			//StretchBlt(auxDC, msgJogo.bola.coord.X + 10 , msgJogo.bola.coord.Y + 10, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
+		}
 
-				//BOLA
-				if (Ellipse(auxDC, msgJogo.bola.coord.X, msgJogo.bola.coord.Y, msgJogo.bola.coord.X + 3, msgJogo.bola.coord.Y + 3) == 0) {
-					exit(0);
-				}
+		//Barreira
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
+				StretchBlt(auxDC, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y, msgJogo.players[i].barreira.dimensao, ALT_BARREIRA, hdcBarreira, 0, 0, bmBarreira.bmWidth, bmBarreira.bmHeight, SRCCOPY);
+			}
+		}
 
-			
-		
+		//BOLA
+		if(msgJogo.bola.ativa == 1)
+			Ellipse(auxDC, msgJogo.bola.coord.X, msgJogo.bola.coord.Y, msgJogo.bola.coord.X + 20, msgJogo.bola.coord.Y + 20);
 
-			swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bola.coord.X, msgJogo.bola.coord.Y);
-			TextOut(auxDC, 10, 505, informacoes, _tcslen(informacoes));
-			//Copia a informação que está no 'DC' para a memória do Display ;)
-			hdc = BeginPaint(hWnd, &ps);
-			BitBlt(hdc, 0, 0, nx, ny, auxDC, 0, 0, SRCCOPY);
-            EndPaint(hWnd, &ps);
-        }
-        break;
+
+		swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bola.coord.X, msgJogo.bola.coord.Y);
+		TextOut(auxDC, 10, 505, informacoes, _tcslen(informacoes));
+		//Copia a informação que está no 'DC' para a memória do Display ;)
+		hdc = BeginPaint(hWnd, &ps);
+		BitBlt(hdc, 0, 0, nx, ny, auxDC, 0, 0, SRCCOPY);
+		EndPaint(hWnd, &ps);
+	}
+	break;
 
 	case WM_KEYDOWN:
 		//Lidar com as teclas primidas
 		break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
 	case WM_CLOSE:
 		exit(0);
 		break;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-    return 0;
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
 }
 
 // Manipulador de mensagem para a caixa 'sobre'.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
 
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
 }
 
 // **** PIPES ****
@@ -415,7 +432,7 @@ DWORD WINAPI leMensagemJogo(void) {
 	IoReady = CreateEvent(NULL, TRUE, FALSE, NULL);
 	int aux = 0;
 
-	
+
 	while (1) {
 		if (login == TRUE) {
 			ZeroMemory(&ov, sizeof(ov));
@@ -424,10 +441,10 @@ DWORD WINAPI leMensagemJogo(void) {
 			ReadFile(hpipe, &msgJogo, sizeof(MensagemJogo), &tam, &ov);
 			WaitForSingleObject(IoReady, INFINITE);
 			GetOverlappedResult(hpipe, &ov, &tam, FALSE);
-			
-			
+
+
 			//fazer um refresh
-			Sleep(0.016666667); // 1 / 60 para meter 60hz
+			Sleep(0166); // 1 / 60 para meter 60hz
 			InvalidateRect(hWnd, NULL, FALSE);
 		}
 	}

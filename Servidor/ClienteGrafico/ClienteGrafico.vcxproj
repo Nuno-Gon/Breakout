@@ -163,6 +163,8 @@
     <ResourceCompile Include="ClienteGrafico.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="barreira.bmp" />
+    <Image Include="bitmap1.bmp" />
     <Image Include="ClienteGrafico.ico" />
     <Image Include="small.ico" />
     <Image Include="tijolo.bmp" />

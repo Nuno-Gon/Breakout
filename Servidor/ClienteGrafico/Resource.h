@@ -15,7 +15,8 @@
 #define IDB_TIJOLO                      110
 #define IDR_MAINFRAME                   128
 #define IDD_LOGINFAIL                   132
-#define IDB_BITMAP1                     134
+#define IDB_BITMAP1                     135
+#define IDB_BARREIRA                    135
 #define IDC_USER                        1000
 #define ID_AJUDA_TOP10                  32772
 #define ID_ARQUIVO_LOGIN                32774
@@ -27,7 +28,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        135
+#define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32776
 #define _APS_NEXT_CONTROL_VALUE         1002
 #define _APS_NEXT_SYMED_VALUE           111
