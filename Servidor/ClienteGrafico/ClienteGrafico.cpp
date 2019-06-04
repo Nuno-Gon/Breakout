@@ -142,10 +142,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//	CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
 
-	
+
 	hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, // segundo parametro szTitle
 		CW_USEDEFAULT, 0, LIMITE_DIREITO + 50, LIMITE_INFERIOR + 110, nullptr, nullptr, hInstance, nullptr);
-		
+
 	if (!hWnd)
 	{
 		return FALSE;
@@ -313,12 +313,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//Barreira
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
-				StretchBlt(auxDC, msgJogo.players[i].barreira.coord.X , msgJogo.players[i].barreira.coord.Y, msgJogo.players[i].barreira.dimensao, ALT_BARREIRA, hdcBarreira, 0, 0, bmBarreira.bmWidth, bmBarreira.bmHeight, SRCCOPY);
+				StretchBlt(auxDC, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y, msgJogo.players[i].barreira.dimensao, ALT_BARREIRA, hdcBarreira, 0, 0, bmBarreira.bmWidth, bmBarreira.bmHeight, SRCCOPY);
 			}
 		}
-	
+
 		//BOLA
-		if(msgJogo.bola.ativa == 1)
+		if (msgJogo.bola.ativa == 1)
 			Ellipse(auxDC, msgJogo.bola.coord.X, msgJogo.bola.coord.Y, msgJogo.bola.coord.X + 20, msgJogo.bola.coord.Y + 20);
 
 
@@ -333,7 +333,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_KEYDOWN:
 		//Lidar com as teclas primidas
-		break;
+		ZeroMemory(&ov, sizeof(ov));
+		ResetEvent(ioReady);
+		ov.hEvent = ioReady;
+
+		switch (wParam) {
+		case VK_LEFT:
+			comando.tipo = CMD_MOVE_ESQ;
+			comando.idUser = 0;
+			comando.idHandle = hpipe;
+			escrevePipe(comando, ioReady, ov, tam);
+			break;
+		case VK_RIGHT:
+			comando.tipo = CMD_MOVE_DIR;
+			comando.idUser = 0;
+			comando.idHandle = hpipe;
+			escrevePipe(comando, ioReady, ov, tam);
+			break;
+		case 0x1B: //Process an escape
+			//Tecnicamente carregando escape o jogador baza :O
+			break;
+		default:
+			break;
+		}
+			break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -444,7 +467,7 @@ DWORD WINAPI leMensagemJogo(void) {
 
 
 			//fazer um refresh
-			Sleep(0166); // 1 / 60 para meter 60hz
+		//	Sleep(0166); // 1 / 60 para meter 60hz
 			InvalidateRect(hWnd, NULL, FALSE);
 		}
 	}

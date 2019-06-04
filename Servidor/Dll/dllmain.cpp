@@ -37,7 +37,7 @@ bool createSharedMemory(dataCr* d) {
 	}
 
 
-	d->hSemafroPodeEscrever = CreateSemaphore(NULL, 500, 1000, nomeSemaforoPodeEscrever);
+	d->hSemafroPodeEscrever = CreateSemaphore(NULL, 1000, 1000, nomeSemaforoPodeEscrever);
 	if (d->hSemafroPodeEscrever == NULL) {
 		_tprintf(TEXT("O semafro correu mal\n"));
 		return false;

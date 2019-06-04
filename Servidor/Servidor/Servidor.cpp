@@ -33,6 +33,8 @@ void inserePlayerJogo(HANDLE novo);
 BOOL checkDireita(int idUser);
 BOOL checkEsquerda(int idUser);
 void insereBarreiraJogo(int id);
+void moveJogadorEsquerda(int idUser);
+void moveJogadorDireita(int idUser);
 
 
 //Variaveis Globais
@@ -59,7 +61,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 	_setmode(_fileno(stdin), _O_WTEXT);
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif 
-	_tprintf(TEXT("Servidor Ligado!\n"));
+	_tprintf(TEXT("*********************Servidor Ligado!*****************************\n"));
 
 	//Mutex
 
@@ -115,7 +117,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 		CloseHandle(eventoMemoria);
 	}
 
-	_tprintf(TEXT("Servidor Desligado!\n"));
+	_tprintf(TEXT("*******************Servidor Desligado!****************************\n"));
 	UnmapViewOfFile(memoriaPartilhadaServidor.sharedJogo);
 	system("pause");
 	return 0;
@@ -124,7 +126,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 //THREADS
 //Lê mensagens da Memória
 DWORD WINAPI readMensagemMemory(void) {
-	_tprintf(TEXT("Comecei Thread ler mensagem!\n"));
+	//_tprintf(TEXT("Comecei Thread ler mensagem!\n"));
 	while (1) {
 		readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
 		trataComando(comandoLido);
@@ -156,9 +158,10 @@ void trataComando(COMANDO_SHARED comando) {
 		loginPlayer = TRUE;
 		break;
 	case CMD_MOVE_DIR:
-
+		moveJogadorDireita(id);
 		break;
 	case CMD_MOVE_ESQ:
+		moveJogadorEsquerda(id);
 		break;
 	case CMD_LOGOUT:
 		desconectaPlayer(id);
@@ -187,7 +190,7 @@ void moveJogadorEsquerda(int idUser) {
 	//Verificar se pode mover para a direita e não colide com outros utilizadores (EIXO DOS X)
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == idUser && checkEsquerda(idUser)) {
-			msgJogo.players[i].barreira.coord.X += movimentoBarreira; //Outro movimento variavel
+			msgJogo.players[i].barreira.coord.X -= movimentoBarreira; //Outro movimento variavel
 			return;
 		}
 	}
@@ -327,7 +330,7 @@ void iniciar_tijolos() {
 void inserePlayerJogo(HANDLE novo) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].idHandle == INVALID_HANDLE_VALUE) {
-			_tprintf(TEXT("\n Cliente Inicializado no Jogo!"));
+			_tprintf(TEXT("Cliente Inicializado no Jogo!\n"));
 			msgJogo.players[i].id = idUserPlayer++;
 			msgJogo.players[i].idHandle = novo;
 			msgJogo.players[i].vidas = MAX_NUM_VIDAS;
@@ -346,7 +349,7 @@ void insereBarreiraJogo(int id) {
 		if (msgJogo.players[i].id == id) {
 			msgJogo.players[i].barreira.coord.X = LIMITE_ESQUERDO + 10;
 			msgJogo.players[i].barreira.coord.Y = LIMITE_INFERIOR;
-			_tprintf(TEXT("Colocado %d na posicao: x = %d, y = %d\n"), id, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y);
+			_tprintf(TEXT("O Jogador foi %d foi colocado na posicao: x = %d, y = %d\n"), id, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y);
 
 			//Fazer função para verificar se ficou na posição certa
 		}
