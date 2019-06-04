@@ -26,7 +26,6 @@ void inicia();
 void trataComando(COMANDO_SHARED comando);
 void inicia_mapa();
 int getIdPlayer(HANDLE aux);
-void iniciar_tijolos();
 Player getPlayer(int idUser);
 void desconectaPlayer(int id);
 void inserePlayerJogo(HANDLE novo);
@@ -100,7 +99,6 @@ int _tmain(int argc, LPTSTR argv[]) {
 	while (1) {
 		acabar = 0;
 
-		iniciar_tijolos();
 		thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
 		WaitForSingleObject(eventoComeco, INFINITE);
 		thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, NULL, 0, NULL);
@@ -360,24 +358,32 @@ DWORD WINAPI controlaBola(void) {
 
 						}
 					}
+					else {
+
+						if (!msgJogo.bola.direita) { //para baixo e para a esquerda
+
+							if (msgJogo.bola.coord.X - msgJogo.tijolos[i].coord.X > msgJogo.bola.coord.Y - msgJogo.tijolos[i].coord.Y) {
+								msgJogo.bola.cima = true;
+							}
+							else {
+								msgJogo.bola.direita = false;
+							}
+
+						}
+						else {
+
+							if (msgJogo.tijolos[i].coord.X + LARG_TIJOLO - msgJogo.bola.coord.X  > msgJogo.bola.coord.Y - msgJogo.tijolos[i].coord.Y) {
+								msgJogo.bola.cima = true;
+							}
+							else {
+								msgJogo.bola.direita = true;
+							}
 
 
-
-					/*
-					if (verificaLadoEsquerdoColisao(i)) {
-						msgJogo.bola.direita = false;
-					}
-					else if(verificaLadoDireitoColisao(i)){
-						msgJogo.bola.direita = true;
-					}
-					else if (verificaCimaColisao(i)) {
-						msgJogo.bola.cima = true;
-					}
-					else if (verificaBaixoColisao(i)) {
-						msgJogo.bola.cima = false;
+						}
 
 					}
-					*/
+
 
 					
 					msgJogo.tijolos[i].vida--;
@@ -436,16 +442,10 @@ void inicia_mapa() {
 	msgJogo.bola.cima = true;
 	msgJogo.bola.direita = true;
 	msgJogo.bola.velocidade = 1;
-	msgJogo.bola.raio = 20;
+	msgJogo.bola.raio = 5;
 }
 
 
-//Iniciar tijolos
-void iniciar_tijolos() {
-	//Meter configurações para iniciar jogo
-
-
-}
 
 void inserePlayerJogo(HANDLE novo) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
