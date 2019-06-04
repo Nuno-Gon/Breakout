@@ -132,10 +132,10 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 		ZeroMemory(&ov, sizeof(ov));
 		ResetEvent(ioReady);
 		ov.hEvent = ioReady;
-
 		ReadFile(x, &aux, sizeof(COMANDO_SHARED), &n, &ov);
-
+		
 		WaitForSingleObject(ioReady, INFINITE);
+
 		GetOverlappedResult(hPipe, &ov, &n, FALSE);
 		if (!n) {
 			_tprintf(TEXT("[Escritor leu] %d bytes... (ReadFile)\n"), n);
@@ -160,7 +160,7 @@ DWORD WINAPI aceita_cliente(LPVOID param) {
 
 	while (termina == 0) {
 		_tprintf(TEXT("[ESCRITOR] Criar uma copia do pipe '%s' ... (CreateNamedPipe)\n"), PIPE_NAME);
-		hPipe = CreateNamedPipe(PIPE_NAME, PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, 5, sizeof(COMANDO_SHARED) , sizeof(COMANDO_SHARED), 1000, NULL);
+		hPipe = CreateNamedPipe(PIPE_NAME, PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, PIPE_WAIT | PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, 5, sizeof(COMANDO_SHARED) + sizeof(MensagemJogo) , sizeof(COMANDO_SHARED) + sizeof(MensagemJogo), 1000, NULL);
 
 		if (hPipe == INVALID_HANDLE_VALUE) {
 			_tprintf(TEXT("[ERRO] Criar Named Pipe! (CreateNamedPipe)"));

@@ -144,7 +144,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 
 	hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, // segundo parametro szTitle
-		CW_USEDEFAULT, 0, LIMITE_DIREITO + 50, LIMITE_INFERIOR + 110, nullptr, nullptr, hInstance, nullptr);
+		CW_USEDEFAULT, 0, LIMITE_DIREITO + 30, LIMITE_INFERIOR + 110, nullptr, nullptr, hInstance, nullptr);
 
 	if (!hWnd)
 	{
@@ -429,8 +429,10 @@ void createPipeCliente() {
 //Escreve Pipe
 void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam) {
 
+
 	if (!WriteFile(hpipe, &comando, sizeof(COMANDO_SHARED), &tam, &ov)) {
 		_tprintf(TEXT("[ERRO] Escrever no pipe! (WriteFile)\n"));
+		//Está a dar erro a escrever para o pipe
 		exit(-1);
 	}
 

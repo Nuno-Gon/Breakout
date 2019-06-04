@@ -52,7 +52,7 @@ INT idTijolo = 1;
 
 
 //VARIAVEIS CONFIGURAVEIS JOGO
-INT movimentoBarreira = 3;
+INT movimentoBarreira = 6;
 
 int _tmain(int argc, LPTSTR argv[]) {
 
@@ -64,7 +64,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 	_tprintf(TEXT("*********************Servidor Ligado!*****************************\n"));
 
 	//Mutex
-
+	mutex_player = CreateMutex(NULL, FALSE, NULL);
 
 
 	//por verificacoes se correu mal ou não
@@ -177,35 +177,65 @@ void trataComando(COMANDO_SHARED comando) {
 
 void moveJogadorDireita(int idUser) {
 	//Verificar se pode mover para a direita, e não colide com outros utilizadores (EIXO DOS X)
+	WaitForSingleObject(mutex_player, INFINITE);
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == idUser && checkDireita(idUser)) {
 			msgJogo.players[i].barreira.coord.X += movimentoBarreira; //Outro movimento variavel
+			ReleaseMutex(mutex_player);
 			return;
 		}
 	}
+	ReleaseMutex(mutex_player);
 
 }
 
 void moveJogadorEsquerda(int idUser) {
 	//Verificar se pode mover para a direita e não colide com outros utilizadores (EIXO DOS X)
+	WaitForSingleObject(mutex_player, INFINITE);
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == idUser && checkEsquerda(idUser)) {
 			msgJogo.players[i].barreira.coord.X -= movimentoBarreira; //Outro movimento variavel
+			ReleaseMutex(mutex_player);
 			return;
 		}
 	}
+	ReleaseMutex(mutex_player);
 }
 
 
 /************************************************************* CHECKA SE PODE MOVER **************************************************/
 
 BOOL checkDireita(int idUser) {
-	//Fazer verificação nos eixo dos x, se alguma barreira está lá
+	//Fazer verificação nos eixo dos x, se alguma barreira está lá, Limites do mapa
+	Player aux = getPlayer(idUser);
+	
+	if (aux.id == -1)
+		return false;
+
+	INT x = aux.barreira.coord.X + aux.barreira.dimensao;
+	INT y = aux.barreira.coord.Y + ALT_BARREIRA;
+
+	if (x >= LIMITE_DIREITO) {
+		return false;
+	}
+
 	return true;
 }
 
 BOOL checkEsquerda(int idUser) {
-	//Fazer verificação nos eixo dos x, se alguma barreira está lá
+	//Fazer verificação nos eixo dos x, se alguma barreira está lá, Limites do mapa
+	Player aux = getPlayer(idUser);
+
+	if (aux.id == -1)
+		return false;
+
+	INT x = aux.barreira.coord.X;
+	INT y = aux.barreira.coord.Y + ALT_BARREIRA;
+
+	if (x <= LIMITE_ESQUERDO) {
+		return false;
+	}
+
 	return true;
 }
 

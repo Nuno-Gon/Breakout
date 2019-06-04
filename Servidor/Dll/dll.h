@@ -51,6 +51,9 @@ HANDLE podeLer;
 HANDLE hMutexLer;
 HANDLE hMutexEscrever;
 
+//JOGO
+HANDLE mutex_player;
+
 //Objetos JOGO (SINCRONIZAÇÃO)
 HANDLE mutex_bola;
 
