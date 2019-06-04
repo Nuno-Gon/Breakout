@@ -105,6 +105,7 @@ typedef struct {
 	bool cima;
 	bool direita;
 	int velocidade;
+	int raio;
 	COORD coord;
 }Bola;
 

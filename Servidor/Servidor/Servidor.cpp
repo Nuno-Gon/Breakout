@@ -208,7 +208,7 @@ void moveJogadorEsquerda(int idUser) {
 BOOL checkDireita(int idUser) {
 	//Fazer verificação nos eixo dos x, se alguma barreira está lá, Limites do mapa
 	Player aux = getPlayer(idUser);
-	
+
 	if (aux.id == -1)
 		return false;
 
@@ -288,21 +288,28 @@ DWORD WINAPI controlaBola(void) {
 
 		}
 
-
-
-
 		if (msgJogo.bola.coord.Y <= LIMITE_SUPERIOR) { // se bater no LIMITE SUPERIOR INVERTER A DIREÇÃO DA BOLA
 			msgJogo.bola.cima = false;
 		}
 		else if (msgJogo.bola.coord.Y >= LIMITE_INFERIOR) {//Meter um else onde verifica se imbate numa barreira, é se a possição dos x quando, está no limit é igual a da barreira!
 			msgJogo.bola.cima = true;
 		}
-		else if (msgJogo.bola.coord.X >= LIMITE_DIREITO){
+		else if (msgJogo.bola.coord.X >= LIMITE_DIREITO) {
 			msgJogo.bola.direita = false;
 		}
 		else if (msgJogo.bola.coord.X <= LIMITE_ESQUERDO) {
 			msgJogo.bola.direita = true;
 		}
+
+
+		//Verificar se bate na barreira
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE)
+				if (msgJogo.bola.coord.Y + msgJogo.bola.raio / 2 >= (msgJogo.players[i].barreira.coord.Y - ALT_BARREIRA) && msgJogo.bola.coord.X + msgJogo.bola.raio >= msgJogo.players[i].barreira.coord.X && msgJogo.bola.coord.X <= msgJogo.players[i].barreira.coord.X + msgJogo.players[i].barreira.dimensao) {
+					msgJogo.bola.cima = true;
+				}
+		}
+
 		Sleep(5);
 	}
 
@@ -321,8 +328,8 @@ void inicia_mapa() {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		msgJogo.players[i].barreira.id = -1;
 		msgJogo.players[i].barreira.dimensao = 40; //ainda  verificar
-		msgJogo.players[i].barreira.coord.X = -1;
-		msgJogo.players[i].barreira.coord.Y = -1;
+		msgJogo.players[i].barreira.coord.X = -20;
+		msgJogo.players[i].barreira.coord.Y = -20;
 
 
 		msgJogo.players[i].id = -1;
@@ -333,11 +340,11 @@ void inicia_mapa() {
 
 	//Tijolos
 	for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
-			msgJogo.tijolos[i].id = idTijolo++;
-			msgJogo.tijolos[i].vida = 1;
-			msgJogo.tijolos[i].coord.X = LIMITE_SUPERIOR + 35 + ((i % MAX_NUM_TIJOLOS_LINHA) * (LARG_TIJOLO + 10)); //Secalhar mudar porque o tijolo não é um quadrado, mas para começar ;)
-			msgJogo.tijolos[i].coord.Y = LIMITE_ESQUERDO + 20 + ((i / MAX_NUM_TIJOLOS_LINHA) * (ALT_TIJOLO + 20));
-			//_tprintf(TEXT("Tijolo Colocado %d na posicao: x = %d, y = %d\n"), msgJogo.tijolos[i].id, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y);
+		msgJogo.tijolos[i].id = idTijolo++;
+		msgJogo.tijolos[i].vida = 1;
+		msgJogo.tijolos[i].coord.X = LIMITE_SUPERIOR + 35 + ((i % MAX_NUM_TIJOLOS_LINHA) * (LARG_TIJOLO + 10)); //Secalhar mudar porque o tijolo não é um quadrado, mas para começar ;)
+		msgJogo.tijolos[i].coord.Y = LIMITE_ESQUERDO + 20 + ((i / MAX_NUM_TIJOLOS_LINHA) * (ALT_TIJOLO + 20));
+		//_tprintf(TEXT("Tijolo Colocado %d na posicao: x = %d, y = %d\n"), msgJogo.tijolos[i].id, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y);
 	}
 
 	//BOLA
@@ -347,6 +354,7 @@ void inicia_mapa() {
 	msgJogo.bola.cima = true;
 	msgJogo.bola.direita = true;
 	msgJogo.bola.velocidade = 1;
+	msgJogo.bola.raio = 20;
 }
 
 

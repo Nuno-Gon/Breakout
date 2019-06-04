@@ -319,7 +319,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		//BOLA
 		if (msgJogo.bola.ativa == 1)
-			Ellipse(auxDC, msgJogo.bola.coord.X, msgJogo.bola.coord.Y, msgJogo.bola.coord.X + 20, msgJogo.bola.coord.Y + 20);
+			Ellipse(auxDC, msgJogo.bola.coord.X, msgJogo.bola.coord.Y, msgJogo.bola.coord.X + msgJogo.bola.raio, msgJogo.bola.coord.Y + msgJogo.bola.raio);
 
 
 		swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bola.coord.X, msgJogo.bola.coord.Y);
