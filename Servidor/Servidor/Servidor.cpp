@@ -346,7 +346,7 @@ DWORD WINAPI controlaBola(void) {
 							}
 
 						}
-						else {
+						else { //Cima direita
 
 							if (msgJogo.bola.coord.X - msgJogo.tijolos[i].coord.X > msgJogo.tijolos[i].coord.Y + ALT_TIJOLO - msgJogo.bola.coord.Y) {
 								msgJogo.bola.cima = false;
@@ -362,21 +362,21 @@ DWORD WINAPI controlaBola(void) {
 
 						if (!msgJogo.bola.direita) { //para baixo e para a esquerda
 
-							if (msgJogo.bola.coord.X - msgJogo.tijolos[i].coord.X > msgJogo.bola.coord.Y - msgJogo.tijolos[i].coord.Y) {
-								msgJogo.bola.cima = true;
-							}
-							else {
-								msgJogo.bola.direita = false;
-							}
-
-						}
-						else {
-
-							if (msgJogo.tijolos[i].coord.X + LARG_TIJOLO - msgJogo.bola.coord.X  > msgJogo.bola.coord.Y - msgJogo.tijolos[i].coord.Y) {
+							if (msgJogo.tijolos[i].coord.X +  LARG_TIJOLO - msgJogo.bola.coord.X > msgJogo.bola.coord.Y - msgJogo.tijolos[i].coord.Y) {
 								msgJogo.bola.cima = true;
 							}
 							else {
 								msgJogo.bola.direita = true;
+							}
+
+						}
+						else { //Para baixo e para a direita
+
+							if (msgJogo.bola.coord.X  - msgJogo.tijolos[i].coord.X > msgJogo.bola.coord.Y - msgJogo.tijolos[i].coord.Y) {
+								msgJogo.bola.cima = true;
+							}
+							else {
+								msgJogo.bola.direita = false;
 							}
 
 
