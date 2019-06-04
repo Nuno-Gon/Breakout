@@ -242,22 +242,22 @@ BOOL checkEsquerda(int idUser) {
 
 /*********************** VERIFICA LADO QUE EMBATEU NO TIJOLO *********************************/
 
-BOOL verificaLadoEsquerdoColisao() {
+BOOL verificaLadoEsquerdoColisao(int val) {
+	
+	return false;
+}
+
+BOOL verificaLadoDireitoColisao(int val) {
 
 	return false;
 }
 
-BOOL verificaLadoDireitoColisao() {
+BOOL verificaCimaColisao(int val) {
 
 	return false;
 }
 
-BOOL verificaCimaColisao() {
-
-	return false;
-}
-
-BOOL verificaBaixoColisao() {
+BOOL verificaBaixoColisao(int val) {
 	return true;
 }
 
@@ -336,26 +336,55 @@ DWORD WINAPI controlaBola(void) {
 					
 					//verificar para que lado muda de posição o quadrado
 
-					if (verificaLadoEsquerdoColisao()) {
+
+					if (msgJogo.bola.cima) {
+						if (!msgJogo.bola.direita) { //para cima e para a esquerda
+
+							if (msgJogo.tijolos[i].coord.X + LARG_TIJOLO - msgJogo.bola.coord.X > msgJogo.tijolos[i].coord.Y + ALT_TIJOLO - msgJogo.bola.coord.Y) {
+								msgJogo.bola.cima = false;
+							}
+							else {
+								msgJogo.bola.direita = true;
+							}
+
+						}
+						else {
+
+							if (msgJogo.bola.coord.X - msgJogo.tijolos[i].coord.X > msgJogo.tijolos[i].coord.Y + ALT_TIJOLO - msgJogo.bola.coord.Y) {
+								msgJogo.bola.cima = false;
+							}
+							else {
+								msgJogo.bola.direita = false;
+							}
+
+
+						}
+					}
+
+
+
+					/*
+					if (verificaLadoEsquerdoColisao(i)) {
 						msgJogo.bola.direita = false;
 					}
-					else if(verificaLadoDireitoColisao()){
+					else if(verificaLadoDireitoColisao(i)){
 						msgJogo.bola.direita = true;
 					}
-					else if (verificaCimaColisao()) {
+					else if (verificaCimaColisao(i)) {
 						msgJogo.bola.cima = true;
 					}
-					else if (verificaBaixoColisao()) {
+					else if (verificaBaixoColisao(i)) {
 						msgJogo.bola.cima = false;
 
 					}
+					*/
 
 					
 					msgJogo.tijolos[i].vida--;
 					if (msgJogo.tijolos[i].vida <= 0) {
 						msgJogo.tijolos[i].coord.X = -30;
 						msgJogo.tijolos[i].coord.Y = -30;
-					 //Chamar funão para verificar vitória
+					 //Chamar função para verificar vitória
 					}
 				}
 
