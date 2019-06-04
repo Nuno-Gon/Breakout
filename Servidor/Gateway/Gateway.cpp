@@ -150,7 +150,9 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 		}
 
 	 writeMensagem(&memoriaPartilhadaGateway, &aux);
-		
+	
+	 SetEvent(id_evento_comeco);
+
 	} while (aux.tipo != CMD_LOGOUT);
 
 	return 0;
@@ -179,8 +181,6 @@ DWORD WINAPI aceita_cliente(LPVOID param) {
 				DisconnectNamedPipe(hPipe);
 			}
 		}
-
-		SetEvent(id_evento_comeco);
 		login = TRUE;
 		_tprintf(TEXT("[ESCRITOR]  liga��o a um leitor com sucesso... (ConnectNamedPipe)\n"));
 		//criar uma thread para cada cliente para ler msg vindas deles.

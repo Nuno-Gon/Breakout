@@ -52,7 +52,7 @@ INT idTijolo = 1;
 
 
 //VARIAVEIS CONFIGURAVEIS JOGO
-INT movimentoBarreira = 6;
+INT movimentoBarreira = 10;
 
 int _tmain(int argc, LPTSTR argv[]) {
 
@@ -88,7 +88,6 @@ int _tmain(int argc, LPTSTR argv[]) {
 		exit(0);
 	}
 
-	WaitForSingleObject(eventoComeco, INFINITE);
 
 	//Abrir Registro
 	createRegistry();
@@ -102,8 +101,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 		acabar = 0;
 
 		iniciar_tijolos();
-
 		thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
+		WaitForSingleObject(eventoComeco, INFINITE);
 		thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, NULL, 0, NULL);
 
 		do {
@@ -240,6 +239,29 @@ BOOL checkEsquerda(int idUser) {
 }
 
 
+
+/*********************** VERIFICA LADO QUE EMBATEU NO TIJOLO *********************************/
+
+BOOL verificaLadoEsquerdoColisao() {
+
+	return false;
+}
+
+BOOL verificaLadoDireitoColisao() {
+
+	return false;
+}
+
+BOOL verificaCimaColisao() {
+
+	return false;
+}
+
+BOOL verificaBaixoColisao() {
+	return true;
+}
+
+
 /**************************************************************************************************************************************/
 
 /*********************************************************************** THREADS *******************************************************/
@@ -252,16 +274,6 @@ DWORD WINAPI controlaBola(void) {
 		//NAO ESQUECER DE VERIFICAR QUANDO bate na barreira para ir para cima
 
 		//Verificações para a bola deve mexer agora
-
-
-		if (msgJogo.bola.coord.Y > LIMITE_INFERIOR + 1) { // SE A BOLA PASSAR O LIMITE INFERIOR
-	//Acabar esta bola
-			msgJogo.bola.ativa = 0;
-			msgJogo.bola.coord.Y = -30;
-			msgJogo.bola.coord.X = -30;
-			break;
-		}
-
 
 		if (msgJogo.bola.cima) { //se mover para cima
 
@@ -288,11 +300,16 @@ DWORD WINAPI controlaBola(void) {
 
 		}
 
+
+		if (msgJogo.bola.coord.Y >= LIMITE_INFERIOR) { // SE A BOLA PASSAR O LIMITE INFERIOR
+			msgJogo.bola.ativa = 0;
+			msgJogo.bola.coord.Y = -30;
+			msgJogo.bola.coord.X = -30;
+			break;
+		}
+
 		if (msgJogo.bola.coord.Y <= LIMITE_SUPERIOR) { // se bater no LIMITE SUPERIOR INVERTER A DIREÇÃO DA BOLA
 			msgJogo.bola.cima = false;
-		}
-		else if (msgJogo.bola.coord.Y >= LIMITE_INFERIOR) {//Meter um else onde verifica se imbate numa barreira, é se a possição dos x quando, está no limit é igual a da barreira!
-			msgJogo.bola.cima = true;
 		}
 		else if (msgJogo.bola.coord.X >= LIMITE_DIREITO) {
 			msgJogo.bola.direita = false;
@@ -304,10 +321,46 @@ DWORD WINAPI controlaBola(void) {
 
 		//Verificar se bate na barreira
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
-			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE)
+			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) //Ver se está tudo bem, porque estou a comprar só um raio!
 				if (msgJogo.bola.coord.Y + msgJogo.bola.raio / 2 >= (msgJogo.players[i].barreira.coord.Y - ALT_BARREIRA) && msgJogo.bola.coord.X + msgJogo.bola.raio >= msgJogo.players[i].barreira.coord.X && msgJogo.bola.coord.X <= msgJogo.players[i].barreira.coord.X + msgJogo.players[i].barreira.dimensao) {
 					msgJogo.bola.cima = true;
 				}
+		}
+
+
+		//Verificar se embate nos tijolos e se bater retirar tijolo
+		for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
+			if (msgJogo.tijolos[i].vida > 0) {
+				if (msgJogo.bola.coord.Y - msgJogo.bola.raio <= msgJogo.tijolos[i].coord.Y + ALT_TIJOLO && msgJogo.bola.coord.Y + msgJogo.bola.raio >= msgJogo.tijolos[i].coord.Y &&
+					msgJogo.bola.coord.X - msgJogo.bola.raio <= msgJogo.tijolos[i].coord.X + LARG_TIJOLO && msgJogo.bola.coord.X + msgJogo.bola.raio >= msgJogo.tijolos[i].coord.X) {
+					
+					//verificar para que lado muda de posição o quadrado
+
+					if (verificaLadoEsquerdoColisao()) {
+						msgJogo.bola.direita = false;
+					}
+					else if(verificaLadoDireitoColisao()){
+						msgJogo.bola.direita = true;
+					}
+					else if (verificaCimaColisao()) {
+						msgJogo.bola.cima = true;
+					}
+					else if (verificaBaixoColisao()) {
+						msgJogo.bola.cima = false;
+
+					}
+
+					
+					msgJogo.tijolos[i].vida--;
+					if (msgJogo.tijolos[i].vida <= 0) {
+						msgJogo.tijolos[i].coord.X = -30;
+						msgJogo.tijolos[i].coord.Y = -30;
+					 //Chamar funão para verificar vitória
+					}
+				}
+
+
+			}
 		}
 
 		Sleep(5);
