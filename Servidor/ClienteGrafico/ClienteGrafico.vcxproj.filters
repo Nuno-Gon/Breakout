@@ -48,10 +48,13 @@
     <Image Include="tijolo.bmp">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
+    <Image Include="barreira.bmp">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
     <Image Include="bitmap1.bmp">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
-    <Image Include="barreira.bmp">
+    <Image Include="SPUP.bmp">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
   </ItemGroup>

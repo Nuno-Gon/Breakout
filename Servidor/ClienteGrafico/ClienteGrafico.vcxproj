@@ -167,6 +167,7 @@
     <Image Include="bitmap1.bmp" />
     <Image Include="ClienteGrafico.ico" />
     <Image Include="small.ico" />
+    <Image Include="SPUP.bmp" />
     <Image Include="tijolo.bmp" />
   </ItemGroup>
   <ItemGroup>

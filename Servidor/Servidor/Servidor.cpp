@@ -15,6 +15,7 @@ using namespace std;
 //Threads
 DWORD WINAPI readMensagemMemory(void);
 DWORD WINAPI controlaBola(void);
+DWORD WINAPI controlaBrinde(LPVOID p);
 
 //Registo
 void createRegistry();
@@ -43,8 +44,8 @@ dataCr memoriaPartilhadaServidor;
 COMANDO_SHARED comandoLido;
 BOOL loginPlayer = FALSE;
 HANDLE thread_read_msg_memory;
-HANDLE thread_bola;
-HANDLE eventoMemoria, eventoComeco;
+HANDLE thread_bola, thread_brinde;
+HANDLE eventoMemoria, eventoComeco, eventoTerminaJogo;
 Scores score;
 INT idUserPlayer = 1;
 INT idTijolo = 1;
@@ -64,8 +65,9 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 
 	//por verificacoes se correu mal ou não
-	eventoComeco = CreateEvent(NULL, FALSE, FALSE, nomeEventoComecoJogo);
 	eventoMemoria = CreateEvent(NULL, FALSE, FALSE, nomeEventoArrancaMemoria);
+	eventoComeco = CreateEvent(NULL, FALSE, FALSE, nomeEventoComecoJogo);
+	eventoTerminaJogo = CreateEvent(NULL, FALSE, FALSE, nomeEventoTerminaJogo);
 
 	if (eventoComeco == NULL || eventoMemoria == NULL) {
 		_tprintf(TEXT("ERRO!"));
@@ -113,17 +115,6 @@ int _tmain(int argc, LPTSTR argv[]) {
 	return 0;
 }
 
-//THREADS
-//Lê mensagens da Memória
-DWORD WINAPI readMensagemMemory(void) {
-	//_tprintf(TEXT("Comecei Thread ler mensagem!\n"));
-	while (1) {
-		readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
-		trataComando(comandoLido);
-	}
-	return 0;
-}
-
 //Outras Funções
 void trataComando(COMANDO_SHARED comando) {
 	int id = 0;
@@ -138,7 +129,6 @@ void trataComando(COMANDO_SHARED comando) {
 
 	switch (comando.tipo) {
 	case CMD_LOGIN:
-
 		COMANDO_SHARED aux_shared;
 		aux_shared = comando;
 		aux_shared.login = true;
@@ -233,12 +223,19 @@ BOOL checkEsquerda(int idUser) {
 /**************************************************************************************************************************************/
 
 /*********************************************************************** THREADS *******************************************************/
+DWORD WINAPI readMensagemMemory(void) {
+	//_tprintf(TEXT("Comecei Thread ler mensagem!\n"));
+	while (1) {
+		readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
+		trataComando(comandoLido);
+	}
+	return 0;
+}
 
 DWORD WINAPI controlaBola(void) {
 	//termina quando o cliente insere uma tecla
-
 	while (1) {
-		//Verificações para a bola
+		//MOVIMENTO
 		if (msgJogo.bola.cima) { //se mover para cima
 
 			if (msgJogo.bola.direita) { //Se mover para a direita
@@ -264,6 +261,7 @@ DWORD WINAPI controlaBola(void) {
 
 		}
 
+		//Se a bola sair dos limites
 		if (msgJogo.bola.coord.Y >= LIMITE_INFERIOR) { // SE A BOLA PASSAR O LIMITE INFERIOR
 			msgJogo.bola.ativa = 0;
 			msgJogo.bola.coord.Y = -30;
@@ -379,8 +377,35 @@ DWORD WINAPI controlaBola(void) {
 
 					msgJogo.tijolos[i].vida--;
 					if (msgJogo.tijolos[i].vida <= 0) { //CAIR BRINDE AO FAZER ISTO !!!
+
+						if (msgJogo.tijolos[i].tipo == magico) {
+
+							for (int x = 0; x < MAX_NUM_BRINDES; x++) {
+								if (msgJogo.brindes[x].ativo == 0) {
+
+									//Se for preciso, configurar mais os brindes
+
+									msgJogo.brindes[x].ativo == 1;
+									msgJogo.brindes[x].coord.X = msgJogo.tijolos[i].coord.X;
+									msgJogo.brindes[x].coord.Y = msgJogo.tijolos[i].coord.Y;
+
+									INT_PTR aux = x;
+
+									thread_brinde = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBrinde, reinterpret_cast<LPVOID>(aux), 0, NULL);
+
+
+									x = MAX_NUM_BRINDES + 1;
+								}
+							}
+
+						}
+
+
+
 						msgJogo.tijolos[i].coord.X = -30;
 						msgJogo.tijolos[i].coord.Y = -30;
+
+
 
 					}
 				}
@@ -397,6 +422,44 @@ DWORD WINAPI controlaBola(void) {
 	return 0;
 }
 
+DWORD WINAPI controlaBrinde(LPVOID p) {
+	INT_PTR id = reinterpret_cast<INT_PTR>(p);
+	bool acabou = false;
+
+	do {
+		_tprintf(TEXT("CHEGUEI AQUI THREAD CONTROLA BRINDE!\n"));
+	
+		msgJogo.brindes[id].coord.X += msgJogo.brindes[id].velocidade;
+
+		
+
+
+		//enum Tipo_Brinde { speed_up, slow_down, vida_extra, triple, barreira }; //Adicionar outros brindes consoante a originalidade
+		switch (msgJogo.brindes[id].tipo) {
+		case speed_up:
+
+
+			break;
+		case slow_down:
+			break;
+		case vida_extra:
+			break;
+		case triple:
+			break;
+		case barreira:
+			break;
+		}
+
+		//Verificar se chegou aqui!
+		if (msgJogo.brindes[id].coord.Y > LIMITE_INFERIOR) {
+			msgJogo.brindes[id].ativo = 0;
+			msgJogo.brindes[id].coord.Y = -30;
+			msgJogo.brindes[id].coord.X = -30;
+			acabou = true;
+		}
+	} while (!acabou);
+	return 0;
+}
 
 /**************************************************************************************************************************************/
 

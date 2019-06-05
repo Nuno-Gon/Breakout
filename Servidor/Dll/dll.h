@@ -120,6 +120,7 @@ typedef struct {
 }Tijolo;
 
 typedef struct {
+	int ativo;
 	int id;
 	COORD coord;
 	DWORD threadId;

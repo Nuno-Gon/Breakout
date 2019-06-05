@@ -192,6 +192,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static BITMAP bmBarreira;
 	static HDC hdcBarreira;
 
+	//Brindes
+	//SPEED-UP (Spup)
+	static HBITMAP hSpup;
+	static BITMAP bmSpup;
+	static HDC hdcSpup;
+
+	//SLOW-DOWN 
+	static HBITMAP hSldwn;
+	static BITMAP bmSldwn;
+	static HDC hdcSldwn;
+
+	//Vida-Extra
+	static HBITMAP hVextra;
+	static BITMAP bmVextra;
+	static HDC hdcVextra;
+
+	//Triple
+	static HBITMAP hTriple;
+	static BITMAP bmTriple;
+	static HDC hdcTriple;
 
 
 	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -313,6 +333,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//Barreira
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
+				StretchBlt(auxDC, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y, msgJogo.players[i].barreira.dimensao, ALT_BARREIRA, hdcBarreira, 0, 0, bmBarreira.bmWidth, bmBarreira.bmHeight, SRCCOPY);
+			}
+		}
+
+		//Brindes
+		for (int i = 0; i < MAX_NUM_BRINDES; i++) {
+			if (msgJogo.brindes[i].ativo == 1) {
 				StretchBlt(auxDC, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y, msgJogo.players[i].barreira.dimensao, ALT_BARREIRA, hdcBarreira, 0, 0, bmBarreira.bmWidth, bmBarreira.bmHeight, SRCCOPY);
 			}
 		}
