@@ -49,6 +49,7 @@ HANDLE eventoMemoria, eventoComeco, eventoTerminaJogo;
 Scores score;
 INT idUserPlayer = 1;
 INT idTijolo = 1;
+INT idBrinde = 1;
 
 
 int _tmain(int argc, LPTSTR argv[]) {
@@ -285,7 +286,7 @@ DWORD WINAPI controlaBola(void) {
 
 					//LANCA A NOVA BOLA (QUE é a mesma XD)
 					if (msgJogo.players[i].vidas > 0) {
-						Sleep(20);
+						Sleep(200);
 						msgJogo.bola.ativa = 1;
 						msgJogo.bola.coord.X = LIMITE_ESQUERDO + (rand() % LIMITE_DIREITO);
 						msgJogo.bola.coord.Y = LIMITE_INFERIOR - 50;
@@ -393,7 +394,6 @@ DWORD WINAPI controlaBola(void) {
 
 									thread_brinde = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBrinde, reinterpret_cast<LPVOID>(aux), 0, NULL);
 
-
 									x = MAX_NUM_BRINDES + 1;
 								}
 							}
@@ -428,10 +428,9 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 
 	do {
 		_tprintf(TEXT("CHEGUEI AQUI THREAD CONTROLA BRINDE!\n"));
-	
-		msgJogo.brindes[id].coord.X += msgJogo.brindes[id].velocidade;
 
-		
+		msgJogo.brindes[id].coord.Y += msgJogo.brindes[id].velocidade;
+		_tprintf(TEXT("COORDENADA Y: %d"), msgJogo.brindes[id].coord.Y);
 
 
 		//enum Tipo_Brinde { speed_up, slow_down, vida_extra, triple, barreira }; //Adicionar outros brindes consoante a originalidade
@@ -468,29 +467,6 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 
 //Configuração inicial do MAPA
 void inicia_mapa() {
-	//Barreira
-	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
-		msgJogo.players[i].barreira.id = -1;
-		msgJogo.players[i].barreira.dimensao = 40; //ainda  verificar
-		msgJogo.players[i].barreira.coord.X = -20;
-		msgJogo.players[i].barreira.coord.Y = -20;
-		msgJogo.players[i].barreira.velocidade = 10;
-
-
-		msgJogo.players[i].id = -1;
-		msgJogo.players[i].pontos = 0;
-		msgJogo.players[i].idHandle = INVALID_HANDLE_VALUE;
-		msgJogo.players[i].vidas = 3;
-	}
-
-	//Tijolos
-	for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
-		msgJogo.tijolos[i].id = idTijolo++;
-		msgJogo.tijolos[i].vida = 1;
-		msgJogo.tijolos[i].coord.X = LIMITE_SUPERIOR + 35 + ((i % MAX_NUM_TIJOLOS_LINHA) * (LARG_TIJOLO + 10)); //Secalhar mudar porque o tijolo não é um quadrado, mas para começar ;)
-		msgJogo.tijolos[i].coord.Y = LIMITE_ESQUERDO + 20 + ((i / MAX_NUM_TIJOLOS_LINHA) * (ALT_TIJOLO + 20));
-		//_tprintf(TEXT("Tijolo Colocado %d na posicao: x = %d, y = %d\n"), msgJogo.tijolos[i].id, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y);
-	}
 
 	//BOLA
 	msgJogo.bola.ativa = 1;
@@ -500,6 +476,78 @@ void inicia_mapa() {
 	msgJogo.bola.direita = true;
 	msgJogo.bola.velocidade = 1;
 	msgJogo.bola.raio = 5;
+
+	//Barreira
+	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		msgJogo.players[i].barreira.id = -1;
+		msgJogo.players[i].barreira.dimensao = 40; //ainda  verificar
+		msgJogo.players[i].barreira.coord.X = -20;
+		msgJogo.players[i].barreira.coord.Y = -20;
+		msgJogo.players[i].barreira.velocidade = 15;
+
+
+		msgJogo.players[i].id = -1;
+		msgJogo.players[i].pontos = 0;
+		msgJogo.players[i].idHandle = INVALID_HANDLE_VALUE;
+		msgJogo.players[i].vidas = 3;
+	}
+
+	//Tijolos  Tipo_Tijolo{normal, resistente, magico};
+	for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
+		msgJogo.tijolos[i].id = idTijolo++;
+		msgJogo.tijolos[i].vida = 1;
+		msgJogo.tijolos[i].coord.X = LIMITE_SUPERIOR + 35 + ((i % MAX_NUM_TIJOLOS_LINHA) * (LARG_TIJOLO + 10)); //Secalhar mudar porque o tijolo não é um quadrado, mas para começar ;)
+		msgJogo.tijolos[i].coord.Y = LIMITE_ESQUERDO + 20 + ((i / MAX_NUM_TIJOLOS_LINHA) * (ALT_TIJOLO + 20));
+
+		switch (rand() % 3)
+		{
+		case 0:
+			msgJogo.tijolos[i].tipo = normal;
+			break;
+		case 1:
+			msgJogo.tijolos[i].tipo = resistente;
+			msgJogo.tijolos[i].vida = 2 + rand() % 3;
+			break;
+		case 2:
+			msgJogo.tijolos[i].tipo = magico;
+			break;
+		default:
+			msgJogo.tijolos[i].tipo = normal;
+			break;
+		}
+
+		//_tprintf(TEXT("TIPO: %d\n"), msgJogo.tijolos[i].tipo);
+		//_tprintf(TEXT("Tijolo Colocado %d na posicao: x = %d, y = %d\n"), msgJogo.tijolos[i].id, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y);
+	}
+
+	//brindes enum Tipo_Brinde { speed_up, slow_down, vida_extra, triple, barreira }; //Adicionar outros brindes consoante a originalidade
+	for (int i = 0; i < MAX_NUM_BRINDES; i++) {
+		msgJogo.brindes[i].id = 1;
+		msgJogo.brindes[i].ativo = 0;
+		msgJogo.brindes[i].dimensao = 2 * msgJogo.bola.raio;
+
+		switch (rand() % 4)
+		{
+		case 0:
+			msgJogo.brindes[i].tipo = speed_up;
+			break;
+		case 1:
+			msgJogo.brindes[i].tipo = slow_down;
+			break;
+		case 2:
+			msgJogo.brindes[i].tipo = vida_extra;
+			break;
+		case 3:
+			msgJogo.brindes[i].tipo = triple;
+			break;
+		default:
+			msgJogo.brindes[i].tipo = speed_up;
+			break;
+		}
+
+		msgJogo.brindes[i].velocidade = 1;
+	}
+
 }
 
 

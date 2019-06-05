@@ -388,7 +388,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//Brindes enum Tipo_Brinde{speed_up, slow_down, vida_extra, triple, barreira}; //Adicionar outros brindes consoante a originalidade
 
 		for (int i = 0; i < MAX_NUM_BRINDES; i++) {
-			if (msgJogo.brindes[i].ativo == 1) {
+			if (msgJogo.brindes[i].ativo != 0) {
 				switch (msgJogo.brindes[i].tipo)
 				{
 				case speed_up:
