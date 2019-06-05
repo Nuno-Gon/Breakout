@@ -23,6 +23,7 @@
 //Altura Barreira
 #define ALT_BARREIRA 10
 #define ALT_TIJOLO 20
+#define ALT_BRINDE 20
 
 
 //DIMENSÔES MAPA

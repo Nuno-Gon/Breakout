@@ -182,10 +182,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static HDC auxDC = NULL;
 	static HBITMAP auxBM = NULL;
 
-	//Tijolo
+	//Tijolo NORMAL
 	static HBITMAP hTijolo = NULL;
 	static BITMAP bmTijolo;
 	static HDC hdcTijolo;
+
+	//RESISTENTE
+	static HBITMAP hTijoloR = NULL;
+	static BITMAP bmTijoloR;
+	static HDC hdcTijoloR;
+
+	//MAGICO
+	static HBITMAP hTijoloM = NULL;
+	static BITMAP bmTijoloM;
+	static HDC hdcTijoloM;
+
+
 
 	//Barreira
 	static HBITMAP hBarreira = NULL;
@@ -235,22 +247,46 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		// Carregar "BITMAP's"
 		hTijolo = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLO), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hTijoloR = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLOR), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hTijoloM = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLOM), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 		hBarreira = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BARREIRA), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hSpup = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_SPUP), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hSldwn = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_Sldwn), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hVextra = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_Vextra), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hTriple = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_Triple), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 
 		hdc = GetDC(hWnd);
 
 		// GETOBJECT ** Returns a reference to an object provided by an ActiveX component.
 		GetObject(hTijolo, sizeof(bmTijolo), &bmTijolo);
+		GetObject(hTijoloR, sizeof(bmTijoloR), &bmTijoloR);
+		GetObject(hTijoloM, sizeof(bmTijoloM), &bmTijoloM);
 		GetObject(hBarreira, sizeof(bmBarreira), &bmBarreira);
-
+		GetObject(hSpup, sizeof(bmSpup), &bmSpup);
+		GetObject(hSldwn, sizeof(bmSldwn), &bmSldwn);
+		GetObject(hVextra, sizeof(bmVextra), &bmVextra);
+		GetObject(hTriple, sizeof(bmTriple), &bmTriple);
 
 		// The CreateCompatibleDC function creates a memory device context (DC) compatible with the specified device.
 		hdcTijolo = CreateCompatibleDC(hdc);
+		hdcTijoloR = CreateCompatibleDC(hdc);
+		hdcTijoloM = CreateCompatibleDC(hdc);
 		hdcBarreira = CreateCompatibleDC(hdc);
+		hdcSpup = CreateCompatibleDC(hdc);
+		hdcSldwn = CreateCompatibleDC(hdc);
+		hdcVextra = CreateCompatibleDC(hdc);
+		hdcTriple = CreateCompatibleDC(hdc);
+
 
 		// The SelectObject function selects an object into the specified device context (DC). The new object replaces the previous object of the same type.
 		SelectObject(hdcTijolo, hTijolo);
+		SelectObject(hdcTijoloR, hTijoloR);
+		SelectObject(hdcTijoloM, hTijoloM);
 		SelectObject(hdcBarreira, hBarreira);
+		SelectObject(hdcSpup, hSpup);
+		SelectObject(hdcSldwn, hSldwn);
+		SelectObject(hdcVextra, hVextra);
+		SelectObject(hdcTriple, hTriple);
 
 		ReleaseDC(hWnd, hdc);
 
@@ -322,10 +358,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//BLACKONWHITE Perserva os valores pretos acima dos brancos (Pixeis)
 		SetStretchBltMode(auxDC, BLACKONWHITE);
 
-		//Imprimir tijolos
+		//Imprimir tijolos enum Tipo_Tijolo{normal, resistente, magico};
 		for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
 			if (msgJogo.tijolos[i].vida != 0) {
-				StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
+
+				switch (msgJogo.tijolos[i].tipo) {
+				case normal:
+					StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
+					break;
+				case resistente:
+					StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijoloR, 0, 0, bmTijoloR.bmWidth, bmTijoloR.bmHeight, SRCCOPY);
+					break;
+				case magico:
+					StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijoloM, 0, 0, bmTijoloM.bmWidth, bmTijoloM.bmHeight, SRCCOPY);
+					break;
+
+				}
 			}
 			//StretchBlt(auxDC, msgJogo.bola.coord.X + 10 , msgJogo.bola.coord.Y + 10, ALT_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
 		}
@@ -337,12 +385,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		//Brindes
+		//Brindes enum Tipo_Brinde{speed_up, slow_down, vida_extra, triple, barreira}; //Adicionar outros brindes consoante a originalidade
+
 		for (int i = 0; i < MAX_NUM_BRINDES; i++) {
 			if (msgJogo.brindes[i].ativo == 1) {
-				StretchBlt(auxDC, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y, msgJogo.players[i].barreira.dimensao, ALT_BARREIRA, hdcBarreira, 0, 0, bmBarreira.bmWidth, bmBarreira.bmHeight, SRCCOPY);
+				switch (msgJogo.brindes[i].tipo)
+				{
+				case speed_up:
+					StretchBlt(auxDC, msgJogo.brindes[i].coord.X, msgJogo.brindes[i].coord.Y, msgJogo.brindes[i].dimensao, ALT_BRINDE, hdcSpup, 0, 0, bmSpup.bmWidth, bmSpup.bmHeight, SRCCOPY);
+					break;
+				case slow_down:
+					StretchBlt(auxDC, msgJogo.brindes[i].coord.X, msgJogo.brindes[i].coord.Y, msgJogo.brindes[i].dimensao, ALT_BRINDE, hdcSldwn, 0, 0, bmSldwn.bmWidth, bmSldwn.bmHeight, SRCCOPY);
+					break;
+				case vida_extra:
+					StretchBlt(auxDC, msgJogo.brindes[i].coord.X, msgJogo.brindes[i].coord.Y, msgJogo.brindes[i].dimensao, ALT_BRINDE, hdcVextra, 0, 0, bmVextra.bmWidth, bmVextra.bmHeight, SRCCOPY);
+					break;
+				case triple:
+					StretchBlt(auxDC, msgJogo.brindes[i].coord.X, msgJogo.brindes[i].coord.Y, msgJogo.brindes[i].dimensao, ALT_BRINDE, hdcTriple, 0, 0, bmTriple.bmWidth, bmTriple.bmHeight, SRCCOPY);
+					break;
+				default:
+					//IMPRIMIR UM NORMAL!
+					break;
+				}
+
 			}
 		}
+
 
 		//BOLA
 		if (msgJogo.bola.ativa == 1)
@@ -383,7 +451,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		default:
 			break;
 		}
-			break;
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;

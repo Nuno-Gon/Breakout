@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -164,11 +164,17 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="barreira.bmp" />
-    <Image Include="bitmap1.bmp" />
+    <Image Include="bitmap2.bmp" />
+    <Image Include="bitmap3.bmp" />
     <Image Include="ClienteGrafico.ico" />
+    <Image Include="Sldwn.bmp" />
     <Image Include="small.ico" />
     <Image Include="SPUP.bmp" />
     <Image Include="tijolo.bmp" />
+    <Image Include="TIJOLOM.bmp" />
+    <Image Include="TIJOLOR.bmp" />
+    <Image Include="Triple.bmp" />
+    <Image Include="Vextra.bmp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PropertySheet.props" />

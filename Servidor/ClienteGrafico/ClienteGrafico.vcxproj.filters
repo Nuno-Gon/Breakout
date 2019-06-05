@@ -51,10 +51,28 @@
     <Image Include="barreira.bmp">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
-    <Image Include="bitmap1.bmp">
+    <Image Include="SPUP.bmp">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
-    <Image Include="SPUP.bmp">
+    <Image Include="Sldwn.bmp">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="Vextra.bmp">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="bitmap2.bmp">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="Triple.bmp">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="bitmap3.bmp">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="TIJOLOR.bmp">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="TIJOLOM.bmp">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
   </ItemGroup>
