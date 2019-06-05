@@ -510,16 +510,18 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 	INT_PTR id = reinterpret_cast<INT_PTR>(p);
 	bool acabou = false;
 	int aux;
-
+	msgJogo.brindes[id].ativo = 1;
+	_tprintf(TEXT("Funcao do brind evocada!\nBrinde do tipo: %d\n\n\n\n"), msgJogo.brindes[id].tipo);
 	do {
-		msgJogo.brindes[id].ativo = 1;
+
 		msgJogo.brindes[id].coord.Y += msgJogo.brindes[id].velocidade;
-		//_tprintf(TEXT("COORDENADA Y: %d"), msgJogo.brindes[id].coord.Y);
+		//_tprintf(TEXT("COORDENADA Y: %d\n"), msgJogo.brindes[id].coord.Y);
 		//_tprintf(TEXT("Funcao do brind evocada!\n"));
+		Sleep(5);
 
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) { //Verificar se os brindes terão espaço de lado
-				if (msgJogo.brindes[id].coord.Y + ALT_BRINDE >= msgJogo.players[i].barreira.coord.Y - ALT_BARREIRA &&
+				if (msgJogo.brindes[id].coord.Y + ALT_BRINDE >= msgJogo.players[i].barreira.coord.Y &&
 					msgJogo.brindes[id].coord.X + msgJogo.brindes[id].dimensao >= msgJogo.players[i].barreira.coord.X &&
 					msgJogo.brindes[id].coord.X <= msgJogo.players[i].barreira.coord.X + msgJogo.players[i].barreira.dimensao) {
 
@@ -527,10 +529,11 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 		//enum Tipo_Brinde { speed_up, slow_down, vida_extra, triple, barreira }; //Adicionar outros brindes consoante a originalidade
 					switch (msgJogo.brindes[id].tipo) {
 					case speed_up:
-						_tprintf(TEXT("Speed-up!\n"));
+						//_tprintf(TEXT("Speed-up!\n"));
 						aux = msgJogo.players[i].barreira.velocidade;
 
 						if (msgJogo.players[i].barreira.velocidade + msgJogo.players[i].barreira.velocidade_inicial * 0.20 > msgJogo.players[i].barreira.velocidade_inicial * 2) {
+							//_tprintf(TEXT("DADA\n\n"));
 							msgJogo.brindes[id].ativo = 0;
 							msgJogo.brindes[id].coord.Y = -30;
 							msgJogo.brindes[id].coord.X = -30;
@@ -551,7 +554,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 						acabou = true;
 						break;
 					case slow_down:
-						_tprintf(TEXT("Slowdown!\n"));
+						//_tprintf(TEXT("Slowdown!\n"));
 						//PReciso de meter a duração, lancar uma thread com temporizador
 						if (msgJogo.players[i].barreira.velocidade_inicial - msgJogo.players[i].barreira.velocidade < msgJogo.players[i].barreira.velocidade_inicial * 0.60) {
 							msgJogo.brindes[id].ativo = 0;
@@ -573,7 +576,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 						acabou = true;
 						break;
 					case vida_extra:
-						_tprintf(TEXT("Vida Extra!\n"));
+					//	_tprintf(TEXT("Vida Extra!\n"));
 						msgJogo.players[i].vidas += 1;
 						i = MAX_NUM_PLAYERS + 1;
 						msgJogo.brindes[id].ativo = 0;
@@ -583,8 +586,10 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 						break;
 					case triple:
 						//edada
+					//	_tprintf(TEXT("BARREIRA\n"));
 						break;
 					case barreira:
+					//	_tprintf(TEXT("BRINDE BARREIRA!\n"));
 						msgJogo.players[i].barreira.dimensao += rand() % 10;
 						i = MAX_NUM_PLAYERS + 1;
 						msgJogo.brindes[id].ativo = 0;
@@ -603,11 +608,14 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 
 		//Verificar se chegou aqui!
 		if (msgJogo.brindes[id].coord.Y > LIMITE_INFERIOR) {
+		//	_tprintf(TEXT("TRDADA\n"));
 			msgJogo.brindes[id].ativo = 0;
 			msgJogo.brindes[id].coord.Y = -30;
 			msgJogo.brindes[id].coord.X = -30;
 			acabou = true;
 		}
+
+
 	} while (!acabou);
 	return 0;
 }
@@ -620,6 +628,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 //Configuração inicial do MAPA
 void inicia_mapa() {
 
+	srand(time(NULL));
 	//BOLA
 	msgJogo.bola.ativa = 1;
 	msgJogo.bola.coord.X = LIMITE_ESQUERDO + (rand() % LIMITE_DIREITO);
@@ -741,7 +750,7 @@ void insereBarreiraJogo(int id) {
 int getIdPlayer(HANDLE aux) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (aux == msgJogo.players[i].idHandle) {
-			_tprintf(TEXT("Retornado id = %d\n"), msgJogo.players[i].id);
+		//	_tprintf(TEXT("Retornado id = %d\n"), msgJogo.players[i].id);
 			return msgJogo.players[i].id;
 		}
 	}
@@ -753,11 +762,11 @@ Player getPlayer(int idUser) {
 	aux.id = -1;
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == idUser) {
-			_tprintf(TEXT("Player com %d [Retorno]\n"), msgJogo.players[i].id);
+		//	_tprintf(TEXT("Player com %d [Retorno]\n"), msgJogo.players[i].id);
 			return msgJogo.players[i];
 		}
 	}
-	_tprintf(TEXT("Player com %d [Retorno]\n"), aux.id);
+	//_tprintf(TEXT("Player com %d [Retorno]\n"), aux.id);
 	return aux;
 }
 

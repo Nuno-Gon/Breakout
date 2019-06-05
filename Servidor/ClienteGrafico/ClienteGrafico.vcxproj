@@ -164,8 +164,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="barreira.bmp" />
-    <Image Include="bitmap2.bmp" />
-    <Image Include="bitmap3.bmp" />
     <Image Include="ClienteGrafico.ico" />
     <Image Include="Sldwn.bmp" />
     <Image Include="small.ico" />

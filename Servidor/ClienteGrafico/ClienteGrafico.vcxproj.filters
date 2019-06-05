@@ -60,13 +60,7 @@
     <Image Include="Vextra.bmp">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
-    <Image Include="bitmap2.bmp">
-      <Filter>Arquivos de Recurso</Filter>
-    </Image>
     <Image Include="Triple.bmp">
-      <Filter>Arquivos de Recurso</Filter>
-    </Image>
-    <Image Include="bitmap3.bmp">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
     <Image Include="TIJOLOR.bmp">
