@@ -77,6 +77,7 @@ int _tmain(void) {
 	DWORD n;
 	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
 	
+	Sleep(1500);
 	do {
 		
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
@@ -128,6 +129,7 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 	DWORD tam = 0;
 	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
 
+	
 	do {
 		ZeroMemory(&ov, sizeof(ov));
 		ResetEvent(ioReady);

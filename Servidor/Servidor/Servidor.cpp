@@ -50,9 +50,6 @@ INT idUserPlayer = 1;
 INT idTijolo = 1;
 
 
-//VARIAVEIS CONFIGURAVEIS JOGO
-INT movimentoBarreira = 10;
-
 int _tmain(int argc, LPTSTR argv[]) {
 
 	//Project Properties > Character Set > Use Unicode Character Set
@@ -95,24 +92,20 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 	inicia_mapa();
 
+	thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
+	acabar = 0;
+	WaitForSingleObject(eventoComeco, INFINITE);
+	thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, NULL, 0, NULL);
 
-	while (1) {
-		acabar = 0;
+	do {
+		CopyMemory(&memoriaPartilhadaServidor.sharedJogo->jogo, &msgJogo, sizeof(MensagemJogo)); //por no dll
+	} while (acabar == 0);
 
-		thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
-		WaitForSingleObject(eventoComeco, INFINITE);
-		thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, NULL, 0, NULL);
-
-		do {
-			CopyMemory(&memoriaPartilhadaServidor.sharedJogo->jogo, &msgJogo, sizeof(MensagemJogo)); //por no dll
-		} while (1);
-
-		acabar = 1;
-		CloseHandle(thread_read_msg_memory);
-		CloseHandle(thread_bola);
-		CloseHandle(eventoComeco);
-		CloseHandle(eventoMemoria);
-	}
+	acabar = 1;
+	CloseHandle(thread_read_msg_memory);
+	CloseHandle(thread_bola);
+	CloseHandle(eventoComeco);
+	CloseHandle(eventoMemoria);
 
 	_tprintf(TEXT("*******************Servidor Desligado!****************************\n"));
 	UnmapViewOfFile(memoriaPartilhadaServidor.sharedJogo);
@@ -177,7 +170,7 @@ void moveJogadorDireita(int idUser) {
 	WaitForSingleObject(mutex_player, INFINITE);
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == idUser && checkDireita(idUser)) {
-			msgJogo.players[i].barreira.coord.X += movimentoBarreira; //Outro movimento variavel
+			msgJogo.players[i].barreira.coord.X += msgJogo.players[i].barreira.velocidade; //Outro movimento variavel
 			ReleaseMutex(mutex_player);
 			return;
 		}
@@ -191,7 +184,7 @@ void moveJogadorEsquerda(int idUser) {
 	WaitForSingleObject(mutex_player, INFINITE);
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == idUser && checkEsquerda(idUser)) {
-			msgJogo.players[i].barreira.coord.X -= movimentoBarreira; //Outro movimento variavel
+			msgJogo.players[i].barreira.coord.X -= msgJogo.players[i].barreira.velocidade; //Outro movimento variavel
 			ReleaseMutex(mutex_player);
 			return;
 		}
@@ -237,29 +230,6 @@ BOOL checkEsquerda(int idUser) {
 }
 
 
-
-/*********************** VERIFICA LADO QUE EMBATEU NO TIJOLO *********************************/
-
-BOOL verificaLadoEsquerdoColisao(int val) {
-	
-	return false;
-}
-
-BOOL verificaLadoDireitoColisao(int val) {
-
-	return false;
-}
-
-BOOL verificaCimaColisao(int val) {
-
-	return false;
-}
-
-BOOL verificaBaixoColisao(int val) {
-	return true;
-}
-
-
 /**************************************************************************************************************************************/
 
 /*********************************************************************** THREADS *******************************************************/
@@ -268,11 +238,7 @@ DWORD WINAPI controlaBola(void) {
 	//termina quando o cliente insere uma tecla
 
 	while (1) {
-
-		//NAO ESQUECER DE VERIFICAR QUANDO bate na barreira para ir para cima
-
-		//Verificações para a bola deve mexer agora
-
+		//Verificações para a bola
 		if (msgJogo.bola.cima) { //se mover para cima
 
 			if (msgJogo.bola.direita) { //Se mover para a direita
@@ -298,12 +264,41 @@ DWORD WINAPI controlaBola(void) {
 
 		}
 
-
 		if (msgJogo.bola.coord.Y >= LIMITE_INFERIOR) { // SE A BOLA PASSAR O LIMITE INFERIOR
 			msgJogo.bola.ativa = 0;
 			msgJogo.bola.coord.Y = -30;
 			msgJogo.bola.coord.X = -30;
-			break;
+			bool bola = false;
+
+			for (int i = 0; i < MAX_NUM_PLAYERS; i++) { //Criar a nova bola, vou reutilizar a mesma thread
+				if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
+
+
+					msgJogo.players[i].vidas--;
+
+					//JOGO ACABOU 
+					if (msgJogo.players[i].vidas <= 0) {
+
+						//PERDERAM OU SEJA! DESLIGAR E VER A PONTUAÇÂO
+						//Desliga do jogo e pode metê-lo no top 10 (verificar se fica)
+						return 0;
+
+					}
+
+					//LANCA A NOVA BOLA (QUE é a mesma XD)
+					if (msgJogo.players[i].vidas > 0) {
+						Sleep(20);
+						msgJogo.bola.ativa = 1;
+						msgJogo.bola.coord.X = LIMITE_ESQUERDO + (rand() % LIMITE_DIREITO);
+						msgJogo.bola.coord.Y = LIMITE_INFERIOR - 50;
+						msgJogo.bola.cima = true;
+						bola = true;
+						i = MAX_NUM_PLAYERS + 1;
+					}
+				}
+
+			}
+
 		}
 
 		if (msgJogo.bola.coord.Y <= LIMITE_SUPERIOR) { // se bater no LIMITE SUPERIOR INVERTER A DIREÇÃO DA BOLA
@@ -331,10 +326,8 @@ DWORD WINAPI controlaBola(void) {
 			if (msgJogo.tijolos[i].vida > 0) {
 				if (msgJogo.bola.coord.Y - msgJogo.bola.raio <= msgJogo.tijolos[i].coord.Y + ALT_TIJOLO && msgJogo.bola.coord.Y + msgJogo.bola.raio >= msgJogo.tijolos[i].coord.Y &&
 					msgJogo.bola.coord.X - msgJogo.bola.raio <= msgJogo.tijolos[i].coord.X + LARG_TIJOLO && msgJogo.bola.coord.X + msgJogo.bola.raio >= msgJogo.tijolos[i].coord.X) {
-					
-					//verificar para que lado muda de posição o quadrado
 
-
+					//verificar para que lado do tijolo embate
 					if (msgJogo.bola.cima) {
 						if (!msgJogo.bola.direita) { //para cima e para a esquerda
 
@@ -362,7 +355,7 @@ DWORD WINAPI controlaBola(void) {
 
 						if (!msgJogo.bola.direita) { //para baixo e para a esquerda
 
-							if (msgJogo.tijolos[i].coord.X +  LARG_TIJOLO - msgJogo.bola.coord.X > msgJogo.bola.coord.Y - msgJogo.tijolos[i].coord.Y) {
+							if (msgJogo.tijolos[i].coord.X + LARG_TIJOLO - msgJogo.bola.coord.X > msgJogo.bola.coord.Y - msgJogo.tijolos[i].coord.Y) {
 								msgJogo.bola.cima = true;
 							}
 							else {
@@ -372,7 +365,7 @@ DWORD WINAPI controlaBola(void) {
 						}
 						else { //Para baixo e para a direita
 
-							if (msgJogo.bola.coord.X  - msgJogo.tijolos[i].coord.X > msgJogo.bola.coord.Y - msgJogo.tijolos[i].coord.Y) {
+							if (msgJogo.bola.coord.X - msgJogo.tijolos[i].coord.X > msgJogo.bola.coord.Y - msgJogo.tijolos[i].coord.Y) {
 								msgJogo.bola.cima = true;
 							}
 							else {
@@ -384,13 +377,11 @@ DWORD WINAPI controlaBola(void) {
 
 					}
 
-
-					
 					msgJogo.tijolos[i].vida--;
-					if (msgJogo.tijolos[i].vida <= 0) {
+					if (msgJogo.tijolos[i].vida <= 0) { //CAIR BRINDE AO FAZER ISTO !!!
 						msgJogo.tijolos[i].coord.X = -30;
 						msgJogo.tijolos[i].coord.Y = -30;
-					 //Chamar função para verificar vitória
+
 					}
 				}
 
@@ -400,6 +391,8 @@ DWORD WINAPI controlaBola(void) {
 
 		Sleep(5);
 	}
+
+	//Fazer verificação se ganha
 
 	return 0;
 }
@@ -418,6 +411,7 @@ void inicia_mapa() {
 		msgJogo.players[i].barreira.dimensao = 40; //ainda  verificar
 		msgJogo.players[i].barreira.coord.X = -20;
 		msgJogo.players[i].barreira.coord.Y = -20;
+		msgJogo.players[i].barreira.velocidade = 10;
 
 
 		msgJogo.players[i].id = -1;
@@ -437,7 +431,7 @@ void inicia_mapa() {
 
 	//BOLA
 	msgJogo.bola.ativa = 1;
-	msgJogo.bola.coord.X = LIMITE_DIREITO / 2;
+	msgJogo.bola.coord.X = LIMITE_ESQUERDO + (rand() % LIMITE_DIREITO);
 	msgJogo.bola.coord.Y = LIMITE_INFERIOR - 20;
 	msgJogo.bola.cima = true;
 	msgJogo.bola.direita = true;
