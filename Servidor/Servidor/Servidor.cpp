@@ -234,7 +234,7 @@ DWORD WINAPI readMensagemMemory(void) {
 }
 
 DWORD WINAPI controlaBola(void) {
-	//termina quando o cliente insere uma tecla
+	bool acabou = false;
 	while (1) {
 		//MOVIMENTO
 		if (msgJogo.bola.cima) { //se mover para cima
@@ -413,7 +413,28 @@ DWORD WINAPI controlaBola(void) {
 			}
 		}
 
-		Sleep(5);
+		//Verifica vitória ou termino de Jogo!
+
+		for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
+			if (msgJogo.tijolos[i].vida > 0) {
+				acabou = false;
+				i = MAX_NUM_TIJOLOS + 1;
+			}
+		}
+
+		//Acabou o jogo
+		if (acabou) {
+			msgJogo.bola.ativa = 0;
+			msgJogo.bola.coord.X = -30;
+			msgJogo.bola.coord.Y = -30;
+		
+
+			break;
+		}
+
+		acabou = true;
+
+		//Sleep(5);
 	}
 
 	//Fazer verificação se ganha
@@ -432,6 +453,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 		_tprintf(TEXT("COORDENADA Y: %d"), msgJogo.brindes[id].coord.Y);
 
 
+		//Verificar se hita em alguma barreira existente se sim dar lhe o power-up
 		//enum Tipo_Brinde { speed_up, slow_down, vida_extra, triple, barreira }; //Adicionar outros brindes consoante a originalidade
 		switch (msgJogo.brindes[id].tipo) {
 		case speed_up:
