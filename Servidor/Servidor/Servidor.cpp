@@ -386,7 +386,6 @@ DWORD WINAPI controlaBola(void) {
 
 									//Se for preciso, configurar mais os brindes
 
-									msgJogo.brindes[x].ativo == 1;
 									msgJogo.brindes[x].coord.X = msgJogo.tijolos[i].coord.X;
 									msgJogo.brindes[x].coord.Y = msgJogo.tijolos[i].coord.Y;
 
@@ -428,7 +427,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 
 	do {
 		_tprintf(TEXT("CHEGUEI AQUI THREAD CONTROLA BRINDE!\n"));
-
+		msgJogo.brindes[id].ativo = 1;
 		msgJogo.brindes[id].coord.Y += msgJogo.brindes[id].velocidade;
 		_tprintf(TEXT("COORDENADA Y: %d"), msgJogo.brindes[id].coord.Y);
 

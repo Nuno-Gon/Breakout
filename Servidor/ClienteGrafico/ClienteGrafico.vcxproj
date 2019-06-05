@@ -173,6 +173,9 @@
     <Image Include="tijolo.bmp" />
     <Image Include="TIJOLOM.bmp" />
     <Image Include="TIJOLOR.bmp" />
+    <Image Include="TIJOLOR1.bmp" />
+    <Image Include="TIJOLOR2.bmp" />
+    <Image Include="TIJOLOR3.bmp" />
     <Image Include="Triple.bmp" />
     <Image Include="Vextra.bmp" />
   </ItemGroup>

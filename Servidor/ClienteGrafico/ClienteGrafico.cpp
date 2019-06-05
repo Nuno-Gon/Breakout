@@ -192,6 +192,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static BITMAP bmTijoloR;
 	static HDC hdcTijoloR;
 
+	//RESISTENTE
+	static HBITMAP hTijoloR1 = NULL;
+	static BITMAP bmTijoloR1;
+	static HDC hdcTijoloR1;
+
+	//RESISTENTE
+	static HBITMAP hTijoloR2 = NULL;
+	static BITMAP bmTijoloR2;
+	static HDC hdcTijoloR2;
+
+	//RESISTENTE
+	static HBITMAP hTijoloR3 = NULL;
+	static BITMAP bmTijoloR3;
+	static HDC hdcTijoloR3;
+
+
 	//MAGICO
 	static HBITMAP hTijoloM = NULL;
 	static BITMAP bmTijoloM;
@@ -248,6 +264,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// Carregar "BITMAP's"
 		hTijolo = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLO), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 		hTijoloR = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLOR), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hTijoloR1 = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLOR1), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hTijoloR2 = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLOR2), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+		hTijoloR3 = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLOR3), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 		hTijoloM = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_TIJOLOM), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 		hBarreira = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BARREIRA), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
 		hSpup = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_SPUP), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
@@ -260,6 +279,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// GETOBJECT ** Returns a reference to an object provided by an ActiveX component.
 		GetObject(hTijolo, sizeof(bmTijolo), &bmTijolo);
 		GetObject(hTijoloR, sizeof(bmTijoloR), &bmTijoloR);
+		GetObject(hTijoloR1, sizeof(bmTijoloR1), &bmTijoloR1);
+		GetObject(hTijoloR2, sizeof(bmTijoloR2), &bmTijoloR2);
+		GetObject(hTijoloR3, sizeof(bmTijoloR3), &bmTijoloR3);
 		GetObject(hTijoloM, sizeof(bmTijoloM), &bmTijoloM);
 		GetObject(hBarreira, sizeof(bmBarreira), &bmBarreira);
 		GetObject(hSpup, sizeof(bmSpup), &bmSpup);
@@ -270,6 +292,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// The CreateCompatibleDC function creates a memory device context (DC) compatible with the specified device.
 		hdcTijolo = CreateCompatibleDC(hdc);
 		hdcTijoloR = CreateCompatibleDC(hdc);
+		hdcTijoloR1 = CreateCompatibleDC(hdc);
+		hdcTijoloR2 = CreateCompatibleDC(hdc);
+		hdcTijoloR3 = CreateCompatibleDC(hdc);
 		hdcTijoloM = CreateCompatibleDC(hdc);
 		hdcBarreira = CreateCompatibleDC(hdc);
 		hdcSpup = CreateCompatibleDC(hdc);
@@ -281,6 +306,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// The SelectObject function selects an object into the specified device context (DC). The new object replaces the previous object of the same type.
 		SelectObject(hdcTijolo, hTijolo);
 		SelectObject(hdcTijoloR, hTijoloR);
+		SelectObject(hdcTijoloR1, hTijoloR1);
+		SelectObject(hdcTijoloR2, hTijoloR2);
+		SelectObject(hdcTijoloR3, hTijoloR3);
 		SelectObject(hdcTijoloM, hTijoloM);
 		SelectObject(hdcBarreira, hBarreira);
 		SelectObject(hdcSpup, hSpup);
@@ -367,7 +395,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijolo, 0, 0, bmTijolo.bmWidth, bmTijolo.bmHeight, SRCCOPY);
 					break;
 				case resistente:
-					StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijoloR, 0, 0, bmTijoloR.bmWidth, bmTijoloR.bmHeight, SRCCOPY);
+					switch (msgJogo.tijolos[i].vida) {
+					case 1:
+						StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijoloR1, 0, 0, bmTijoloR1.bmWidth, bmTijoloR1.bmHeight, SRCCOPY);
+						break;
+					case 2:
+						StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijoloR2, 0, 0, bmTijoloR2.bmWidth, bmTijoloR2.bmHeight, SRCCOPY);
+						break;
+					case 3:
+						StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijoloR3, 0, 0, bmTijoloR3.bmWidth, bmTijoloR3.bmHeight, SRCCOPY);
+						break;
+					case 4:
+						StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijoloR, 0, 0, bmTijoloR.bmWidth, bmTijoloR.bmHeight, SRCCOPY);
+						break;
+					}
+
+
 					break;
 				case magico:
 					StretchBlt(auxDC, msgJogo.tijolos[i].coord.X, msgJogo.tijolos[i].coord.Y, LARG_TIJOLO, ALT_TIJOLO, hdcTijoloM, 0, 0, bmTijoloM.bmWidth, bmTijoloM.bmHeight, SRCCOPY);
