@@ -82,6 +82,7 @@ typedef struct {
 	COORD coord;
 	int dimensao;
 	int velocidade;
+	int velocidade_inicial;
 }Barreira;
 
 //COMANDO PARTILHADO (COMANDO_SHARED)

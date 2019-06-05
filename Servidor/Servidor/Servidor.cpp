@@ -292,6 +292,7 @@ DWORD WINAPI controlaBola(void) {
 						msgJogo.bola.coord.Y = LIMITE_INFERIOR - 50;
 						msgJogo.bola.cima = true;
 						bola = true;
+						acabou = true;
 						i = MAX_NUM_PLAYERS + 1;
 					}
 				}
@@ -413,6 +414,69 @@ DWORD WINAPI controlaBola(void) {
 			}
 		}
 
+
+		//Verificar se bate contra o brinde
+		for (int i = 0; i < MAX_NUM_BRINDES; i++) {
+			if (msgJogo.brindes[i].ativo != 0) {
+				if (msgJogo.bola.coord.Y - msgJogo.bola.raio <= msgJogo.brindes[i].coord.Y + ALT_BRINDE && msgJogo.bola.coord.Y + msgJogo.bola.raio >= msgJogo.brindes[i].coord.Y &&
+					msgJogo.bola.coord.X - msgJogo.bola.raio <= msgJogo.brindes[i].coord.X + msgJogo.brindes[i].dimensao && msgJogo.bola.coord.X + msgJogo.bola.raio >= msgJogo.brindes[i].coord.X) {
+
+					//verificar para que lado do tijolo embate
+					if (msgJogo.bola.cima) {
+						if (!msgJogo.bola.direita) { //para cima e para a esquerda
+
+							if (msgJogo.brindes[i].coord.X + msgJogo.brindes[i].dimensao - msgJogo.bola.coord.X > msgJogo.brindes[i].coord.Y + ALT_BRINDE - msgJogo.bola.coord.Y) {
+								msgJogo.bola.cima = false;
+							}
+							else {
+								msgJogo.bola.direita = true;
+							}
+
+						}
+						else { //Cima direita
+
+							if (msgJogo.bola.coord.X - msgJogo.brindes[i].coord.X > msgJogo.brindes[i].coord.Y + ALT_BRINDE - msgJogo.bola.coord.Y) {
+								msgJogo.bola.cima = false;
+							}
+							else {
+								msgJogo.bola.direita = false;
+							}
+
+
+						}
+					}
+					else {
+
+						if (!msgJogo.bola.direita) { //para baixo e para a esquerda
+
+							if (msgJogo.brindes[i].coord.X + msgJogo.brindes[i].dimensao - msgJogo.bola.coord.X > msgJogo.bola.coord.Y - msgJogo.brindes[i].coord.Y) {
+								msgJogo.bola.cima = true;
+							}
+							else {
+								msgJogo.bola.direita = true;
+							}
+
+						}
+						else { //Para baixo e para a direita
+
+							if (msgJogo.bola.coord.X - msgJogo.brindes[i].coord.X > msgJogo.bola.coord.Y - msgJogo.brindes[i].coord.Y) {
+								msgJogo.bola.cima = true;
+							}
+							else {
+								msgJogo.bola.direita = false;
+							}
+
+
+						}
+
+					}
+
+				}
+
+
+			}
+		}
+
 		//Verifica vitória ou termino de Jogo!
 
 		for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
@@ -427,14 +491,14 @@ DWORD WINAPI controlaBola(void) {
 			msgJogo.bola.ativa = 0;
 			msgJogo.bola.coord.X = -30;
 			msgJogo.bola.coord.Y = -30;
-		
+
 
 			break;
 		}
 
 		acabou = true;
 
-		//Sleep(5);
+		Sleep(5);
 	}
 
 	//Fazer verificação se ganha
@@ -445,30 +509,97 @@ DWORD WINAPI controlaBola(void) {
 DWORD WINAPI controlaBrinde(LPVOID p) {
 	INT_PTR id = reinterpret_cast<INT_PTR>(p);
 	bool acabou = false;
+	int aux;
 
 	do {
-		_tprintf(TEXT("CHEGUEI AQUI THREAD CONTROLA BRINDE!\n"));
 		msgJogo.brindes[id].ativo = 1;
 		msgJogo.brindes[id].coord.Y += msgJogo.brindes[id].velocidade;
-		_tprintf(TEXT("COORDENADA Y: %d"), msgJogo.brindes[id].coord.Y);
+		//_tprintf(TEXT("COORDENADA Y: %d"), msgJogo.brindes[id].coord.Y);
+		//_tprintf(TEXT("Funcao do brind evocada!\n"));
 
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) { //Verificar se os brindes terão espaço de lado
+				if (msgJogo.brindes[id].coord.Y + ALT_BRINDE >= msgJogo.players[i].barreira.coord.Y - ALT_BARREIRA &&
+					msgJogo.brindes[id].coord.X + msgJogo.brindes[id].dimensao >= msgJogo.players[i].barreira.coord.X &&
+					msgJogo.brindes[id].coord.X <= msgJogo.players[i].barreira.coord.X + msgJogo.players[i].barreira.dimensao) {
 
-		//Verificar se hita em alguma barreira existente se sim dar lhe o power-up
+					//Verificar se hita em alguma barreira existente se sim dar lhe o power-up
 		//enum Tipo_Brinde { speed_up, slow_down, vida_extra, triple, barreira }; //Adicionar outros brindes consoante a originalidade
-		switch (msgJogo.brindes[id].tipo) {
-		case speed_up:
+					switch (msgJogo.brindes[id].tipo) {
+					case speed_up:
+						_tprintf(TEXT("Speed-up!\n"));
+						aux = msgJogo.players[i].barreira.velocidade;
+
+						if (msgJogo.players[i].barreira.velocidade + msgJogo.players[i].barreira.velocidade_inicial * 0.20 > msgJogo.players[i].barreira.velocidade_inicial * 2) {
+							msgJogo.brindes[id].ativo = 0;
+							msgJogo.brindes[id].coord.Y = -30;
+							msgJogo.brindes[id].coord.X = -30;
+
+						}
+						else {
+							msgJogo.players[i].barreira.velocidade = msgJogo.players[i].barreira.velocidade + msgJogo.players[i].barreira.velocidade_inicial * 0.20;
+							msgJogo.brindes[id].ativo = 0;
+							msgJogo.brindes[id].coord.Y = -30;
+							msgJogo.brindes[id].coord.X = -30;
+							Sleep(msgJogo.brindes[id].duracao * 1000);
+							msgJogo.players[i].barreira.velocidade = aux;
+
+						}
+
+					
+						i = MAX_NUM_PLAYERS + 1;
+						acabou = true;
+						break;
+					case slow_down:
+						_tprintf(TEXT("Slowdown!\n"));
+						//PReciso de meter a duração, lancar uma thread com temporizador
+						if (msgJogo.players[i].barreira.velocidade_inicial - msgJogo.players[i].barreira.velocidade < msgJogo.players[i].barreira.velocidade_inicial * 0.60) {
+							msgJogo.brindes[id].ativo = 0;
+							msgJogo.brindes[id].coord.Y = -30;
+							msgJogo.brindes[id].coord.X = -30;
+						}
+						else {
+							aux = msgJogo.players[i].barreira.velocidade;
+							msgJogo.players[i].barreira.velocidade = msgJogo.players[i].barreira.velocidade - msgJogo.players[i].barreira.velocidade_inicial * 0.20;
+							msgJogo.brindes[id].ativo = 0;
+							msgJogo.brindes[id].coord.Y = -30;
+							msgJogo.brindes[id].coord.X = -30;
+
+							Sleep(msgJogo.brindes[id].duracao * 1000);
+							msgJogo.players[i].barreira.velocidade = aux;
+						}
+					
+						i = MAX_NUM_PLAYERS + 1;
+						acabou = true;
+						break;
+					case vida_extra:
+						_tprintf(TEXT("Vida Extra!\n"));
+						msgJogo.players[i].vidas += 1;
+						i = MAX_NUM_PLAYERS + 1;
+						msgJogo.brindes[id].ativo = 0;
+						msgJogo.brindes[id].coord.Y = -30;
+						msgJogo.brindes[id].coord.X = -30;
+						acabou = true;
+						break;
+					case triple:
+						//edada
+						break;
+					case barreira:
+						msgJogo.players[i].barreira.dimensao += rand() % 10;
+						i = MAX_NUM_PLAYERS + 1;
+						msgJogo.brindes[id].ativo = 0;
+						msgJogo.brindes[id].coord.Y = -30;
+						msgJogo.brindes[id].coord.X = -30;
+						acabou = true;
+						break;
+					}
 
 
-			break;
-		case slow_down:
-			break;
-		case vida_extra:
-			break;
-		case triple:
-			break;
-		case barreira:
-			break;
+				}
+			}
 		}
+
+
 
 		//Verificar se chegou aqui!
 		if (msgJogo.brindes[id].coord.Y > LIMITE_INFERIOR) {
@@ -505,6 +636,7 @@ void inicia_mapa() {
 		msgJogo.players[i].barreira.coord.X = -20;
 		msgJogo.players[i].barreira.coord.Y = -20;
 		msgJogo.players[i].barreira.velocidade = 15;
+		msgJogo.players[i].barreira.velocidade_inicial = 15;
 
 
 		msgJogo.players[i].id = -1;
@@ -546,6 +678,7 @@ void inicia_mapa() {
 		msgJogo.brindes[i].id = 1;
 		msgJogo.brindes[i].ativo = 0;
 		msgJogo.brindes[i].dimensao = 2 * msgJogo.bola.raio;
+		msgJogo.brindes[i].duracao = 10; //EM SEGUNDOS
 
 		switch (rand() % 4)
 		{
@@ -565,13 +698,11 @@ void inicia_mapa() {
 			msgJogo.brindes[i].tipo = speed_up;
 			break;
 		}
+		//_tprintf(TEXT("Brinde criado! %d\n"), msgJogo.brindes[i].tipo);
 
 		msgJogo.brindes[i].velocidade = 1;
 	}
-
 }
-
-
 
 void inserePlayerJogo(HANDLE novo) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {

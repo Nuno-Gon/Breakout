@@ -25,8 +25,8 @@
 #define IDB_TIJOLOM                     142
 #define IDB_TIJOLOR1                    143
 #define IDB_TIJOLOR2                    144
-#define IDB_BITMAP2                     145
 #define IDB_TIJOLOR3                    145
+#define IDB_BITMAP2                     146
 #define IDC_USER                        1000
 #define ID_AJUDA_TOP10                  32772
 #define ID_ARQUIVO_LOGIN                32774
@@ -38,7 +38,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        146
+#define _APS_NEXT_RESOURCE_VALUE        147
 #define _APS_NEXT_COMMAND_VALUE         32776
 #define _APS_NEXT_CONTROL_VALUE         1002
 #define _APS_NEXT_SYMED_VALUE           111
