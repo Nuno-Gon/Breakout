@@ -456,11 +456,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 		//BOLA
-		if (msgJogo.bola.ativa == 1)
-			Ellipse(auxDC, msgJogo.bola.coord.X, msgJogo.bola.coord.Y, msgJogo.bola.coord.X + msgJogo.bola.raio, msgJogo.bola.coord.Y + msgJogo.bola.raio);
+		for (int i = 0; i < MAX_NUM_BOLAS; i++) {
+			if (msgJogo.bolas[i].ativa == 1)
+				Ellipse(auxDC, msgJogo.bolas[i].coord.X, msgJogo.bolas[i].coord.Y, msgJogo.bolas[i].coord.X + msgJogo.bolas[i].raio, msgJogo.bolas[i].coord.Y + msgJogo.bolas[i].raio);
+		}
+		
 
 
-		swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bola.coord.X, msgJogo.bola.coord.Y);
+		swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bolas[0].coord.X, msgJogo.bolas[0].coord.Y);
 		TextOut(auxDC, LIMITE_ESQUERDO + 10, LIMITE_INFERIOR + 20, informacoes, _tcslen(informacoes));
 		//Copia a informação que está no 'DC' para a memória do Display ;)
 		hdc = BeginPaint(hWnd, &ps);

@@ -16,6 +16,7 @@
 #define MAX_NUM_TIJOLOS 66
 #define MAX_NUM_TIJOLOS_LINHA 11
 #define MAX_NUM_BRINDES 30
+#define MAX_NUM_BOLAS 10
 
 //LARGURA
 #define LARG_TIJOLO 50
@@ -139,7 +140,7 @@ typedef struct {
 typedef struct {
 	Player players[MAX_NUM_PLAYERS];
 	Scores ranking;
-	Bola bola;  // Ver se só existe uma bola
+	Bola bolas[MAX_NUM_BOLAS];  // Ver se só existe uma bola
 	Tijolo tijolos[MAX_NUM_TIJOLOS];
 	Brinde brindes[MAX_NUM_BRINDES];
 
