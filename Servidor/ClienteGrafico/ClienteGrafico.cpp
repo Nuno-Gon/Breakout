@@ -336,6 +336,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_LOGIN:
 			if (login == false) {
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGIN), hWnd, About);
+				thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
 				comando.tipo = CMD_LOGIN;
 				comando.idHandle = hpipe;
 				ZeroMemory(&ov, sizeof(ov));
@@ -343,7 +344,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				ov.hEvent = ioReady;
 				escrevePipe(comando, ioReady, ov, tam);
 				login = true;
-				thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
+				
 			}
 			else {
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGINFAIL), hWnd, About);
@@ -423,7 +424,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//Barreira
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
-				StretchBlt(auxDC, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y, msgJogo.players[i].barreira.dimensao, ALT_BARREIRA, hdcBarreira, 0, 0, bmBarreira.bmWidth, bmBarreira.bmHeight, SRCCOPY);
+				if (msgJogo.players[i].barreira.ativa) {
+					StretchBlt(auxDC, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y, msgJogo.players[i].barreira.dimensao, ALT_BARREIRA, hdcBarreira, 0, 0, bmBarreira.bmWidth, bmBarreira.bmHeight, SRCCOPY);
+				}
 			}
 		}
 

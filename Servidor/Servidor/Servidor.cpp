@@ -336,6 +336,9 @@ DWORD WINAPI controlaBola(LPVOID p) {
 					//JOGO ACABOU 
 					if (msgJogo.players[i].vidas <= 0) {
 
+						msgJogo.players[i].barreira.ativa = false;
+						msgJogo.players[i].barreira.coord.X = -30;
+						msgJogo.players[i].barreira.coord.Y = -30;
 						//PERDERAM OU SEJA! DESLIGAR E VER A PONTUAÇÂO
 						//Desliga do jogo e pode metê-lo no top 10 (verificar se fica)
 						return 0;
@@ -724,6 +727,7 @@ void inicia_mapa() {
 
 	//Barreira
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		msgJogo.players[i].barreira.ativa = 0;
 		msgJogo.players[i].barreira.id = -1;
 		msgJogo.players[i].barreira.dimensao = 40; //ainda  verificar
 		msgJogo.players[i].barreira.coord.X = -20;
@@ -819,6 +823,7 @@ void insereBarreiraJogo(int id) {
 
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == id) {
+			msgJogo.players[i].barreira.ativa = true;
 			msgJogo.players[i].barreira.coord.X = LIMITE_ESQUERDO + 10;
 			msgJogo.players[i].barreira.coord.Y = LIMITE_INFERIOR;
 			_tprintf(TEXT("O Jogador foi %d foi colocado na posicao: x = %d, y = %d\n"), id, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y);

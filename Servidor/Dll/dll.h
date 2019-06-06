@@ -79,6 +79,7 @@ enum Tipo_Brinde{speed_up, slow_down, vida_extra, triple, barreira}; //Adicionar
 
 //Estruturas
 typedef struct {
+	bool ativa;
 	int id;
 	COORD coord;
 	int dimensao;
