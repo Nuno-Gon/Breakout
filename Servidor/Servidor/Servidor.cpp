@@ -274,6 +274,7 @@ BOOL checkDireita(int idUser) {
 		return false;
 	}
 
+	/*
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
 			if (aux.id != msgJogo.players[i].id) {
@@ -287,6 +288,7 @@ BOOL checkDireita(int idUser) {
 
 
 	}
+	*/
 	return true;
 }
 
@@ -304,6 +306,8 @@ BOOL checkEsquerda(int idUser) {
 		return false;
 	}
 
+	/*
+
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
 
@@ -315,6 +319,7 @@ BOOL checkEsquerda(int idUser) {
 		}
 	}
 
+	*/
 
 
 	return true;
