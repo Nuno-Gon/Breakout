@@ -172,6 +172,10 @@ void trataComando(COMANDO_SHARED comando) {
 	if (comando.tipo != CMD_LOGIN) {
 		id = getIdPlayer(comando.idHandle);
 		aux = getPlayer(id);
+		_tprintf(TEXT("id: %d\n"), id);
+		_tprintf(TEXT("handdle: %d\n"), aux.idHandle);
+
+
 	}
 
 	//Outros tipos de comando

@@ -136,8 +136,8 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 		ZeroMemory(&ov, sizeof(ov));
 		ResetEvent(ioReady);
 		ov.hEvent = ioReady;
+		_tprintf(TEXT("handele dentro thread: %d\n"), x);
 		ReadFile(x, &aux, sizeof(COMANDO_SHARED), &n, &ov);
-		_tprintf(TEXT("HANDLE: %d\n"), aux.idHandle);
 		WaitForSingleObject(ioReady, INFINITE);
 
 		GetOverlappedResult(hPipe, &ov, &n, FALSE);
@@ -152,6 +152,8 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 			_tprintf(TEXT("[ESCRITOR leu] Vou eliminar um jogador!\n"));
 			eliminaHandlePlayer(x);
 		}
+
+		aux.idHandle = x;
 
 	 writeMensagem(&memoriaPartilhadaGateway, &aux);
 	
@@ -193,6 +195,7 @@ DWORD WINAPI aceita_cliente(LPVOID param) {
 			_tprintf(TEXT("Erro ao criar Thread!"));
 			exit(-1);
 		}
+		_tprintf(TEXT("Handle criar thread: %d"), hPipe);
 	
 	
 	}

@@ -483,11 +483,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		switch (wParam) {
 		case VK_LEFT:
+			comando.idUser = 0;
 			comando.tipo = CMD_MOVE_ESQ;
 			comando.idHandle = hpipe;
 			escrevePipe(comando, ioReady, ov, tam);
 			break;
 		case VK_RIGHT:
+			comando.idUser = 0;
 			comando.tipo = CMD_MOVE_DIR;
 			comando.idHandle = hpipe;
 			escrevePipe(comando, ioReady, ov, tam);
