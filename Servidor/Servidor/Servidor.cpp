@@ -14,6 +14,7 @@ using namespace std;
 //Listagem de Funções
 //Threads
 DWORD WINAPI readMensagemMemory(void);
+DWORD WINAPI writeMensagemMemory(void);
 DWORD WINAPI controlaBola(LPVOID p);
 DWORD WINAPI controlaBrinde(LPVOID p);
 
@@ -43,13 +44,14 @@ MensagemJogo msgJogo;
 dataCr memoriaPartilhadaServidor;
 COMANDO_SHARED comandoLido;
 BOOL loginPlayer = FALSE;
-HANDLE thread_read_msg_memory;
+HANDLE thread_read_msg_memory, thread_write_msg_memory;
 HANDLE thread_bola, thread_brinde;
 HANDLE eventoMemoria, eventoComeco, eventoTerminaJogo;
 Scores score;
 INT idUserPlayer = 1;
 INT idTijolo = 1;
 INT idBrinde = 1;
+bool jogo;
 
 
 int _tmain(int argc, LPTSTR argv[]) {
@@ -61,6 +63,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 #endif 
 	_tprintf(TEXT("*********************Servidor Ligado!*****************************\n"));
 
+	jogo = false;
 	//Mutex
 	mutex_player = CreateMutex(NULL, FALSE, NULL);
 
@@ -94,6 +97,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 	inicia_mapa();
 
 	thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
+	thread_write_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)writeMensagemMemory, NULL, 0, NULL);
 	acabar = 0;
 
 	TCHAR str[BUFFER_SIZE];
@@ -109,20 +113,54 @@ int _tmain(int argc, LPTSTR argv[]) {
 			str[i] = _totupper(str[i]);
 		}
 
+		if (_tcsicmp(TEXT("JOGO"), str) == 0) {
+
+			if (jogo == false) {
+				WaitForSingleObject(eventoComeco, INFINITE);
+				_tprintf(TEXT("Jogo Iniciado!\n"));
+				INT_PTR aux = 0;
+				 //Meter se um jogador estiver a entrar quando o jogo está iniciado não deixar controlar uma barreira
+				thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, reinterpret_cast<LPVOID>(aux), 0, NULL);
+				jogo = true;
+			}
+			else {
+				_tprintf(TEXT("JA SE ENCONTRA UM JOGO A DECORRER!\n"));
+			}
+			
+
+		}
+		else if (_tcsicmp(TEXT("COMANDOS"), str) == 0) {
+
+			_tprintf(TEXT("************** LISTAGEM DE COMANDOS **************\n"));
+			_tprintf(TEXT("'JOGO' --> Cria Novo Jogo\n"));
+			_tprintf(TEXT("'TOP' --> Mostra TOP 10\n"));
+			_tprintf(TEXT("'CONFIGURAR' --> Configurar aspectos do jogo\n"));
+			_tprintf(TEXT("'SAIR' --> DESLIGA SERVIDOR\n"));
+
+
+		}
+		else if (_tcsicmp(TEXT("CONFIGURAR"), str) == 0) {
+			//FAlta implementar
+		}
+		else if (_tcsicmp(TEXT("TOP"), str) == 0) {
+			_tprintf(TEXT("********* TOP 10 **********\n"));
+			for (int i = 0; i < 10; i++) {
+				_tprintf(TEXT("NOME: %s \t SCORE: %d\n"), score.jogadores[i].nome, score.jogadores[i].pontos);
+			}
+
+		}
 
 
 	} while (_tcsicmp(TEXT("SAIR"), str));
 
 
-	WaitForSingleObject(eventoComeco, INFINITE);
 
-	INT_PTR aux = 0;
 
-	thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, reinterpret_cast<LPVOID>(aux), 0, NULL);
 
-	do {
-		CopyMemory(&memoriaPartilhadaServidor.sharedJogo->jogo, &msgJogo, sizeof(MensagemJogo)); //por no dll
-	} while (acabar == 0);
+
+
+
+	
 
 	acabar = 1;
 	CloseHandle(thread_read_msg_memory);
@@ -250,6 +288,14 @@ DWORD WINAPI readMensagemMemory(void) {
 		readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
 		trataComando(comandoLido);
 	}
+	return 0;
+}
+
+DWORD WINAPI writeMensagemMemory(void) {
+	do {
+		CopyMemory(&memoriaPartilhadaServidor.sharedJogo->jogo, &msgJogo, sizeof(MensagemJogo)); //por no dll
+	} while (acabar == 0);
+
 	return 0;
 }
 
@@ -855,7 +901,7 @@ void writeRegistry() {
 		_tprintf(TEXT("Success closing key.\n"));
 	}
 	else {
-		_tprintf(TEXT("Error closing key."));
+		_tprintf(TEXT("Error closing key.\n"));
 	}
 }
 
@@ -863,10 +909,10 @@ void writeRegistry() {
 void readRegistry() {
 	LONG openRes = RegOpenKeyEx(HKEY_CURRENT_USER, (LPWSTR)REGKEY, 0, KEY_ALL_ACCESS, &hKey);
 	if (openRes == ERROR_SUCCESS) {
-		_tprintf(TEXT("Success opening key."));
+		_tprintf(TEXT("Success opening key.\n"));
 	}
 	else {
-		_tprintf(TEXT("Error opening key."));
+		_tprintf(TEXT("Error opening key.\n"));
 	}
 
 
@@ -874,10 +920,10 @@ void readRegistry() {
 	RegGetValue(HKEY_CURRENT_USER, REGKEY, value, RRF_RT_ANY, NULL, (PVOID)& score, &tam);
 	LONG closeOut = RegCloseKey(hKey);
 	if (closeOut == ERROR_SUCCESS) {
-		_tprintf(TEXT("Success closing key."));
+		_tprintf(TEXT("Success closing key.\n"));
 	}
 	else {
-		_tprintf(TEXT("Error closing key."));
+		_tprintf(TEXT("Error closing key.\n"));
 	}
 }
 
