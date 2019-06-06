@@ -349,11 +349,10 @@ DWORD WINAPI writeMensagemMemory(void) {
 
 DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 	INT_PTR id = reinterpret_cast<INT_PTR>(p);
-	bool acabou = false;
-	bool teste;
+	bool semvidas = false;
 
 	msgJogo.bolas[id].ativa = 1;
-	while (1) {
+	do {
 		//MOVIMENTO
 		if (msgJogo.bolas[id].cima) { //se mover para cima
 
@@ -379,58 +378,6 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 			}
 
 		}
-
-		//Se a bola sair dos limites
-		if (msgJogo.bolas[id].coord.Y >= LIMITE_INFERIOR) { // SE A BOLA PASSAR O LIMITE INFERIOR
-			msgJogo.bolas[id].ativa = 0;
-			msgJogo.bolas[id].coord.Y = -30;
-			msgJogo.bolas[id].coord.X = -30;
-			bool bola = false;
-
-			for (int i = 0; i < MAX_NUM_PLAYERS; i++) { //Criar a nova bola, vou reutilizar a mesma thread
-				if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
-					msgJogo.players[i].vidas--;
-					//JOGO ACABOU 
-
-					if (msgJogo.players[i].vidas <= 0) {
-
-						msgJogo.players[i].barreira.ativa = false;
-						msgJogo.players[i].barreira.coord.X = -30;
-						msgJogo.players[i].barreira.coord.Y = -30;
-						//PERDERAM OU SEJA! DESLIGAR E VER A PONTUAÇÂO
-						//Desliga do jogo e pode metê-lo no top 10 (verificar se fica)
-						meteTop(msgJogo.players[i].id);
-
-					}
-
-					teste = true;
-					for (int p = 0; p < MAX_NUM_BOLAS; p++) {
-						if (msgJogo.bolas[p].ativa == 1) {
-							teste = false;
-						}
-					}
-
-					//LANCA A NOVA BOLA (QUE é a mesma XD)
-					if (msgJogo.players[i].vidas > 0 && teste) {
-						Sleep(200);
-						msgJogo.bolas[id].ativa = 1;
-						msgJogo.bolas[id].coord.X = LIMITE_ESQUERDO + (rand() % LIMITE_DIREITO);
-						msgJogo.bolas[id].coord.Y = LIMITE_INFERIOR - 50;
-						msgJogo.bolas[id].cima = true;
-						bola = true;
-						acabou = true;
-						i = MAX_NUM_PLAYERS + 1;
-
-					}
-
-				}
-
-			}
-
-		}
-
-
-		/*************************************************************************************************************************************************************/
 
 
 		if (msgJogo.bolas[id].coord.Y <= LIMITE_SUPERIOR) { // se bater no LIMITE SUPERIOR INVERTER A DIREÇÃO DA BOLA
@@ -625,35 +572,87 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 			}
 		}
 
-		//Verifica vitória ou termino de Jogo!
 
-		for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
-			if (msgJogo.tijolos[i].vida > 0) {
-				acabou = false;
-				//Ver o score dos jogadores e meter a dar 
 
-				jogo = false;
-				i = MAX_NUM_TIJOLOS + 1;
+
+		/*****************************************************************************************************************/
+
+		//Se a bola sair dos limites
+		if (msgJogo.bolas[id].coord.Y >= LIMITE_INFERIOR) { // SE A BOLA PASSAR O LIMITE INFERIOR
+			msgJogo.bolas[id].ativa = 0;
+			msgJogo.bolas[id].coord.Y = -30;
+			msgJogo.bolas[id].coord.X = -30;
+
+			for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+				if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE)
+					msgJogo.players[i].vidas--;
 			}
 		}
 
-		//Acabou o jogo
-		if (acabou) {
+		//Se acabar os tijolos
+		bool acabou = true;
+		for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
+			if (msgJogo.tijolos[i].vida > 0) {
+				acabou = false;
+			}
+		}
+
+		semvidas = true;
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
+				if (msgJogo.players[i].vidas > 0) {
+					semvidas = false;
+					break;
+				}
+			}
+		}
+
+
+
+		if (acabou || semvidas) { //Acabar com as bolas todas
 			for (int i = 0; i < MAX_NUM_BOLAS; i++) {
 				msgJogo.bolas[i].ativa = 0;
 				msgJogo.bolas[i].coord.X = -30;
 				msgJogo.bolas[i].coord.Y = -30;
 			}
 
-			break;
+			return 0;
 		}
 
-		acabou = true;
+
+
 
 		Sleep(5);
+
+	} while (msgJogo.bolas[id].ativa);
+
+
+	bool check = false;
+	//Fazer verificação se ganha
+	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
+			if (msgJogo.players[i].vidas > 0)
+				if (msgJogo.players[i].barreira.ativa == 1) {
+					for (int x = 0; x < MAX_NUM_BOLAS; x++) {
+						if (msgJogo.bolas[x].ativa == 1) {
+							check = true;
+							break;
+						}
+					}
+				}
+		}
+
 	}
 
-	//Fazer verificação se ganha
+	if (!check) {
+		//lancar nova bola
+		msgJogo.bolas[0].cima = true;
+		msgJogo.bolas[0].direita = rand() % 2;
+		msgJogo.bolas[0].coord.X = LIMITE_ESQUERDO + (rand() % LIMITE_DIREITO);
+		msgJogo.bolas[0].coord.Y = LIMITE_INFERIOR - 20;
+		INT_PTR aux = 0;
+		thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, reinterpret_cast<LPVOID>(aux), 0, NULL);
+	}
 
 	return 0;
 }
