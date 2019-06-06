@@ -129,13 +129,15 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 	DWORD tam = 0;
 	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
 
+//	_tprintf(TEXT("HANDLE: %d\n"), x);
 	
 	do {
+		
 		ZeroMemory(&ov, sizeof(ov));
 		ResetEvent(ioReady);
 		ov.hEvent = ioReady;
 		ReadFile(x, &aux, sizeof(COMANDO_SHARED), &n, &ov);
-		
+		_tprintf(TEXT("HANDLE: %d\n"), aux.idHandle);
 		WaitForSingleObject(ioReady, INFINITE);
 
 		GetOverlappedResult(hPipe, &ov, &n, FALSE);
@@ -161,6 +163,7 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 }
 
 DWORD WINAPI aceita_cliente(LPVOID param) {
+
 
 	while (termina == 0) {
 		_tprintf(TEXT("[ESCRITOR] Criar uma copia do pipe '%s' ... (CreateNamedPipe)\n"), PIPE_NAME);
@@ -190,6 +193,7 @@ DWORD WINAPI aceita_cliente(LPVOID param) {
 			_tprintf(TEXT("Erro ao criar Thread!"));
 			exit(-1);
 		}
+	
 	
 	}
 	return 0;

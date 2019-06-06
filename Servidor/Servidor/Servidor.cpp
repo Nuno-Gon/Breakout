@@ -62,7 +62,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 	_setmode(_fileno(stdout), _O_WTEXT);
 #endif 
 	_tprintf(TEXT("*********************Servidor Ligado!*****************************\n"));
-
+	acabar = 0;
 	jogo = false;
 	//Mutex
 	mutex_player = CreateMutex(NULL, FALSE, NULL);
@@ -148,6 +148,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 	} while (_tcsicmp(TEXT("SAIR"), str));
 
+	acabar = 1;
+
 	CloseHandle(thread_read_msg_memory);
 	CloseHandle(thread_write_msg_memory);
 	CloseHandle(thread_bola);
@@ -164,6 +166,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 void trataComando(COMANDO_SHARED comando) {
 	int id = 0;
 	Player aux;
+	_tprintf(TEXT("COMANDO: %d\n"), comando.idHandle);
+	
 
 	if (comando.tipo != CMD_LOGIN) {
 		id = getIdPlayer(comando.idHandle);
@@ -174,9 +178,6 @@ void trataComando(COMANDO_SHARED comando) {
 
 	switch (comando.tipo) {
 	case CMD_LOGIN:
-		COMANDO_SHARED aux_shared;
-		aux_shared = comando;
-		aux_shared.login = true;
 		_tprintf(TEXT("Novo Utilizador Logado!\n"));
 		//Insere no JOGO
 		inserePlayerJogo(comando.idHandle);
@@ -272,6 +273,7 @@ DWORD WINAPI readMensagemMemory(void) {
 	//_tprintf(TEXT("Comecei Thread ler mensagem!\n"));
 	while (1) {
 		readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
+		_tprintf(TEXT("Comando LIDO: %d! \n"), comandoLido.idHandle);
 		trataComando(comandoLido);
 	}
 	return 0;
@@ -538,17 +540,21 @@ DWORD WINAPI controlaBola(LPVOID p) {
 		for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
 			if (msgJogo.tijolos[i].vida > 0) {
 				acabou = false;
+				//Ver o score dos jogadores e meter a dar 
+
+				jogo = false;
 				i = MAX_NUM_TIJOLOS + 1;
 			}
 		}
 
 		//Acabou o jogo
 		if (acabou) {
-			msgJogo.bolas[id].ativa = 0;
-			msgJogo.bolas[id].coord.X = -30;
-			msgJogo.bolas[id].coord.Y = -30;
-
-
+			for (int i = 0; i < MAX_NUM_BOLAS; i++) {
+				msgJogo.bolas[i].ativa = 0;
+				msgJogo.bolas[i].coord.X = -30;
+				msgJogo.bolas[i].coord.Y = -30;
+			}
+		
 			break;
 		}
 
@@ -797,6 +803,7 @@ void inserePlayerJogo(HANDLE novo) {
 			_tprintf(TEXT("Cliente Inicializado no Jogo!\n"));
 			msgJogo.players[i].id = idUserPlayer++;
 			msgJogo.players[i].idHandle = novo;
+			_tprintf(TEXT("HANDLE : %d\n"), novo);
 			msgJogo.players[i].vidas = MAX_NUM_VIDAS;
 
 			insereBarreiraJogo(msgJogo.players[i].id);
@@ -829,7 +836,7 @@ void insereBarreiraJogo(int id) {
 int getIdPlayer(HANDLE aux) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (aux == msgJogo.players[i].idHandle) {
-		//	_tprintf(TEXT("Retornado id = %d\n"), msgJogo.players[i].id);
+		_tprintf(TEXT("Retornado id = %d\n"), msgJogo.players[i].id);
 			return msgJogo.players[i].id;
 		}
 	}
@@ -841,7 +848,7 @@ Player getPlayer(int idUser) {
 	aux.id = -1;
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == idUser) {
-		//	_tprintf(TEXT("Player com %d [Retorno]\n"), msgJogo.players[i].id);
+		_tprintf(TEXT("Player com %d [Retorno]\n"), msgJogo.players[i].id);
 			return msgJogo.players[i];
 		}
 	}

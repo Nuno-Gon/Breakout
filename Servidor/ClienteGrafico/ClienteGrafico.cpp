@@ -336,7 +336,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_LOGIN:
 			if (login == false) {
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGIN), hWnd, About);
-				comando.idUser = 0;
 				comando.tipo = CMD_LOGIN;
 				comando.idHandle = hpipe;
 				ZeroMemory(&ov, sizeof(ov));
@@ -482,13 +481,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam) {
 		case VK_LEFT:
 			comando.tipo = CMD_MOVE_ESQ;
-			comando.idUser = 0;
 			comando.idHandle = hpipe;
 			escrevePipe(comando, ioReady, ov, tam);
 			break;
 		case VK_RIGHT:
 			comando.tipo = CMD_MOVE_DIR;
-			comando.idUser = 0;
 			comando.idHandle = hpipe;
 			escrevePipe(comando, ioReady, ov, tam);
 			break;
