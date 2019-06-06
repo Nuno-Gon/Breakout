@@ -107,6 +107,7 @@ typedef struct {
 
 typedef struct {
 	int ativa;
+	int jogador;
 	bool cima;
 	bool direita;
 	int velocidade;

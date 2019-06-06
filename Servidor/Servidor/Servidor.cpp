@@ -386,6 +386,7 @@ DWORD WINAPI controlaBola(LPVOID p) {
 			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) //Ver se está tudo bem, porque estou a comprar só um raio!
 				if (msgJogo.bolas[id].coord.Y + msgJogo.bolas[id].raio / 2 >= (msgJogo.players[i].barreira.coord.Y - ALT_BARREIRA) && msgJogo.bolas[id].coord.X + msgJogo.bolas[id].raio >= msgJogo.players[i].barreira.coord.X && msgJogo.bolas[id].coord.X <= msgJogo.players[i].barreira.coord.X + msgJogo.players[i].barreira.dimensao) {
 					msgJogo.bolas[id].cima = true;
+					msgJogo.bolas[id].jogador = msgJogo.players[i].id;
 				}
 		}
 
@@ -395,6 +396,21 @@ DWORD WINAPI controlaBola(LPVOID p) {
 			if (msgJogo.tijolos[i].vida > 0) {
 				if (msgJogo.bolas[id].coord.Y - msgJogo.bolas[id].raio <= msgJogo.tijolos[i].coord.Y + ALT_TIJOLO && msgJogo.bolas[id].coord.Y + msgJogo.bolas[id].raio >= msgJogo.tijolos[i].coord.Y &&
 					msgJogo.bolas[id].coord.X - msgJogo.bolas[id].raio <= msgJogo.tijolos[i].coord.X + LARG_TIJOLO && msgJogo.bolas[id].coord.X + msgJogo.bolas[id].raio >= msgJogo.tijolos[i].coord.X) {
+
+
+					//Adicionar pontos ao jogador
+					for (int x = 0; x < MAX_NUM_PLAYERS; x++) {
+						if (msgJogo.players[x].idHandle != INVALID_HANDLE_VALUE) {
+							if (msgJogo.players[x].id == msgJogo.bolas[id].jogador) {
+								msgJogo.players[x].pontos += 1;
+								x = MAX_NUM_PLAYERS + 1;
+							}
+
+							
+						}
+						
+					}
+
 
 					//verificar para que lado do tijolo embate
 					if (msgJogo.bolas[id].cima) {
