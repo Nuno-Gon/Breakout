@@ -117,22 +117,32 @@ int _tmain(int argc, LPTSTR argv[]) {
 		if (_tcsicmp(TEXT("JOGO"), str) == 0) {
 
 			if (jogo == false) {
-
+				int count = 0;
 				WaitForSingleObject(eventoComeco, INFINITE);
 				_tprintf(TEXT("Jogo Iniciado!\n"));
 				for (int x = 0; x < MAX_NUM_PLAYERS; x++) {
 					if (msgJogo.players[x].idHandle != INVALID_HANDLE_VALUE) {
 						if (msgJogo.players[x].login == true) {
 							insereBarreiraJogo(msgJogo.players[x].id);
+							count++;
 						}
 
 					}
+				}
+
+				for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+					if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE)
+						if (msgJogo.players[i].barreira.ativa)
+							msgJogo.players[i].barreira.dimensao -= 5 * count;
+
 				}
 
 				INT_PTR aux = 0;
 				//Meter se um jogador estiver a entrar quando o jogo está iniciado não deixar controlar uma barreira
 				Sleep(200);
 				thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, reinterpret_cast<LPVOID>(aux), 0, NULL);
+
+
 				jogo = true;
 			}
 			else {
@@ -754,7 +764,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 						break;
 					case barreira:
 						//	_tprintf(TEXT("BRINDE BARREIRA!\n"));
-						msgJogo.players[i].barreira.dimensao += rand() % 40;
+						msgJogo.players[i].barreira.dimensao += rand() % 60;
 						i = MAX_NUM_PLAYERS + 1;
 						msgJogo.brindes[id].ativo = 0;
 						msgJogo.brindes[id].coord.Y = -30;
@@ -1005,36 +1015,28 @@ void insereBarreiraJogo(int id) {
 		if (msgJogo.players[i].id == id) {
 			msgJogo.players[i].barreira.ativa = true;
 			msgJogo.players[i].barreira.coord.Y = LIMITE_INFERIOR;
-
-
-
-			for (int x = 0; x < MAX_NUM_PLAYERS; x++) {
-				if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
-					msgJogo.players[i].barreira.dimensao -= 5;
-				}
-
-			}
-			pode = true;
-
-			do {
-				coordenada = rand() % LIMITE_DIREITO;
-				for (int x = 0; x < MAX_NUM_PLAYERS; x++) {
-					if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
-						if (msgJogo.players[i].barreira.coord.X + msgJogo.players[i].barreira.dimensao <= coordenada && msgJogo.players[i].barreira.coord.X >= coordenada + msgJogo.players[i].barreira.dimensao)
-							pode = false;
-					}
-				}
-			} while (!pode);
-
-
-			msgJogo.players[i].barreira.coord.X = coordenada;
-
-			_tprintf(TEXT("O Jogador foi %d foi colocado na posicao: x = %d, y = %d\n"), id, msgJogo.players[i].barreira.coord.X, msgJogo.players[i].barreira.coord.Y);
-
-			//Fazer função para verificar se ficou na posição certa
 		}
 	}
+
+
+		pode = true;
+
+		do {
+			coordenada = rand() % LIMITE_DIREITO;
+			for (int x = 0; x < MAX_NUM_PLAYERS; x++) {
+				if (msgJogo.players[x].idHandle != INVALID_HANDLE_VALUE) {
+					if (msgJogo.players[x].barreira.coord.X + msgJogo.players[x].barreira.dimensao <= coordenada && msgJogo.players[x].barreira.coord.X >= coordenada + msgJogo.players[x].barreira.dimensao)
+						pode = false;
+				}
+			}
+		} while (!pode);
+
+
+		msgJogo.players[id].barreira.coord.X = coordenada;
+
+		_tprintf(TEXT("O Jogador foi %d foi colocado na posicao: x = %d, y = %d\n"), id, msgJogo.players[id].barreira.coord.X, msgJogo.players[id].barreira.coord.Y);
 }
+
 
 /**************************************************************************************************************************************/
 
