@@ -164,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="barreira.bmp" />
+    <Image Include="bitmap2.bmp" />
     <Image Include="ClienteGrafico.ico" />
     <Image Include="Sldwn.bmp" />
     <Image Include="small.ico" />
@@ -178,6 +179,7 @@
     <Image Include="Vextra.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="POINTER.cur" />
     <None Include="PropertySheet.props" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

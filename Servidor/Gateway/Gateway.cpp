@@ -136,7 +136,7 @@ DWORD WINAPI recebe_comando_cliente(LPVOID param) {
 		ZeroMemory(&ov, sizeof(ov));
 		ResetEvent(ioReady);
 		ov.hEvent = ioReady;
-		_tprintf(TEXT("handele dentro thread: %d\n"), x);
+	//	_tprintf(TEXT("handele dentro thread: %d\n"), x);
 		ReadFile(x, &aux, sizeof(COMANDO_SHARED), &n, &ov);
 		WaitForSingleObject(ioReady, INFINITE);
 
@@ -195,7 +195,7 @@ DWORD WINAPI aceita_cliente(LPVOID param) {
 			_tprintf(TEXT("Erro ao criar Thread!"));
 			exit(-1);
 		}
-		_tprintf(TEXT("Handle criar thread: %d"), hPipe);
+		//_tprintf(TEXT("Handle criar thread: %d"), hPipe);
 	
 	
 	}

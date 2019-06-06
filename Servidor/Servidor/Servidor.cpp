@@ -166,24 +166,28 @@ int _tmain(int argc, LPTSTR argv[]) {
 void trataComando(COMANDO_SHARED comando) {
 	int id = 0;
 	Player aux;
-	_tprintf(TEXT("COMANDO: %d\n"), comando.idHandle);
+	//_tprintf(TEXT("COMANDO: %d\n"), comando.idHandle);
 	
 
 	if (comando.tipo != CMD_LOGIN) {
 		id = getIdPlayer(comando.idHandle);
 		aux = getPlayer(id);
-		_tprintf(TEXT("id: %d\n"), id);
-		_tprintf(TEXT("handdle: %d\n"), aux.idHandle);
-
-
+	//	_tprintf(TEXT("id: %d\n"), id);
+		//_tprintf(TEXT("handdle: %d\n"), aux.idHandle);
 	}
 
 	//Outros tipos de comando
 
 	switch (comando.tipo) {
 	case CMD_LOGIN:
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+			if (comando.idHandle == msgJogo.players[i].idHandle) {
+				_tprintf(TEXT("Utilizador ja se encontra Logado!\n"));
+				return;
+			}
+		}
+
 		_tprintf(TEXT("Novo Utilizador Logado!\n"));
-		//Insere no JOGO
 		inserePlayerJogo(comando.idHandle);
 		loginPlayer = TRUE;
 		break;
@@ -277,7 +281,7 @@ DWORD WINAPI readMensagemMemory(void) {
 	//_tprintf(TEXT("Comecei Thread ler mensagem!\n"));
 	while (1) {
 		readMensagem(&memoriaPartilhadaServidor, &comandoLido); //função no DLL
-		_tprintf(TEXT("Comando LIDO: %d! \n"), comandoLido.idHandle);
+	//	_tprintf(TEXT("Comando LIDO: %d! \n"), comandoLido.idHandle);
 		trataComando(comandoLido);
 	}
 	return 0;
@@ -672,7 +676,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 						break;
 					case barreira:
 					//	_tprintf(TEXT("BRINDE BARREIRA!\n"));
-						msgJogo.players[i].barreira.dimensao += rand() % 10;
+						msgJogo.players[i].barreira.dimensao += rand() % 40;
 						i = MAX_NUM_PLAYERS + 1;
 						msgJogo.brindes[id].ativo = 0;
 						msgJogo.brindes[id].coord.Y = -30;
@@ -811,7 +815,7 @@ void inserePlayerJogo(HANDLE novo) {
 			_tprintf(TEXT("Cliente Inicializado no Jogo!\n"));
 			msgJogo.players[i].id = idUserPlayer++;
 			msgJogo.players[i].idHandle = novo;
-			_tprintf(TEXT("HANDLE : %d\n"), novo);
+			//_tprintf(TEXT("HANDLE : %d\n"), novo);
 			msgJogo.players[i].vidas = MAX_NUM_VIDAS;
 
 			insereBarreiraJogo(msgJogo.players[i].id);

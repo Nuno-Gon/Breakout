@@ -78,8 +78,14 @@
     <Image Include="TIJOLOR3.bmp">
       <Filter>Arquivos de Recurso</Filter>
     </Image>
+    <Image Include="bitmap2.bmp">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="PropertySheet.props" />
+    <None Include="POINTER.cur">
+      <Filter>Arquivos de Recurso</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@
 #define IDD_ABOUTBOX                    103
 #define IDM_ABOUT                       104
 #define IDD_LOGIN                       104
+#define IDC_POINTER                     104
 #define IDM_EXIT                        105
 #define IDI_CLIENTEGRAFICO              107
 #define IDI_SMALL                       108

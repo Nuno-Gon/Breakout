@@ -68,6 +68,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	DWORD mode = PIPE_READMODE_MESSAGE;
 	SetNamedPipeHandleState(hpipe, &mode, NULL, NULL);
 
+	login = false;
+
 	// Inicializar cadeias de caracteres globais
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadStringW(hInstance, IDC_CLIENTEGRAFICO, szWindowClass, MAX_LOADSTRING);
@@ -322,8 +324,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 	{
 
-		if (!verifica_ON())
+		if (verifica_ON()) {
+			login = true;
+		}
+		else {
 			login = false;
+		}
+			
 
 		ZeroMemory(&ov, sizeof(ov));
 		ResetEvent(ioReady);
@@ -336,18 +343,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_LOGIN:
 			if (login == false) {
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGIN), hWnd, About);
-				thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
+
 				comando.tipo = CMD_LOGIN;
 				comando.idHandle = hpipe;
 				ZeroMemory(&ov, sizeof(ov));
 				ResetEvent(ioReady);
 				ov.hEvent = ioReady;
 				escrevePipe(comando, ioReady, ov, tam);
+				thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
 				login = true;
 				
 			}
 			else {
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGINFAIL), hWnd, About);
+				
 			}
 
 			break;
@@ -466,7 +475,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 		//swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bolas[0].coord.X, msgJogo.bolas[0].coord.Y);
-		swprintf_s(informacoes, TEXT("Vidas: %d \t Pontuação: %d\n"), msgJogo.players[0].vidas, msgJogo.players[0].pontos);
+		swprintf_s(informacoes, TEXT("Vidas: %d \t Pontuacao: %d\n"), msgJogo.players[0].vidas, msgJogo.players[0].pontos);
 		TextOut(auxDC, LIMITE_ESQUERDO + 10, LIMITE_INFERIOR + 20, informacoes, _tcslen(informacoes));
 		//Copia a informação que está no 'DC' para a memória do Display ;)
 		hdc = BeginPaint(hWnd, &ps);
