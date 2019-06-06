@@ -463,7 +463,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		
 
 
-		swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bolas[0].coord.X, msgJogo.bolas[0].coord.Y);
+		//swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bolas[0].coord.X, msgJogo.bolas[0].coord.Y);
+		swprintf_s(informacoes, TEXT("Vidas: %d \t Pontuação: %d\n"), msgJogo.players[0].vidas, msgJogo.players[0].pontos);
 		TextOut(auxDC, LIMITE_ESQUERDO + 10, LIMITE_INFERIOR + 20, informacoes, _tcslen(informacoes));
 		//Copia a informação que está no 'DC' para a memória do Display ;)
 		hdc = BeginPaint(hWnd, &ps);

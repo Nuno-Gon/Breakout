@@ -98,7 +98,6 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 	thread_read_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)readMensagemMemory, NULL, 0, NULL);
 	thread_write_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)writeMensagemMemory, NULL, 0, NULL);
-	acabar = 0;
 
 	TCHAR str[BUFFER_SIZE];
 
@@ -126,18 +125,14 @@ int _tmain(int argc, LPTSTR argv[]) {
 			else {
 				_tprintf(TEXT("JA SE ENCONTRA UM JOGO A DECORRER!\n"));
 			}
-			
-
 		}
 		else if (_tcsicmp(TEXT("COMANDOS"), str) == 0) {
-
 			_tprintf(TEXT("************** LISTAGEM DE COMANDOS **************\n"));
 			_tprintf(TEXT("'JOGO' --> Cria Novo Jogo\n"));
-			_tprintf(TEXT("'TOP' --> Mostra TOP 10\n"));
+			_tprintf(TEXT("'NIVEL' --> Inserir o nivel que pretende jogar\n"));
 			_tprintf(TEXT("'CONFIGURAR' --> Configurar aspectos do jogo\n"));
+			_tprintf(TEXT("'TOP' --> Mostra TOP 10\n"));
 			_tprintf(TEXT("'SAIR' --> DESLIGA SERVIDOR\n"));
-
-
 		}
 		else if (_tcsicmp(TEXT("CONFIGURAR"), str) == 0) {
 			//FAlta implementar
@@ -153,17 +148,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 	} while (_tcsicmp(TEXT("SAIR"), str));
 
-
-
-
-
-
-
-
-	
-
-	acabar = 1;
 	CloseHandle(thread_read_msg_memory);
+	CloseHandle(thread_write_msg_memory);
 	CloseHandle(thread_bola);
 	CloseHandle(eventoComeco);
 	CloseHandle(eventoMemoria);
@@ -580,6 +566,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 	INT_PTR id = reinterpret_cast<INT_PTR>(p);
 	bool acabou = false;
 	int aux;
+	int numero;
 	msgJogo.brindes[id].ativo = 1;
 	//_tprintf(TEXT("Funcao do brind evocada!\nBrinde do tipo: %d\n\n\n\n"), msgJogo.brindes[id].tipo);
 	do {
@@ -655,6 +642,18 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 						acabou = true;
 						break;
 					case triple:
+						INT_PTR outra;
+						numero = 2;
+						for (int o = 0; o < MAX_NUM_BOLAS; o++) {
+							if (msgJogo.bolas[o].ativa == 0 && numero > 0) {
+								outra = o;
+								thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, reinterpret_cast<LPVOID>(outra), 0, NULL);
+								numero--;
+							}
+						}
+
+
+					
 						//edada
 					//	_tprintf(TEXT("BARREIRA\n"));
 						break;
@@ -799,6 +798,7 @@ void inserePlayerJogo(HANDLE novo) {
 			msgJogo.players[i].id = idUserPlayer++;
 			msgJogo.players[i].idHandle = novo;
 			msgJogo.players[i].vidas = MAX_NUM_VIDAS;
+
 			insereBarreiraJogo(msgJogo.players[i].id);
 			return;
 		}
