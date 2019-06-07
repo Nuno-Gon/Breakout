@@ -289,21 +289,22 @@ BOOL checkDireita(int idUser) {
 		return false;
 	}
 
-	/*
+
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
-			if (aux.id != msgJogo.players[i].id) {
-				if (x + aux.barreira.velocidade >= msgJogo.players[i].barreira.coord.X) {
-					return false;
+			if (msgJogo.players[i].barreira.ativa == 1) {
+				if (aux.id != msgJogo.players[i].id) {
+					if (x + aux.barreira.velocidade >= msgJogo.players[i].barreira.coord.X && x + aux.barreira.velocidade <= msgJogo.players[i].barreira.coord.X + msgJogo.players[i].barreira.dimensao && y - ALT_BARREIRA == msgJogo.players[i].barreira.coord.Y) {
+						return false;
+					}
 				}
 			}
-
-
+				
 		}
 
 
 	}
-	*/
+
 	return true;
 }
 
@@ -321,21 +322,20 @@ BOOL checkEsquerda(int idUser) {
 		return false;
 	}
 
-	/*
 
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
+			if (msgJogo.players[i].barreira.ativa) {
+				if (aux.id != msgJogo.players[i].id) {
 
-			if (aux.id != msgJogo.players[i].id) {
-				if (x - aux.barreira.velocidade <= msgJogo.players[i].barreira.coord.X + msgJogo.players[i].barreira.dimensao) {
-					return false;
+					if (x - aux.barreira.velocidade <= msgJogo.players[i].barreira.coord.X + msgJogo.players[i].barreira.dimensao && x - aux.barreira.velocidade >= msgJogo.players[i].barreira.coord.X && y - ALT_BARREIRA == msgJogo.players[i].barreira.coord.Y) {
+						return false;
+					}
 				}
 			}
 		}
+
 	}
-
-	*/
-
 
 	return true;
 }
@@ -592,6 +592,7 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 
 		/*****************************************************************************************************************/
 
+		
 		//Se a bola sair dos limites
 		if (msgJogo.bolas[id].coord.Y >= LIMITE_INFERIOR) { // SE A BOLA PASSAR O LIMITE INFERIOR
 			msgJogo.bolas[id].ativa = 0;
@@ -651,19 +652,19 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 				msgJogo.bolas[i].coord.Y = -30;
 			}
 
-			
+
 
 			return 0;
 		}
 
-
+		
 
 
 		Sleep(5);
 
 	} while (msgJogo.bolas[id].ativa);
 
-
+	Sleep(200);
 	bool check = false;
 	//Fazer verificação se ganha
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
@@ -691,7 +692,7 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 		thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, reinterpret_cast<LPVOID>(aux), 0, NULL);
 	}
 	else {
-		for (int i = 0; i < MAX_NUM_PLAYERS;i++) {
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
 				meteTop(msgJogo.players[i].id);
 				msgJogo.players[i].barreira.ativa = 0;
