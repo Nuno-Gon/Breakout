@@ -241,6 +241,7 @@ void eliminaHandlePlayer(HANDLE aux) {
 DWORD WINAPI leMsgJogo(void) {
 	while (termina == 0) {
 		CopyMemory(&msgJogo, &memoriaPartilhadaGateway.sharedJogo->jogo, sizeof(MensagemJogo)); //meter funcao no dll
+		SetEvent(id_evento_comeco);
 	}
 	return 0;
 }

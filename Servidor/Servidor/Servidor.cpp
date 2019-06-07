@@ -17,6 +17,7 @@ DWORD WINAPI readMensagemMemory(void);
 DWORD WINAPI writeMensagemMemory(void);
 DWORD WINAPI controlaBola(LPVOID p);
 DWORD WINAPI controlaBrinde(LPVOID p);
+DWORD WINAPI moveTijolos(LPVOID p);
 
 //Registo
 void createRegistry();
@@ -47,7 +48,7 @@ dataCr memoriaPartilhadaServidor;
 COMANDO_SHARED comandoLido;
 BOOL loginPlayer = FALSE;
 HANDLE thread_read_msg_memory, thread_write_msg_memory;
-HANDLE thread_bola, thread_brinde;
+HANDLE thread_bola, thread_brinde, thread_move_tijolos;
 HANDLE eventoMemoria, eventoComeco, eventoTerminaJogo;
 Scores score;
 INT idUserPlayer = 1;
@@ -116,8 +117,12 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 		if (_tcsicmp(TEXT("JOGO"), str) == 0) {
 
+
+
 			if (jogo == false) {
+
 				int count = 0;
+				_tprintf(TEXT("Jogo Iniciado!\n"));
 				WaitForSingleObject(eventoComeco, INFINITE);
 				_tprintf(TEXT("Jogo Iniciado!\n"));
 				for (int x = 0; x < MAX_NUM_PLAYERS; x++) {
@@ -154,6 +159,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 			_tprintf(TEXT("'JOGO' --> Cria Novo Jogo\n"));
 			_tprintf(TEXT("'NIVEL' --> Inserir o nivel que pretende jogar\n"));
 			_tprintf(TEXT("'CONFIGURAR' --> Configurar aspectos do jogo\n"));
+			_tprintf(TEXT("'MOVER' --> Tijolos a mover\n"));
 			_tprintf(TEXT("'TOP' --> Mostra TOP 10\n"));
 			_tprintf(TEXT("'SAIR' --> DESLIGA SERVIDOR\n"));
 		}
@@ -166,7 +172,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 				}
 
 			}
-			
+
 			if (teste) {
 				jogo = false;
 			}
@@ -187,6 +193,24 @@ int _tmain(int argc, LPTSTR argv[]) {
 				_tprintf(TEXT("NOME: %s \t SCORE: %d\n"), score.jogadores[i].nome, score.jogadores[i].pontos);
 			}
 
+		}
+		else if (_tcsicmp(TEXT("MOVER"), str) == 0) {
+			if (jogo == true) {
+				//Lancar thread para mexer tijolos
+				for (int i = (MAX_NUM_TIJOLOS / MAX_NUM_TIJOLOS_LINHA - 1) * MAX_NUM_TIJOLOS_LINHA; i <  MAX_NUM_TIJOLOS ; i++) {
+					INT_PTR aux = i;
+					thread_move_tijolos = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)moveTijolos, reinterpret_cast<LPVOID>(aux), 0, NULL);
+				}
+			
+
+			}
+			else {
+				_tprintf(TEXT("O jogo precisa de estar a correr!\n"));
+			}
+
+		}
+		else {
+			_tprintf(TEXT("Comando nao reconhecido! (Digite: 'COMANDOS' para ajuda)\n"));
 		}
 
 
@@ -312,7 +336,7 @@ BOOL checkDireita(int idUser) {
 					}
 				}
 			}
-				
+
 		}
 
 
@@ -371,6 +395,43 @@ DWORD WINAPI writeMensagemMemory(void) {
 	do {
 		CopyMemory(&memoriaPartilhadaServidor.sharedJogo->jogo, &msgJogo, sizeof(MensagemJogo)); //por no dll
 	} while (acabar == 0);
+
+	return 0;
+}
+
+
+DWORD WINAPI moveTijolos(LPVOID p) {
+	INT_PTR id = reinterpret_cast<INT_PTR>(p);
+	Sleep(30);
+	do {
+		if (msgJogo.tijolos[id].vida > 0) {
+			do {
+				msgJogo.tijolos[id].coord.X += 1;
+				Sleep(20);
+	
+			} while (msgJogo.tijolos[id].coord.X + msgJogo.tijolos[id].dimensao <= LIMITE_DIREITO - 15);
+
+			
+			for (int i = 0; i < ALT_TIJOLO + 10; i++) {
+				msgJogo.tijolos[id].coord.Y += 1;
+				Sleep(20);
+			}
+
+			do {
+				msgJogo.tijolos[id].coord.X -= 1;
+				Sleep(20);
+			} while (msgJogo.tijolos[id].coord.X >= LIMITE_ESQUERDO + 15);
+
+			for (int i = 0; i < ALT_TIJOLO + 10; i++) {
+				msgJogo.tijolos[id].coord.Y -= 1;
+				Sleep(20);
+			}
+
+		}
+		else {
+			return 0;
+		}
+	} while (jogo == true);
 
 	return 0;
 }
@@ -605,7 +666,7 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 
 		/*****************************************************************************************************************/
 
-		
+
 		//Se a bola sair dos limites
 		if (msgJogo.bolas[id].coord.Y >= LIMITE_INFERIOR) { // SE A BOLA PASSAR O LIMITE INFERIOR
 			msgJogo.bolas[id].ativa = 0;
@@ -663,6 +724,7 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 				msgJogo.bolas[i].ativa = 0;
 				msgJogo.bolas[i].coord.X = -30;
 				msgJogo.bolas[i].coord.Y = -30;
+				jogo = false;
 			}
 
 
@@ -670,7 +732,7 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 			return 0;
 		}
 
-		
+
 
 
 		Sleep(5);
@@ -711,6 +773,7 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 				msgJogo.players[i].barreira.ativa = 0;
 				msgJogo.players[i].barreira.coord.X = -30;
 				msgJogo.players[i].barreira.coord.Y = -30;
+				jogo = false;
 			}
 
 		}
