@@ -100,6 +100,7 @@ typedef struct {
 
 typedef struct {
 	int idUser;
+	TCHAR nome[BUFFER_SIZE];
 	int tipo;
 	bool login;
 	HANDLE idHandle;

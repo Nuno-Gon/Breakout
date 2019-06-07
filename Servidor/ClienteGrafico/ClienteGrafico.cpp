@@ -34,6 +34,7 @@ HWND hWnd;
 //PROVISORIO
 int x = 10;
 int y = 10;
+int aux_global = 0;
 
 //thread
 HANDLE thread_mensagem_jogo;
@@ -53,6 +54,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK Login(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -215,6 +217,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static BITMAP bmTijoloM;
 	static HDC hdcTijoloM;
 
+	int aux;
 
 
 	//Barreira
@@ -342,21 +345,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case IDM_LOGIN:
 			if (login == false) {
-				DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGIN), hWnd, About);
-
-				comando.tipo = CMD_LOGIN;
-				comando.idHandle = hpipe;
-				ZeroMemory(&ov, sizeof(ov));
-				ResetEvent(ioReady);
-				ov.hEvent = ioReady;
-				escrevePipe(comando, ioReady, ov, tam);
-				thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
-				login = true;
-				
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGIN), hWnd, Login);
 			}
 			else {
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_LOGINFAIL), hWnd, About);
-				
 			}
 
 			break;
@@ -473,9 +465,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		
 
-
 		//swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bolas[0].coord.X, msgJogo.bolas[0].coord.Y);
-		swprintf_s(informacoes, TEXT("Vidas: %d \t Pontuacao: %d\n"), msgJogo.players[0].vidas, msgJogo.players[0].pontos);
+	
+
+
+		
+		swprintf_s(informacoes, TEXT("Nome: %s Vidas: %d \t Pontuacao: %d Velocidade: %d Dimensao: %d\n"), msgJogo.players[aux_global].nome, msgJogo.players[aux_global].vidas, msgJogo.players[aux_global].pontos, msgJogo.players[aux_global].barreira.velocidade, msgJogo.players[aux_global].barreira.dimensao);
 		TextOut(auxDC, LIMITE_ESQUERDO + 10, LIMITE_INFERIOR + 20, informacoes, _tcslen(informacoes));
 		//Copia a informação que está no 'DC' para a memória do Display ;)
 		hdc = BeginPaint(hWnd, &ps);
@@ -505,6 +500,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case 0x1B: //Process an escape
 			//Tecnicamente carregando escape o jogador baza :O
+			comando.idUser = 0;
+			comando.tipo = CMD_LOGOUT;
+			comando.idHandle = hpipe;
+			escrevePipe(comando, ioReady, ov, tam);
+			Sleep(20);
+			exit(0);
 			break;
 		default:
 			break;
@@ -536,6 +537,51 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			EndDialog(hDlg, LOWORD(wParam));
 			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
+}
+
+// Manipulador de mensagem para a caixa 'sobre'.
+INT_PTR CALLBACK Login(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK)
+		{
+			COMANDO_SHARED comando;
+			HANDLE ioReady;
+			OVERLAPPED ov;
+			DWORD tam = 0;
+			ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+			HWND edit;
+			TCHAR buff[1024];
+
+			edit = GetDlgItem(hDlg, IDC_USER);
+			GetWindowText(edit, buff, 1024);
+			_tcscpy_s(comando.nome, sizeof(TCHAR[25]), buff);
+
+			comando.tipo = CMD_LOGIN;
+			comando.idHandle = hpipe;
+			ZeroMemory(&ov, sizeof(ov));
+			ResetEvent(ioReady);
+			ov.hEvent = ioReady;
+			escrevePipe(comando, ioReady, ov, tam);
+			thread_mensagem_jogo = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)leMensagemJogo, NULL, 0, NULL);
+			login = true;
+
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		else if (LOWORD(wParam) == IDCANCEL) {
+			EndDialog(hDlg, LOWORD(wParam));
 		}
 		break;
 	}
@@ -623,7 +669,15 @@ DWORD WINAPI leMensagemJogo(void) {
 
 			//fazer um refresh
 		//	Sleep(0166); // 1 / 60 para meter 60hz
+			
+			for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+				if (msgJogo.players[i].idHandle == hpipe) {
+					aux_global = i;
+				}
+			}
+
 			InvalidateRect(hWnd, NULL, FALSE);
+
 		}
 	}
 	return 0;
@@ -637,3 +691,4 @@ BOOL verifica_ON() { //Meter no lado do servidor a funcionar
 	}
 	return false;
 }
+

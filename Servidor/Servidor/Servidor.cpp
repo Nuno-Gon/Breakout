@@ -31,7 +31,7 @@ void inicia_configuracao_jogo();
 int getIdPlayer(HANDLE aux);
 Player getPlayer(int idUser);
 void desconectaPlayer(int id);
-void inserePlayerJogo(HANDLE novo);
+void inserePlayerJogo(HANDLE novo, COMANDO_SHARED aux);
 BOOL checkDireita(int idUser);
 BOOL checkEsquerda(int idUser);
 void insereBarreiraJogo(int id);
@@ -219,7 +219,7 @@ void trataComando(COMANDO_SHARED comando) {
 		}
 
 		_tprintf(TEXT("Novo Utilizador Logado!\n"));
-		inserePlayerJogo(comando.idHandle);
+		inserePlayerJogo(comando.idHandle, comando);
 		loginPlayer = TRUE;
 		break;
 	case CMD_MOVE_DIR:
@@ -229,6 +229,7 @@ void trataComando(COMANDO_SHARED comando) {
 		moveJogadorEsquerda(id);
 		break;
 	case CMD_LOGOUT:
+		meteTop(id);
 		desconectaPlayer(id);
 		_tprintf(TEXT("Cliente [%d] desconectado!\n"), id);
 		break;
@@ -599,6 +600,23 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 			}
 		}
 
+
+		//Se um jogador ficou sem vidas, tirar a barra
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
+				if (msgJogo.players[i].vidas <= 0) {
+					if (msgJogo.players[i].barreira.ativa != 0) {
+						msgJogo.players[i].barreira.ativa = 0;
+						msgJogo.players[i].barreira.coord.X = -30;
+						msgJogo.players[i].barreira.coord.Y = -30;
+						meteTop(msgJogo.players[i].id);
+					}
+				}
+			}
+		}
+
+
+
 		//Se acabar os tijolos
 		bool acabou = true;
 		for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
@@ -607,13 +625,16 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 			}
 		}
 
+
+
 		semvidas = true;
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
-				if (msgJogo.players[i].vidas > 0) {
-					semvidas = false;
-					break;
-				}
+				if (msgJogo.players[i].barreira.ativa)
+					if (msgJogo.players[i].vidas > 0) {
+						semvidas = false;
+						break;
+					}
 			}
 		}
 
@@ -625,6 +646,8 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 				msgJogo.bolas[i].coord.X = -30;
 				msgJogo.bolas[i].coord.Y = -30;
 			}
+
+			
 
 			return 0;
 		}
@@ -662,6 +685,17 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 		msgJogo.bolas[0].coord.Y = LIMITE_INFERIOR - 20;
 		INT_PTR aux = 0;
 		thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, reinterpret_cast<LPVOID>(aux), 0, NULL);
+	}
+	else {
+		for (int i = 0; i < MAX_NUM_PLAYERS;i++) {
+			if (msgJogo.players[i].idHandle != INVALID_HANDLE_VALUE) {
+				meteTop(msgJogo.players[i].id);
+				msgJogo.players[i].barreira.ativa = 0;
+				msgJogo.players[i].barreira.coord.X = -30;
+				msgJogo.players[i].barreira.coord.Y = -30;
+			}
+
+		}
 	}
 
 	return 0;
@@ -706,7 +740,11 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 							msgJogo.brindes[id].ativo = 0;
 							msgJogo.brindes[id].coord.Y = -30;
 							msgJogo.brindes[id].coord.X = -30;
-							Sleep(msgJogo.brindes[id].duracao * 1000);
+
+							do {
+								Sleep(1000);
+								msgJogo.brindes[id].duracao -= 1;
+							} while (msgJogo.brindes[id].duracao > 0);
 							msgJogo.players[i].barreira.velocidade = aux;
 
 						}
@@ -730,7 +768,11 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 							msgJogo.brindes[id].coord.Y = -30;
 							msgJogo.brindes[id].coord.X = -30;
 
-							Sleep(msgJogo.brindes[id].duracao * 1000);
+							do {
+								Sleep(1000);
+								msgJogo.brindes[id].duracao -= 1;
+							} while (msgJogo.brindes[id].duracao > 0);
+
 							msgJogo.players[i].barreira.velocidade = aux;
 						}
 
@@ -990,13 +1032,14 @@ void inicia_configuracao_jogo() {
 	}
 }
 
-void inserePlayerJogo(HANDLE novo) {
+void inserePlayerJogo(HANDLE novo, COMANDO_SHARED aux) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].idHandle == INVALID_HANDLE_VALUE) {
-			_tprintf(TEXT("Cliente Inicializado no Jogo!\n"));
 			msgJogo.players[i].id = idUserPlayer++;
 			msgJogo.players[i].idHandle = novo;
+			wcscpy_s(msgJogo.players[i].nome, aux.nome);
 			msgJogo.players[i].login = true;
+			_tprintf(TEXT("Cliente %s com o id: %d \tInicializado no Jogo!\n"), msgJogo.players[i].nome, msgJogo.players[i].id);
 			//_tprintf(TEXT("HANDLE : %d\n"), novo);
 			msgJogo.players[i].vidas = MAX_NUM_VIDAS;
 			return;
@@ -1019,22 +1062,22 @@ void insereBarreiraJogo(int id) {
 	}
 
 
-		pode = true;
+	pode = true;
 
-		do {
-			coordenada = rand() % LIMITE_DIREITO;
-			for (int x = 0; x < MAX_NUM_PLAYERS; x++) {
-				if (msgJogo.players[x].idHandle != INVALID_HANDLE_VALUE) {
-					if (msgJogo.players[x].barreira.coord.X + msgJogo.players[x].barreira.dimensao <= coordenada && msgJogo.players[x].barreira.coord.X >= coordenada + msgJogo.players[x].barreira.dimensao)
-						pode = false;
-				}
+	do {
+		coordenada = rand() % LIMITE_DIREITO;
+		for (int x = 0; x < MAX_NUM_PLAYERS; x++) {
+			if (msgJogo.players[x].idHandle != INVALID_HANDLE_VALUE) {
+				if (msgJogo.players[x].barreira.coord.X + msgJogo.players[x].barreira.dimensao <= coordenada && msgJogo.players[x].barreira.coord.X >= coordenada + msgJogo.players[x].barreira.dimensao)
+					pode = false;
 			}
-		} while (!pode);
+		}
+	} while (!pode);
 
 
-		msgJogo.players[id].barreira.coord.X = coordenada;
+	msgJogo.players[id].barreira.coord.X = coordenada;
 
-		_tprintf(TEXT("O Jogador foi %d foi colocado na posicao: x = %d, y = %d\n"), id, msgJogo.players[id].barreira.coord.X, msgJogo.players[id].barreira.coord.Y);
+	_tprintf(TEXT("O Jogador foi %d foi colocado na posicao: x = %d, y = %d\n"), id, msgJogo.players[id].barreira.coord.X, msgJogo.players[id].barreira.coord.Y);
 }
 
 
@@ -1105,7 +1148,8 @@ void writeRegistry() {
 		_tprintf(TEXT("Error opening key.\n"));
 	}
 
-	LONG setRes = RegSetValueEx(hKey, value, 0, REG_SZ, (LPBYTE)& score, sizeof(Scores));
+	//LONG setRes = RegSetValueEx(hKey, value, 0, REG_SZ, (LPBYTE)& score, sizeof(Scores));
+	LONG setRes = RegSetValueEx(hKey, value, 0, REG_BINARY, (LPBYTE)& score, sizeof(Scores));
 	if (setRes == ERROR_SUCCESS) {
 		_tprintf(TEXT("Success writing to Registry.\n"));
 	}
