@@ -28,10 +28,15 @@
 #define IDB_TIJOLOR2                    144
 #define IDB_TIJOLOR3                    145
 #define IDB_BITMAP2                     146
+#define IDD_TOP10                       147
 #define IDC_USER                        1000
+#define IDC_NOME0                       1004
+#define IDC_SCORE0                      1005
+#define IDC_NOME1                       1006
 #define ID_AJUDA_TOP10                  32772
 #define ID_ARQUIVO_LOGIN                32774
 #define IDM_LOGIN                       32775
+#define IDM_TOP10                       32776
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -39,9 +44,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        147
-#define _APS_NEXT_COMMAND_VALUE         32776
-#define _APS_NEXT_CONTROL_VALUE         1002
+#define _APS_NEXT_RESOURCE_VALUE        148
+#define _APS_NEXT_COMMAND_VALUE         32777
+#define _APS_NEXT_CONTROL_VALUE         1007
 #define _APS_NEXT_SYMED_VALUE           111
 #endif
 #endif

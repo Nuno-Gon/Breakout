@@ -18,6 +18,7 @@
 void createPipeCliente();
 void escrevePipe(COMANDO_SHARED comando, HANDLE ioReady, OVERLAPPED ov, DWORD tam);
 BOOL verifica_ON();
+int getPlayer();
 
 //THREADS
 DWORD WINAPI leMensagemJogo(void);
@@ -34,7 +35,6 @@ HWND hWnd;
 //PROVISORIO
 int x = 10;
 int y = 10;
-int aux_global = 0;
 
 //thread
 HANDLE thread_mensagem_jogo;
@@ -55,6 +55,7 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK Login(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK Top(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -355,15 +356,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_ABOUT:
 			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
 			break;
-
+		case IDM_TOP10:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_TOP10), hWnd, Top);
+			break;
 		case IDM_EXIT:
 			//mandar mensagem ao servidor para inserir no ranking e dizer que desconectou !
 			comando.idUser = 0;
 			comando.tipo = CMD_LOGOUT;
 			comando.idHandle = hpipe;
 			login = false;
-
-
+			escrevePipe(comando, ioReady, ov, tam);
 			DestroyWindow(hWnd);
 			break;
 		default:
@@ -468,7 +470,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//swprintf_s(informacoes, TEXT("Posicao da Bola : (% d, % d)\n"), msgJogo.bolas[0].coord.X, msgJogo.bolas[0].coord.Y);
 	
 
-
+		int aux_global = getPlayer();
 		
 		swprintf_s(informacoes, TEXT("Nome: %s Vidas: %d \t Pontuacao: %d Velocidade: %d Dimensao: %d\n"), msgJogo.players[aux_global].nome, msgJogo.players[aux_global].vidas, msgJogo.players[aux_global].pontos, msgJogo.players[aux_global].barreira.velocidade, msgJogo.players[aux_global].barreira.dimensao);
 		TextOut(auxDC, LIMITE_ESQUERDO + 10, LIMITE_INFERIOR + 20, informacoes, _tcslen(informacoes));
@@ -543,7 +545,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	return (INT_PTR)FALSE;
 }
 
-// Manipulador de mensagem para a caixa 'sobre'.
+// Manipulador de mensagem para a caixa 'login'.
 INT_PTR CALLBACK Login(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
@@ -587,6 +589,34 @@ INT_PTR CALLBACK Login(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return (INT_PTR)FALSE;
 }
+
+// Manipulador de mensagem para a caixa 'sobre'.
+INT_PTR CALLBACK Top(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK)
+		{
+			//METER TEXTO NO TOP 10
+
+			for (int i = 0; i < 10; i++) {
+				msgJogo.ranking.jogadores[i].nome;
+				msgJogo.ranking.jogadores[i].pontos;
+			}
+
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
+}
+
 
 // **** PIPES ****
 //Criar Pipe
@@ -669,12 +699,7 @@ DWORD WINAPI leMensagemJogo(void) {
 
 			//fazer um refresh
 		//	Sleep(0166); // 1 / 60 para meter 60hz
-			
-			for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
-				if (msgJogo.players[i].idHandle == hpipe) {
-					aux_global = i;
-				}
-			}
+		
 
 			InvalidateRect(hWnd, NULL, FALSE);
 
@@ -692,3 +717,11 @@ BOOL verifica_ON() { //Meter no lado do servidor a funcionar
 	return false;
 }
 
+int getPlayer() {
+	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		if (msgJogo.players[i].idHandle == hpipe) {
+			return i;
+		}
+	}
+	return 0;
+}
