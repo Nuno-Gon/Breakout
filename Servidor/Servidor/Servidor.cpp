@@ -159,6 +159,19 @@ int _tmain(int argc, LPTSTR argv[]) {
 		}
 		else if (_tcsicmp(TEXT("CONFIGURAR"), str) == 0) {
 			//FAlta implementar
+			bool teste = true;
+			for (int i = 0; i < MAX_NUM_BOLAS; i++) {
+				if (msgJogo.bolas[i].ativa != 0) {
+					teste = false;
+				}
+
+			}
+			
+			if (teste) {
+				jogo = false;
+			}
+
+
 			if (jogo == true) {
 				_tprintf(TEXT("UM JOGO JA SE ENCONTRA A DECORRER!\n"));
 			}
