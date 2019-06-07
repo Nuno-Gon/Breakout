@@ -218,8 +218,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static BITMAP bmTijoloM;
 	static HDC hdcTijoloM;
 
-	int aux;
-
 
 	//Barreira
 	static HBITMAP hBarreira = NULL;
@@ -355,9 +353,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case IDM_ABOUT:
 			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+			return DefWindowProc(hWnd, message, wParam, lParam);
 			break;
 		case IDM_TOP10:
 			DialogBox(hInst, MAKEINTRESOURCE(IDD_TOP10), hWnd, Top);
+			return DefWindowProc(hWnd, message, wParam, lParam);
 			break;
 		case IDM_EXIT:
 			//mandar mensagem ao servidor para inserir no ranking e dizer que desconectou !
@@ -593,21 +593,46 @@ INT_PTR CALLBACK Login(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 // Manipulador de mensagem para a caixa 'sobre'.
 INT_PTR CALLBACK Top(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	COMANDO_SHARED comando;
+	HANDLE ioReady;
+	OVERLAPPED ov;
+	DWORD tam = 0;
+	ioReady = CreateEvent(NULL, TRUE, FALSE, NULL);
+	TCHAR str[100] = TEXT("");
+	HWND hwndList;
 	UNREFERENCED_PARAMETER(lParam);
 	switch (message)
 	{
 	case WM_INITDIALOG:
+
+		hwndList = GetDlgItem(hDlg, IDC_LISTBOX);
+
+		comando.idUser = 0;
+		comando.tipo = CMD_REGISTRY;
+		comando.idHandle = hpipe;
+		ZeroMemory(&ov, sizeof(ov));
+		ResetEvent(ioReady);
+		ov.hEvent = ioReady;
+		escrevePipe(comando, ioReady, ov, tam);
+
+	
+		for (int i = 0; i < 10; i++) {
+			swprintf_s(str, TEXT("%d º Nome: %s Score: %d"), i, msgJogo.ranking.jogadores[i].nome, msgJogo.ranking.jogadores[i].pontos);
+
+			//int pos = (int)//
+				SendMessage(hwndList, LB_ADDSTRING, 0, (LPARAM)str);
+		
+			//SendMessage(hwndList, LB_SETITEMDATA, pos, (LPARAM)i);
+		}
+
+		SetFocus(hwndList);
+
 		return (INT_PTR)TRUE;
 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK)
 		{
-			//METER TEXTO NO TOP 10
-
-			for (int i = 0; i < 10; i++) {
-				msgJogo.ranking.jogadores[i].nome;
-				msgJogo.ranking.jogadores[i].pontos;
-			}
+			
 
 			EndDialog(hDlg, LOWORD(wParam));
 			return (INT_PTR)TRUE;
@@ -699,7 +724,6 @@ DWORD WINAPI leMensagemJogo(void) {
 
 			//fazer um refresh
 		//	Sleep(0166); // 1 / 60 para meter 60hz
-		
 
 			InvalidateRect(hWnd, NULL, FALSE);
 

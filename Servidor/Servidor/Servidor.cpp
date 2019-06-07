@@ -233,6 +233,10 @@ void trataComando(COMANDO_SHARED comando) {
 		desconectaPlayer(id);
 		_tprintf(TEXT("Cliente [%d] desconectado!\n"), id);
 		break;
+	case CMD_REGISTRY:
+		readRegistry();
+		msgJogo.ranking = score;
+		break;
 	}
 
 	return;
@@ -1186,6 +1190,7 @@ void readRegistry() {
 	else {
 		_tprintf(TEXT("Error closing key.\n"));
 	}
+	msgJogo.ranking = score;
 }
 
 //Inicia para teste REGISTRY

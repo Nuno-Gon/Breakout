@@ -39,6 +39,7 @@
 #define CMD_MOVE_DIR 4
 #define CMD_LOGIN 5
 #define CMD_LOGOUT 6
+#define CMD_REGISTRY 7
 
 #define PIPE_NAME TEXT("\\\\.\\pipe\\connect")
 
