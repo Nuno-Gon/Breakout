@@ -104,6 +104,9 @@ int _tmain(int argc, LPTSTR argv[]) {
 	thread_write_msg_memory = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)writeMensagemMemory, NULL, 0, NULL);
 
 	TCHAR str[BUFFER_SIZE];
+	TCHAR ctr[BUFFER_SIZE];
+	TCHAR ttr[BUFFER_SIZE];
+	TCHAR vttr[BUFFER_SIZE];
 
 	_tprintf(TEXT("\n"));
 	do {
@@ -159,7 +162,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 			_tprintf(TEXT("************** LISTAGEM DE COMANDOS **************\n"));
 			_tprintf(TEXT("'JOGO' --> Cria Novo Jogo\n"));
 			_tprintf(TEXT("'NIVEL' --> Inserir o nivel que pretende jogar\n"));
-			_tprintf(TEXT("'CONFIGURAR' --> Configurar aspectos do jogo\n"));
+			_tprintf(TEXT("'CONFIGURAR' --> Configuracao ja existente\n"));
+			_tprintf(TEXT("'CODE' --> Configurar aspectos do jogo!\n"));
 			_tprintf(TEXT("'MOVER' --> Tijolos a mover\n"));
 			_tprintf(TEXT("'TOP' --> Mostra TOP 10\n"));
 			_tprintf(TEXT("'SAIR' --> DESLIGA SERVIDOR\n"));
@@ -214,6 +218,380 @@ int _tmain(int argc, LPTSTR argv[]) {
 				inicia_configuracao_jogo();
 			}
 
+		}
+		else if (_tcsicmp(TEXT("CODE"), str) == 0) {
+			bool teste = true;
+			for (int i = 0; i < MAX_NUM_BOLAS; i++) {
+				if (msgJogo.bolas[i].ativa != 0) {
+					teste = false;
+				}
+
+			}
+
+			if (teste) {
+				jogo = false;
+			}
+
+
+			if (jogo == true) {
+				_tprintf(TEXT("UM JOGO JA SE ENCONTRA A DECORRER!\n"));
+			}
+			else {
+				_tprintf(TEXT("Bem Vindo ao menu configuracao!\n"));
+
+				do {
+
+					_tprintf(TEXT("Conf: "));
+					fflush(stdin);
+					_fgetts(ctr, BUFFER_SIZE, stdin);
+
+					ctr[_tcslen(ctr) - 1] = '\0';
+
+					for (int i = 0; i < _tcslen(ctr); i++) {
+						ctr[i] = _totupper(ctr[i]);
+					}
+
+
+					if (_tcsicmp(TEXT("COMANDOS"), ctr) == 0) {
+						_tprintf(TEXT("************** LISTAGEM DE COMANDOS **************\n"));
+						_tprintf(TEXT("'BOLAS' --> Menu Configuracao Bolas\n"));
+						_tprintf(TEXT("'BARREIRAS' --> Menu Configuracao Barreiras\n"));
+						_tprintf(TEXT("'TIJOLOS' --> Menu Configuracao Tijolos\n"));
+						_tprintf(TEXT("'BRINDES' --> Menu Configuracao Brindes!\n"));
+						_tprintf(TEXT("'SAIR' --> Sair do modo configuracao\n"));
+					}
+					else if (_tcsicmp(TEXT("BOLAS"), ctr) == 0) {
+						do {
+							_tprintf(TEXT("Bolas: "));
+							fflush(stdin);
+							_fgetts(ttr, BUFFER_SIZE, stdin);
+
+							ttr[_tcslen(ttr) - 1] = '\0';
+
+							for (int i = 0; i < _tcslen(ttr); i++) {
+								ttr[i] = _totupper(ttr[i]);
+							}
+
+							if (_tcsicmp(TEXT("COMANDOS"), ttr) == 0) {
+								_tprintf(TEXT("************** LISTAGEM DE COMANDOS **************\n"));
+								_tprintf(TEXT("'VELOCIDADE' --> Mudar a Velocidade das Bolas\n"));
+								_tprintf(TEXT("'RAIO' --> Mudar o Raio das Bolas\n"));
+								_tprintf(TEXT("'SAIR' --> Sair para o menu anterior\n"));
+							}
+							else if (_tcsicmp(TEXT("VELOCIDADE"), ttr) == 0) {
+								_tprintf(TEXT("Velocidade: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 30 || aux_d <= 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									for (int i = 0; i < MAX_NUM_BOLAS; i++) {
+										msgJogo.bolas[i].velocidade = aux_d;
+										msgJogo.bolas[i].velocidade_inicial = aux_d;
+									}
+									_tprintf(TEXT("Velocidade alterada para %d\n"), msgJogo.bolas[0].velocidade);
+								}
+
+
+
+							}
+							else if (_tcsicmp(TEXT("RAIO"), ttr) == 0) {
+								_tprintf(TEXT("Raio: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 30 || aux_d <= 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									for (int i = 0; i < MAX_NUM_BOLAS; i++) {
+										msgJogo.bolas[i].raio = aux_d;
+									}
+									_tprintf(TEXT("Valor do raio alterado para %d\n"), msgJogo.bolas[0].raio);
+								}
+
+
+							}
+							else {
+								_tprintf(TEXT("Comando nao reconhecido! (Digite: 'COMANDOS' para ajuda)\n"));
+							}
+						} while (_tcsicmp(TEXT("SAIR"), ttr));
+					}
+					else if (_tcsicmp(TEXT("BARREIRAS"), ctr) == 0) {
+						do {
+							_tprintf(TEXT("Barreiras: "));
+							fflush(stdin);
+							_fgetts(ttr, BUFFER_SIZE, stdin);
+
+							ttr[_tcslen(ttr) - 1] = '\0';
+
+							for (int i = 0; i < _tcslen(ttr); i++) {
+								ttr[i] = _totupper(ttr[i]);
+							}
+
+							if (_tcsicmp(TEXT("COMANDOS"), ttr) == 0) {
+								_tprintf(TEXT("************** LISTAGEM DE COMANDOS **************\n"));
+								_tprintf(TEXT("'VELOCIDADE' --> Mudar a Velocidade das Barreiras\n"));
+								_tprintf(TEXT("'DIMENSAO' --> Mudar a Dimensao das Barreiras\n"));
+								_tprintf(TEXT("'SAIR' --> Sair para o menu anterior\n"));
+							}
+							else if (_tcsicmp(TEXT("VELOCIDADE"), ttr) == 0) {
+								_tprintf(TEXT("Velocidade: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 100 || aux_d <= 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+										msgJogo.players[i].barreira.velocidade = aux_d;
+									}
+
+									_tprintf(TEXT("Velocidade dos jogadores alterada para: %d\n"), msgJogo.players[0].barreira.velocidade);
+								}
+
+
+
+							}
+							else if (_tcsicmp(TEXT("DIMENSAO"), ttr) == 0) {
+								_tprintf(TEXT("Dimensao: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 200 || aux_d <= 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+										msgJogo.players[i].barreira.dimensao = aux_d;
+									}
+									_tprintf(TEXT("Dimensao da Barreira Alterada para: %d\n"), msgJogo.players[0].barreira.dimensao);
+								}
+
+
+							}
+							else {
+								_tprintf(TEXT("Comando nao reconhecido! (Digite: 'COMANDOS' para ajuda)\n"));
+							}
+						} while (_tcsicmp(TEXT("SAIR"), ttr));
+
+
+					}
+					else if (_tcsicmp(TEXT("TIJOLOS"), ctr) == 0) {
+						do {
+							_tprintf(TEXT("Tijolos: "));
+							fflush(stdin);
+							_fgetts(ttr, BUFFER_SIZE, stdin);
+
+							ttr[_tcslen(ttr) - 1] = '\0';
+
+							for (int i = 0; i < _tcslen(ttr); i++) {
+								ttr[i] = _totupper(ttr[i]);
+							}
+
+							if (_tcsicmp(TEXT("COMANDOS"), ttr) == 0) {
+								_tprintf(TEXT("************** LISTAGEM DE COMANDOS **************\n"));
+								_tprintf(TEXT("'NORMAL' -->  Definir probabilidade tijolos NORMAL\n"));
+								_tprintf(TEXT("'MAGICO' -->  Definir probabilidade tijolos MAGICO\n"));
+								_tprintf(TEXT("'RESISTENTE' -->Definir probabilidade tijolos RESISTENTE\n"));
+								_tprintf(TEXT("'SAIR' --> Sair para o menu anterior\n"));
+							}
+							else if (_tcsicmp(TEXT("NORMAL"), ttr) == 0) {
+								_tprintf(TEXT("Normal: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 100 || aux_d < 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									int aux_ppp;
+									for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
+										srand(NULL);
+										aux_ppp = rand() % aux_d;
+									
+										if (aux_ppp <= aux_d) {
+											msgJogo.tijolos[i].vida = 1;
+											msgJogo.tijolos[i].tipo = normal;
+										}
+										
+									}
+									_tprintf(TEXT("Tijolos Normais criados!\n"));
+								}
+
+
+
+							}
+							else if (_tcsicmp(TEXT("MAGICO"), ttr) == 0) {
+								_tprintf(TEXT("Magico: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 100 || aux_d < 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									int aux_ppp;
+									for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
+										srand(NULL);
+										aux_ppp = rand() % aux_d;
+
+										if (aux_ppp <= aux_d) {
+											msgJogo.tijolos[i].vida = 1;
+											msgJogo.tijolos[i].tipo = magico;
+										}
+
+									}
+									_tprintf(TEXT("Tijolos Magicos criados!\n"));
+								}
+
+
+							}
+							else if (_tcsicmp(TEXT("RESISTENTE"), ttr) == 0) {
+								_tprintf(TEXT("Resistente: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 100 || aux_d < 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									int aux_ppp;
+									for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
+										srand(NULL);
+										aux_ppp = rand() % aux_d;
+
+										if (aux_ppp <= aux_d) {
+											msgJogo.tijolos[i].vida =  2 + rand() % 3;
+											msgJogo.tijolos[i].tipo = resistente;
+										}
+
+									}
+									_tprintf(TEXT("Tijolos Resistentes criados!\n"));
+								}
+
+
+							}
+							else {
+								_tprintf(TEXT("Comando nao reconhecido! (Digite: 'COMANDOS' para ajuda)\n"));
+							}
+						} while (_tcsicmp(TEXT("SAIR"), ttr));
+					}
+					else if (_tcsicmp(TEXT("BRINDES"), ctr) == 0) {
+						do {
+							_tprintf(TEXT("Brindes: "));
+							fflush(stdin);
+							_fgetts(ttr, BUFFER_SIZE, stdin);
+
+							ttr[_tcslen(ttr) - 1] = '\0';
+
+							for (int i = 0; i < _tcslen(ttr); i++) {
+								ttr[i] = _totupper(ttr[i]);
+							}
+
+							if (_tcsicmp(TEXT("COMANDOS"), ttr) == 0) {
+								_tprintf(TEXT("************** LISTAGEM DE COMANDOS **************\n"));
+								_tprintf(TEXT("'VELOCIDADE' --> Mudar a Velocidade dos Brindes\n"));
+								_tprintf(TEXT("'DURACAO' --> Mudar a direcao dos Brindes\n"));
+								_tprintf(TEXT("'SPU' --> Probabilidade do brinde Speed-up\n"));
+								_tprintf(TEXT("'SLD' --> Probabilidade do brinde Slow-down\n"));
+								_tprintf(TEXT("'VE' --> Probabilidade do brinde Vida Extra\n"));
+								_tprintf(TEXT("'TP' --> Probabilidade do brinde Triple\n"));
+								_tprintf(TEXT("'BR' --> Probabilidade do brinde Barreira\n"));
+								_tprintf(TEXT("'SAIR' --> Sair para o menu anterior\n"));
+							}
+							else if (_tcsicmp(TEXT("VELOCIDADE"), ttr) == 0) {
+								_tprintf(TEXT("Velocidade: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 30 || aux_d <= 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									for (int i = 0; i < MAX_NUM_BOLAS; i++) {
+										msgJogo.bolas[i].velocidade = aux_d;
+										msgJogo.bolas[i].velocidade_inicial = aux_d;
+									}
+									_tprintf(TEXT("Velocidade alterada para %d\n"), msgJogo.bolas[0].velocidade);
+								}
+
+
+
+							}
+							else if (_tcsicmp(TEXT("RAIO"), ttr) == 0) {
+								_tprintf(TEXT("Raio: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 30 || aux_d <= 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									for (int i = 0; i < MAX_NUM_BOLAS; i++) {
+										msgJogo.bolas[i].raio = aux_d;
+									}
+									_tprintf(TEXT("Valor do raio alterado para %d\n"), msgJogo.bolas[0].raio);
+								}
+
+
+							}
+							else {
+								_tprintf(TEXT("Comando nao reconhecido! (Digite: 'COMANDOS' para ajuda)\n"));
+							}
+						} while (_tcsicmp(TEXT("SAIR"), ttr));
+					}
+					else {
+						_tprintf(TEXT("Comando nao reconhecido! (Digite: 'COMANDOS' para ajuda)\n"));
+					}
+
+
+				} while (_tcsicmp(TEXT("SAIR"), ctr));
+
+
+
+
+				/*******************************************/
+			}
 		}
 		else if (_tcsicmp(TEXT("TOP"), str) == 0) {
 			_tprintf(TEXT("********* TOP 10 **********\n"));
@@ -783,7 +1161,7 @@ DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
 		INT_PTR aux = 0;
 		thread_bola = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)controlaBola, reinterpret_cast<LPVOID>(aux), 0, NULL);
 	}
-	
+
 
 	return 0;
 }
@@ -894,7 +1272,23 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 						break;
 					case barreira:
 						//	_tprintf(TEXT("BRINDE BARREIRA!\n"));
-						msgJogo.players[i].barreira.dimensao += rand() % 60;
+						switch (rand() % 2) {
+						case 0:
+							msgJogo.players[i].barreira.dimensao += rand() % 20;
+							break;
+						case 1:
+							msgJogo.players[i].barreira.dimensao -= rand() % 20;
+							break;
+						}
+
+						if (msgJogo.players[i].barreira.dimensao <= 40) {
+							msgJogo.players[i].barreira.dimensao += rand() % 20;
+						}
+
+						if (msgJogo.players[i].barreira.dimensao >= 175) {
+							msgJogo.players[i].barreira.dimensao -= rand() % 50;
+						}
+
 						i = MAX_NUM_PLAYERS + 1;
 						msgJogo.brindes[id].ativo = 0;
 						msgJogo.brindes[id].coord.Y = -30;
@@ -1097,7 +1491,7 @@ void inicia_configuracao_jogo() {
 		msgJogo.brindes[i].dimensao = 2 * msgJogo.bolas[0].raio;
 		msgJogo.brindes[i].duracao = 10; //EM SEGUNDOS
 
-		switch (rand() % 4)
+		switch (rand() % 5)
 		{
 		case 0:
 			msgJogo.brindes[i].tipo = speed_up;
@@ -1112,7 +1506,7 @@ void inicia_configuracao_jogo() {
 			msgJogo.brindes[i].tipo = triple;
 			break;
 		default:
-			msgJogo.brindes[i].tipo = speed_up;
+			msgJogo.brindes[i].tipo = barreira;
 			break;
 		}
 		//_tprintf(TEXT("Brinde criado! %d\n"), msgJogo.brindes[i].tipo);
@@ -1372,6 +1766,8 @@ void inicia_configuracao_nivel(int aux) {
 			case 3:
 				msgJogo.brindes[i].tipo = triple;
 				break;
+			case 4:
+				msgJogo.brindes[i].tipo = barreira;
 			default:
 				msgJogo.brindes[i].tipo = speed_up;
 				break;
