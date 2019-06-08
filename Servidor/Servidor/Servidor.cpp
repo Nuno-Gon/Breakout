@@ -431,7 +431,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 									int aux_ppp;
 									for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
 										srand(NULL);
-										aux_ppp = rand() % aux_d;
+										aux_ppp = rand() % 100;
 									
 										if (aux_ppp <= aux_d) {
 											msgJogo.tijolos[i].vida = 1;
@@ -461,7 +461,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 									int aux_ppp;
 									for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
 										srand(NULL);
-										aux_ppp = rand() % aux_d;
+										aux_ppp = rand() % 100;
 
 										if (aux_ppp <= aux_d) {
 											msgJogo.tijolos[i].vida = 1;
@@ -490,7 +490,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 									int aux_ppp;
 									for (int i = 0; i < MAX_NUM_TIJOLOS; i++) {
 										srand(NULL);
-										aux_ppp = rand() % aux_d;
+										aux_ppp = rand() % 100;
 
 										if (aux_ppp <= aux_d) {
 											msgJogo.tijolos[i].vida =  2 + rand() % 3;
@@ -544,18 +544,17 @@ int _tmain(int argc, LPTSTR argv[]) {
 									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
 								}
 								else {
-									for (int i = 0; i < MAX_NUM_BOLAS; i++) {
-										msgJogo.bolas[i].velocidade = aux_d;
-										msgJogo.bolas[i].velocidade_inicial = aux_d;
+									for (int i = 0; i < MAX_NUM_BRINDES; i++) {
+										msgJogo.brindes[i].velocidade = aux_d;
 									}
-									_tprintf(TEXT("Velocidade alterada para %d\n"), msgJogo.bolas[0].velocidade);
+									_tprintf(TEXT("Velocidade alterada para %d\n"), msgJogo.brindes[0].velocidade);
 								}
 
 
 
 							}
-							else if (_tcsicmp(TEXT("RAIO"), ttr) == 0) {
-								_tprintf(TEXT("Raio: "));
+							else if (_tcsicmp(TEXT("DURACAO"), ttr) == 0) {
+								_tprintf(TEXT("Duracao: "));
 								fflush(stdin);
 								_fgetts(vttr, BUFFER_SIZE, stdin);
 
@@ -563,15 +562,127 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 								int aux_d = _ttoi(vttr);
 
-								if (aux_d > 30 || aux_d <= 0) {
+								if (aux_d > 200 || aux_d <= 0) {
 									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
 								}
 								else {
-									for (int i = 0; i < MAX_NUM_BOLAS; i++) {
-										msgJogo.bolas[i].raio = aux_d;
+									for (int i = 0; i < MAX_NUM_BRINDES; i++) {
+										msgJogo.brindes[i].duracao = aux_d;
 									}
-									_tprintf(TEXT("Valor do raio alterado para %d\n"), msgJogo.bolas[0].raio);
+									_tprintf(TEXT("Valor da duracao alterado para %d segundos\n"), msgJogo.brindes[0].duracao);
 								}
+
+
+							}
+							else if (_tcsicmp(TEXT("SPU"), ttr) == 0) {
+								_tprintf(TEXT("Speed-up: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 100 || aux_d < 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									int aux_ppp;
+									for (int i = 0; i < MAX_NUM_BRINDES; i++) {
+										srand(NULL);
+										aux_ppp = rand() % 100;
+
+										if (aux_ppp <= aux_d) {
+											msgJogo.brindes[i].tipo = speed_up;
+										}
+
+									}
+									_tprintf(TEXT("Brindes speed-up  criados!\n"));
+								}
+
+
+							}
+							else if (_tcsicmp(TEXT("SLD"), ttr) == 0) {
+								_tprintf(TEXT("Slow-down: "));
+								fflush(stdin);
+								_fgetts(vttr, BUFFER_SIZE, stdin);
+
+								vttr[_tcslen(vttr) - 1] = '\0';
+
+								int aux_d = _ttoi(vttr);
+
+								if (aux_d > 100 || aux_d < 0) {
+									_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+								}
+								else {
+									int aux_ppp;
+									for (int i = 0; i < MAX_NUM_BRINDES; i++) {
+										srand(NULL);
+										aux_ppp = rand() % 100;
+
+										if (aux_ppp <= aux_d) {
+											msgJogo.brindes[i].tipo = slow_down;
+										}
+
+									}
+									_tprintf(TEXT("Brindes slow-down criados!\n"));
+								}
+
+
+							}
+							else if (_tcsicmp(TEXT("VE"), ttr) == 0) {
+							_tprintf(TEXT("Vida-extra: "));
+							fflush(stdin);
+							_fgetts(vttr, BUFFER_SIZE, stdin);
+
+							vttr[_tcslen(vttr) - 1] = '\0';
+
+							int aux_d = _ttoi(vttr);
+
+							if (aux_d > 100 || aux_d < 0) {
+								_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+							}
+							else {
+								int aux_ppp;
+								for (int i = 0; i < MAX_NUM_BRINDES; i++) {
+									srand(NULL);
+									aux_ppp = rand() % 100;
+
+									if (aux_ppp <= aux_d) {
+										msgJogo.brindes[i].tipo = vida_extra;
+									}
+
+								}
+								_tprintf(TEXT("Brindes speed-up  criados!\n"));
+							}
+
+
+							}
+							else if (_tcsicmp(TEXT("SPU"), ttr) == 0) {
+							_tprintf(TEXT("Speed-up: "));
+							fflush(stdin);
+							_fgetts(vttr, BUFFER_SIZE, stdin);
+
+							vttr[_tcslen(vttr) - 1] = '\0';
+
+							int aux_d = _ttoi(vttr);
+
+							if (aux_d > 100 || aux_d < 0) {
+								_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+							}
+							else {
+								int aux_ppp;
+								for (int i = 0; i < MAX_NUM_BRINDES; i++) {
+									srand(NULL);
+									aux_ppp = rand() % 100;
+
+									if (aux_ppp <= aux_d) {
+										msgJogo.brindes[i].tipo = speed_up;
+									}
+
+								}
+								_tprintf(TEXT("Brindes speed-up  criados!\n"));
+							}
 
 
 							}
