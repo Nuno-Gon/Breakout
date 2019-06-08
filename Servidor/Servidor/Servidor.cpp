@@ -658,8 +658,8 @@ int _tmain(int argc, LPTSTR argv[]) {
 
 
 							}
-							else if (_tcsicmp(TEXT("SPU"), ttr) == 0) {
-							_tprintf(TEXT("Speed-up: "));
+							else if (_tcsicmp(TEXT("TP"), ttr) == 0) {
+							_tprintf(TEXT("Triple: "));
 							fflush(stdin);
 							_fgetts(vttr, BUFFER_SIZE, stdin);
 
@@ -677,11 +677,39 @@ int _tmain(int argc, LPTSTR argv[]) {
 									aux_ppp = rand() % 100;
 
 									if (aux_ppp <= aux_d) {
-										msgJogo.brindes[i].tipo = speed_up;
+										msgJogo.brindes[i].tipo = triple;
 									}
 
 								}
-								_tprintf(TEXT("Brindes speed-up  criados!\n"));
+								_tprintf(TEXT("Brindes triple criados!\n"));
+							}
+
+
+							}
+							else if (_tcsicmp(TEXT("BR"), ttr) == 0) {
+							_tprintf(TEXT("Barreira: "));
+							fflush(stdin);
+							_fgetts(vttr, BUFFER_SIZE, stdin);
+
+							vttr[_tcslen(vttr) - 1] = '\0';
+
+							int aux_d = _ttoi(vttr);
+
+							if (aux_d > 100 || aux_d < 0) {
+								_tprintf(TEXT("[ERRO] Insira um valor aceitavel! (nao negativo!)\n"));
+							}
+							else {
+								int aux_ppp;
+								for (int i = 0; i < MAX_NUM_BRINDES; i++) {
+									srand(NULL);
+									aux_ppp = rand() % 100;
+
+									if (aux_ppp <= aux_d) {
+										msgJogo.brindes[i].tipo = barreira;
+									}
+
+								}
+								_tprintf(TEXT("Brindes barreira criados!\n"));
 							}
 
 
