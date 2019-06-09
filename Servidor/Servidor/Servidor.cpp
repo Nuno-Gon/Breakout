@@ -981,11 +981,12 @@ DWORD WINAPI moveTijolos(LPVOID p) {
 	return 0;
 }
 
-DWORD WINAPI controlaBola(LPVOID p) { //ERROS AQUI!
+DWORD WINAPI controlaBola(LPVOID p) { 
 	INT_PTR id = reinterpret_cast<INT_PTR>(p);
 	bool semvidas = false;
 	bool acabou = true;
 
+	msgJogo.bolas[id].velocidade = msgJogo.bolas[id].velocidade_inicial;
 	msgJogo.bolas[id].ativa = 1;
 	do {
 		//MOVIMENTO
@@ -1330,57 +1331,52 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 					switch (msgJogo.brindes[id].tipo) {
 					case speed_up:
 						//_tprintf(TEXT("Speed-up!\n"));
-						aux = msgJogo.bolas[0].velocidade;
 
-						if (msgJogo.bolas[0].velocidade * 1.20 > msgJogo.bolas[0].velocidade_inicial * 2) {
+						msgJogo.brindes[id].ativo = 0;
+						msgJogo.brindes[id].coord.Y = -30;
+						msgJogo.brindes[id].coord.X = -30;
+
+						for (int j = 0; j < MAX_NUM_BOLAS; j++) {				
+
+						if (msgJogo.bolas[j].velocidade * 1.20 > msgJogo.bolas[j].velocidade_inicial * 2) {
 							//_tprintf(TEXT("DADA\n\n"));
-							msgJogo.brindes[id].ativo = 0;
-							msgJogo.brindes[id].coord.Y = -30;
-							msgJogo.brindes[id].coord.X = -30;
-
 						}
 						else {
-							msgJogo.bolas[0].velocidade = msgJogo.bolas[0].velocidade * 1.20;
-							msgJogo.brindes[id].ativo = 0;
-							msgJogo.brindes[id].coord.Y = -30;
-							msgJogo.brindes[id].coord.X = -30;
+							msgJogo.bolas[j].velocidade = msgJogo.bolas[j].velocidade * 1.20;
 
-							do {
-								Sleep(1000);
-								msgJogo.brindes[id].duracao -= 1;
-							} while (msgJogo.brindes[id].duracao > 0);
-							msgJogo.bolas[0].velocidade = aux;
+								Sleep(msgJogo.brindes[id].duracao * 1000);
+
+							msgJogo.bolas[j].velocidade -= msgJogo.bolas[j].velocidade_inicial * 0.2;
 
 						}
 
-
+						}
 						i = MAX_NUM_PLAYERS + 1;
 						acabou = true;
 						break;
 					case slow_down:
 						//_tprintf(TEXT("Slowdown!\n")); //VELOCIDADE DA BLA
 						//PReciso de meter a duração, lancar uma thread com temporizador
+						msgJogo.brindes[id].ativo = 0;
+						msgJogo.brindes[id].coord.Y = -30;
+						msgJogo.brindes[id].coord.X = -30;
 
-						if (msgJogo.bolas[0].velocidade - msgJogo.bolas[0].velocidade * 0.20 <= msgJogo.bolas[0].velocidade_inicial * 0.60) {
-							msgJogo.brindes[id].ativo = 0;
-							msgJogo.brindes[id].coord.Y = -30;
-							msgJogo.brindes[id].coord.X = -30;
+
+						for (int j = 0; j < MAX_NUM_BOLAS; j++) {
+					
+						if (msgJogo.bolas[j].velocidade - msgJogo.bolas[j].velocidade * 0.20 <= msgJogo.bolas[j].velocidade_inicial * 0.60) {
+						
 						}
 						else {
-							aux = msgJogo.players[i].barreira.velocidade;
-							msgJogo.bolas[0].velocidade = msgJogo.bolas[0].velocidade - msgJogo.bolas[0].velocidade * 0.20;
-							msgJogo.brindes[id].ativo = 0;
-							msgJogo.brindes[id].coord.Y = -30;
-							msgJogo.brindes[id].coord.X = -30;
+							msgJogo.bolas[j].velocidade = msgJogo.bolas[j].velocidade - msgJogo.bolas[j].velocidade * 0.20;
 
-							do {
-								Sleep(1000);
-								msgJogo.brindes[id].duracao -= 1;
-							} while (msgJogo.brindes[id].duracao > 0);
 
-							msgJogo.bolas[0].velocidade = aux;
+								Sleep(msgJogo.brindes[id].duracao * 1000);
+
+
+							msgJogo.bolas[j].velocidade += msgJogo.bolas[j].velocidade_inicial * 0.2;
 						}
-
+						}
 						i = MAX_NUM_PLAYERS + 1;
 						acabou = true;
 						break;
