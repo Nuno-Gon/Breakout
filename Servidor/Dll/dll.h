@@ -111,8 +111,10 @@ typedef struct {
 	int jogador;
 	bool cima;
 	bool direita;
-	int velocidade;
-	int velocidade_inicial;
+	//int velocidade;
+	//int velocidade_inicial;
+	float velocidade;
+	float velocidade_inicial;
 	int raio;
 	COORD coord;
 }Bola;

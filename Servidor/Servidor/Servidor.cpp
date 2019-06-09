@@ -1330,7 +1330,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 		//enum Tipo_Brinde { speed_up, slow_down, vida_extra, triple, barreira }; //Adicionar outros brindes consoante a originalidade
 					switch (msgJogo.brindes[id].tipo) {
 					case speed_up:
-						//_tprintf(TEXT("Speed-up!\n"));
+						_tprintf(TEXT("Brinde Speed-up!\n"));
 
 						msgJogo.brindes[id].ativo = 0;
 						msgJogo.brindes[id].coord.Y = -30;
@@ -1355,7 +1355,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 						acabou = true;
 						break;
 					case slow_down:
-						//_tprintf(TEXT("Slowdown!\n")); //VELOCIDADE DA BLA
+						_tprintf(TEXT("Brinde Slowdown!\n")); //VELOCIDADE DA BLA
 						//PReciso de meter a duração, lancar uma thread com temporizador
 						msgJogo.brindes[id].ativo = 0;
 						msgJogo.brindes[id].coord.Y = -30;
@@ -1381,7 +1381,7 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 						acabou = true;
 						break;
 					case vida_extra:
-						//	_tprintf(TEXT("Vida Extra!\n"));
+						_tprintf(TEXT("Brinde Vida Extra!\n"));
 						msgJogo.players[i].vidas += 1;
 						i = MAX_NUM_PLAYERS + 1;
 						msgJogo.brindes[id].ativo = 0;
@@ -1409,10 +1409,10 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 
 
 						//edada
-					//	_tprintf(TEXT("BARREIRA\n"));
+					_tprintf(TEXT("Brinde Triple\n"));
 						break;
 					case barreira:
-						//	_tprintf(TEXT("BRINDE BARREIRA!\n"));
+							_tprintf(TEXT("BRINDE BARREIRA!\n"));
 						switch (rand() % 2) {
 						case 0:
 							msgJogo.players[i].barreira.dimensao += rand() % 20;
