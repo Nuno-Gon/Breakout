@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <io.h>
 #include <tchar.h>
+#include <mmsystem.h>
 #include "..\Dll\dll.h"
 
 #define MAX_LOADSTRING 100
@@ -492,11 +493,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			comando.idUser = 0;
 			comando.tipo = CMD_MOVE_ESQ;
 			comando.idHandle = hpipe;
+			//PlaySound(TEXT("sound4.wav"), NULL, SND_SYNC | SND_RESOURCE);
 			escrevePipe(comando, ioReady, ov, tam);
 			break;
 		case VK_RIGHT:
 			comando.idUser = 0;
 			comando.tipo = CMD_MOVE_DIR;
+			//PlaySound(TEXT("sound4.wav"), NULL, SND_SYNC | SND_RESOURCE);
 			comando.idHandle = hpipe;
 			escrevePipe(comando, ioReady, ov, tam);
 			break;
