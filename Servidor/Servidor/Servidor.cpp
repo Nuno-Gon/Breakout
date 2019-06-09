@@ -1404,6 +1404,12 @@ DWORD WINAPI controlaBrinde(LPVOID p) {
 							}
 						}
 
+						i = MAX_NUM_PLAYERS + 1;
+						msgJogo.brindes[id].ativo = 0;
+						msgJogo.brindes[id].coord.Y = -30;
+						msgJogo.brindes[id].coord.X = -30;
+
+						acabou = true;
 
 
 						//edada
@@ -1978,7 +1984,7 @@ void insereBarreiraJogo(int id) {
 int getIdPlayer(HANDLE aux) {
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (aux == msgJogo.players[i].idHandle) {
-			_tprintf(TEXT("Retornado id = %d\n"), msgJogo.players[i].id);
+		//	_tprintf(TEXT("Retornado id = %d\n"), msgJogo.players[i].id);
 			return msgJogo.players[i].id;
 		}
 	}
@@ -1990,7 +1996,7 @@ Player getPlayer(int idUser) {
 	aux.id = -1;
 	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
 		if (msgJogo.players[i].id == idUser) {
-			_tprintf(TEXT("Player com %d [Retorno]\n"), msgJogo.players[i].id);
+		//	_tprintf(TEXT("Player com %d [Retorno]\n"), msgJogo.players[i].id);
 			return msgJogo.players[i];
 		}
 	}

@@ -27,10 +27,8 @@
 #define IDB_TIJOLOR1                    143
 #define IDB_TIJOLOR2                    144
 #define IDB_TIJOLOR3                    145
-#define IDB_BITMAP2                     146
 #define IDD_TOP10                       147
 #define IDC_USER                        1000
-#define IDC_LIST1                       1032
 #define IDC_LISTBOX                     1032
 #define ID_AJUDA_TOP10                  32772
 #define ID_ARQUIVO_LOGIN                32774

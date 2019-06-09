@@ -383,9 +383,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		 // **The PatBlt function** paints the specified rectangle using the brush that is currently 
 		 //selected into the specified device context. The brush color and the surface color 
 		 //or colors are combined by using the specified raster operation.
-		PatBlt(auxDC, 0, 0, nx, ny, PATCOPY);
+		//PatBlt(auxDC, 0, 0, nx, ny, PATCOPY);WHITENESS 
 
-
+		PatBlt(auxDC, 0, 0, nx, ny, BLACKNESS);
 		//The SetStretchBltMode function sets the bitmap stretching mode in the specified device context.
 		//BLACKONWHITE Perserva os valores pretos acima dos brancos (Pixeis)
 		SetStretchBltMode(auxDC, BLACKONWHITE);
