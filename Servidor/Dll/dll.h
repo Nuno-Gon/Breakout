@@ -137,6 +137,7 @@ typedef struct {
 	Tipo_Brinde tipo;
 	float velocidade;
 	int duracao;
+	bool conf[MAX_NUM_BOLAS];
 }Brinde;
 
 typedef struct {
