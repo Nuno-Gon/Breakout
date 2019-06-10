@@ -986,6 +986,10 @@ DWORD WINAPI controlaBola(LPVOID p) {
 	bool semvidas = false;
 	bool acabou = true;
 
+	msgJogo.bolas[id].coord.X = rand() % LIMITE_DIREITO;
+	msgJogo.bolas[id].coord.Y = LIMITE_INFERIOR - 30;
+	msgJogo.bolas[id].direita = rand() % 2;
+	msgJogo.bolas[id].cima = true;
 	msgJogo.bolas[id].velocidade = msgJogo.bolas[id].velocidade_inicial;
 	msgJogo.bolas[id].ativa = 1;
 	do {

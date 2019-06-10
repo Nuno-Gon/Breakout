@@ -84,7 +84,7 @@ typedef struct {
 	int id;
 	COORD coord;
 	int dimensao;
-	int velocidade;
+	float velocidade;
 }Barreira;
 
 //COMANDO PARTILHADO (COMANDO_SHARED)
@@ -135,7 +135,7 @@ typedef struct {
 	DWORD threadId;
 	int dimensao;
 	Tipo_Brinde tipo;
-	int velocidade;
+	float velocidade;
 	int duracao;
 }Brinde;
 
