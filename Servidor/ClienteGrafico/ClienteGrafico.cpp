@@ -473,7 +473,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		int aux_global = getPlayer();
 		
-		swprintf_s(informacoes, TEXT("Nome: %s Vidas: %d \t Pontuacao: %d Velocidade: %d Dimensao: %d\n"), msgJogo.players[aux_global].nome, msgJogo.players[aux_global].vidas, msgJogo.players[aux_global].pontos, msgJogo.players[aux_global].barreira.velocidade, msgJogo.players[aux_global].barreira.dimensao);
+		swprintf_s(informacoes, TEXT("Nome: %s Vidas: %d \t Pontuacao: %d Velocidade: %f Dimensao: %d\n"), msgJogo.players[aux_global].nome, msgJogo.players[aux_global].vidas, msgJogo.players[aux_global].pontos, msgJogo.players[aux_global].barreira.velocidade, msgJogo.players[aux_global].barreira.dimensao);
 		TextOut(auxDC, LIMITE_ESQUERDO + 10, LIMITE_INFERIOR + 20, informacoes, _tcslen(informacoes));
 		//Copia a informação que está no 'DC' para a memória do Display ;)
 		hdc = BeginPaint(hWnd, &ps);

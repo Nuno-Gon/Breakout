@@ -296,7 +296,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 										msgJogo.bolas[i].velocidade = aux_d;
 										msgJogo.bolas[i].velocidade_inicial = aux_d;
 									}
-									_tprintf(TEXT("Velocidade alterada para %d\n"), msgJogo.bolas[0].velocidade);
+									_tprintf(TEXT("Velocidade alterada para %f\n"), msgJogo.bolas[0].velocidade);
 								}
 
 
@@ -363,7 +363,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 										msgJogo.players[i].barreira.velocidade = aux_d;
 									}
 
-									_tprintf(TEXT("Velocidade dos jogadores alterada para: %d\n"), msgJogo.players[0].barreira.velocidade);
+									_tprintf(TEXT("Velocidade dos jogadores alterada para: %f\n"), msgJogo.players[0].barreira.velocidade);
 								}
 
 
@@ -548,7 +548,7 @@ int _tmain(int argc, LPTSTR argv[]) {
 									for (int i = 0; i < MAX_NUM_BRINDES; i++) {
 										msgJogo.brindes[i].velocidade = aux_d;
 									}
-									_tprintf(TEXT("Velocidade alterada para %d\n"), msgJogo.brindes[0].velocidade);
+									_tprintf(TEXT("Velocidade alterada para %f\n"), msgJogo.brindes[0].velocidade);
 								}
 
 
@@ -2000,6 +2000,7 @@ void insereBarreiraJogo(int id) {
 		if (msgJogo.players[i].id == id) {
 			msgJogo.players[i].barreira.ativa = true;
 			msgJogo.players[i].barreira.coord.Y = LIMITE_INFERIOR;
+			msgJogo.players[i].pontos = 0;
 		}
 	}
 
@@ -2158,11 +2159,19 @@ void inicia() {
 
 void meteTop(int id) {
 	bool insere = false;
-	int posicao = 0;
+	int posicao = 0, jogador = 0;
 	int p = 0;
 
+	for (int i = 0; i < MAX_NUM_PLAYERS; i++) {
+		if (msgJogo.players[i].id == id) {
+			jogador = i;
+			break;
+		}
+	}
+
+
 	for (int i = 0; i < 10; i++) {
-		if (msgJogo.players[id].pontos > score.jogadores[i].pontos) {
+		if (msgJogo.players[jogador].pontos > score.jogadores[i].pontos) {
 			posicao = i;
 			insere = true;
 			break;
@@ -2175,7 +2184,7 @@ void meteTop(int id) {
 
 		for (int i = 0; i < 10; i++) {
 			if (i == posicao) {
-				aux.jogadores[i] = msgJogo.players[id];
+				aux.jogadores[i] = msgJogo.players[jogador];
 			}
 			else {
 				aux.jogadores[i] = score.jogadores[p];
@@ -2183,11 +2192,14 @@ void meteTop(int id) {
 			}
 		}
 
+		
 
 		score = aux;
 		msgJogo.ranking = aux;
+		
 	}
 
+	_tprintf(TEXT("Score: %d\n"), score.jogadores[posicao].pontos);
 	writeRegistry();
 
 }
